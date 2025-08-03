@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Classes</title>
+
+    <!--css files-->
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/media.css">
+    <link rel="stylesheet" href="styles/booking.css">
+
+    <!--google font-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap" as="style">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap" rel="stylesheet">
+  </head>
+
+  <body>
+    <!--skip navigation for accessibility-->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!--accessibility controls-->
+    <div class="accessibility-controls">
+      <button id="high-contrast" class="accessibility-button" aria-label="high contrast mode">
+        <span class="button-text">High Contrast</span>
+      </button>
+      <button id="font-size" class="accessibility-button" aria-label="Increase font size">
+        <span class="button-text">A+</span>
+      </button>
+    </div>
+    
+    <!--header-->
+    <header class="header">
+      <nav class="button-section" role="navigation">
+        <a class="link" href="index.html" tabindex="0" aria-label="Go to Home Page">
+          HOME
+        </a>
+        <a class="link" href="index.html#story-page" tabindex="0" aria-label="Go to Our Story">
+          OUR STORY
+        </a>
+        <a class="link" href="index.html#opening-page" tabindex="0" aria-label="Go to Opening Times">
+          OPENING TIMES
+        </a>
+        <a class="link" href="index.html#contact-us-page" tabindex="0" aria-label="Go to Contact Page">
+          CONTACT US
+        </a>
+        <a class="link" href="reviews.html" target="_blank" rel="noopener" tabindex="0" aria-label="Go to Reviews Page">
+          REVIEWS
+        </a>
+        <a class="link active" href="booking.html" tabindex="0" aria-label="Book Classes">
+          BOOK CLASSES
+        </a>
+      </nav>
+      <img class="header-logo" src="Images (resit)/logos/logo_black.png" alt="Royal Drawing School's logo">
+    </header>
+
+    <!--main content-->
+    <main class="content" id="main-content">
+      <section id="booking-page">
+        <h1>BOOK YOUR CLASSES</h1>
+        
+        <div class="booking-container">
+          <!-- Available Classes Section -->
+          <div class="available-classes">
+            <h2>Available Classes</h2>
+            <div id="classes-list" class="classes-grid">
+              <!-- Classes will be populated by JavaScript -->
+            </div>
+          </div>
+
+          <!-- Application Form -->
+          <div class="application-form">
+            <h2>Class Application</h2>
+            <form id="application-form" class="form">
+              <div class="form-group">
+                <label for="student-name">Full Name *</label>
+                <input type="text" id="student-name" name="studentName" required>
+              </div>
+
+              <div class="form-group">
+                <label for="student-email">Email Address *</label>
+                <input type="email" id="student-email" name="studentEmail" required>
+              </div>
+
+              <div class="form-group">
+                <label for="student-phone">Phone Number</label>
+                <input type="tel" id="student-phone" name="studentPhone">
+              </div>
+
+              <div class="form-group">
+                <label for="selected-class">Selected Class *</label>
+                <select id="selected-class" name="selectedClass" required>
+                  <option value="">Please select a class</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="experience-level">Experience Level</label>
+                <select id="experience-level" name="experienceLevel">
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="additional-notes">Additional Notes</label>
+                <textarea id="additional-notes" name="additionalNotes" rows="4" placeholder="Any special requirements or questions..."></textarea>
+              </div>
+
+              <div class="form-group checkbox-group">
+                <input type="checkbox" id="terms-accept" name="termsAccept" required>
+                <label for="terms-accept">I agree to the terms and conditions *</label>
+              </div>
+
+              <button type="submit" class="submit-button">Submit Application</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Application Status -->
+        <div id="application-status" class="application-status hidden">
+          <h2>Application Status</h2>
+          <div id="status-content"></div>
+        </div>
+      </section>
+    </main>
+
+    <!--footer-->
+    <footer class="footer">
+      <div class="social-media-icons" role="list">
+        <a href="https://www.instagram.com/royaldrawingschool" target="_blank" rel="noopener" aria-label="Go to Instagram page" role="listitem">
+          <img class="social-icon instagram-icon" src="icons/instagram-icon.png" alt="Instagram icon">
+        </a>
+        <a href="https://www.youtube.com/@RoyalDrawingSchool" target="_blank" rel="noopener" aria-label="Go to Youtube Page" role="listitem">
+          <img class="social-icon youtube-icon" src="icons/youtube-icon.png" alt="youtube icon">
+        </a>
+        <a href="https://www.facebook.com/royaldrawingschool" target="_blank" rel="noopener" aria-label="Go to Facebook Page" role="listitem">
+          <img class="social-icon facebook-icon" src="icons/facebook-icon.png" alt="facebook icon">
+        </a>
+        <a href="https://www.linkedin.com/company/royaldrawingschool" target="_blank" rel="noopener" aria-label="Go to LinkedIn Page" role="listitem">
+          <img class="social-icon linkedin-icon" src="icons/linkedin-icon.png" alt="linkedin icon">
+        </a>
+      </div>
+    </footer>
+
+    <script src="js/booking.js"></script>
+    <script>
+      // Accessibility controls
+      document.addEventListener('DOMContentLoaded', function() {
+        const highContrast = document.getElementById('high-contrast');
+        const fontSize = document.getElementById('font-size');
+        
+        // High contrast toggle
+        highContrast.addEventListener('click', function() {
+          document.body.classList.toggle('high-contrast');
+          const isHighContrast = document.body.classList.contains('high-contrast');
+          localStorage.setItem('highContrast', isHighContrast);
+          
+          // Update button text
+          const buttonText = this.querySelector('.button-text');
+          buttonText.textContent = isHighContrast ? 'Normal Contrast' : 'High Contrast';
+        });
+        
+        // Font size toggle
+        fontSize.addEventListener('click', function() {
+          document.body.classList.toggle('large-text');
+          const isLargeText = document.body.classList.contains('large-text');
+          localStorage.setItem('largeText', isLargeText);
+          
+          // Update button text
+          const btnText = this.querySelector('.btn-text');
+          btnText.textContent = isLargeText ? 'A-' : 'A+';
+        });
+        
+        // Load saved preferences
+        if (localStorage.getItem('highContrast') === 'true') {
+          document.body.classList.add('high-contrast');
+          highContrastToggle.querySelector('.button-text').textContent = 'Normal Contrast';
+        }
+        
+        if (localStorage.getItem('largeText') === 'true') {
+          document.body.classList.add('large-text');
+          fontSizeToggle.querySelector('.button-text').textContent = 'A-';
+        }
+      });
+    </script>
+  </body>
+</html> 

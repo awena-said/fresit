@@ -1,0 +1,415 @@
+/* Media Queries for Responsive Design - Mobile and Desktop Only */
+
+/* Mobile Devices (up to 767px) */
+@media screen and (max-width: 767px) {
+  /* Header adjustments */
+  .header {
+    padding: 0.5rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: relative;
+    height: auto;
+    min-height: auto;
+  }
+
+  .button-section {
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .link {
+    font-size: 0.9rem;
+    padding: 0.5rem;
+    text-align: center;
+    width: 100%;
+  }
+
+  .header-logo {
+    height: 4rem;
+    padding-right: 0;
+  }
+
+  /* Remove body padding for mobile */
+  body {
+    padding-top: 0;
+  }
+
+  /* Home section */
+  .home-text h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .tag-line {
+    font-size: 1.2rem;
+  }
+
+  .cta-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  /* Section spacing */
+  section {
+    padding: 2rem 1rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Story section */
+  .story-content {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .story-pic {
+    max-width: 100%;
+    flex: none;
+  }
+
+  .story-text {
+    flex: none;
+  }
+
+  /* Courses grid */
+  .courses-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .course-card {
+    padding: 1.5rem;
+  }
+
+  .course-details {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  /* Contact grid */
+  .contact-us-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .contact-us-container > div {
+    padding: 1.5rem;
+  }
+
+  /* Reviews grid */
+  .reviews-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .review-card {
+    padding: 1.5rem;
+  }
+
+  /* Opening times */
+  .opening-container {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .map-iframe {
+    max-width: 100%;
+    height: 300px;
+  }
+
+  /* Footer */
+  .footer {
+    padding: 1.5rem 1rem;
+  }
+
+  .social-media-icons {
+    gap: 1rem;
+  }
+
+  .social-icon {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  /* Accessibility controls */
+  .accessibility-controls {
+    position: fixed;
+    top: 5px;
+    left: 5px;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .accessibility-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Desktop Devices (768px and up) */
+@media screen and (min-width: 768px) {
+  /* Header */
+  .header {
+    flex-direction: row;
+    padding: 1rem 1.5rem;
+    position: fixed;
+    height: auto;
+    min-height: 80px;
+  }
+
+  .button-section {
+    flex-direction: row;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .link {
+    font-size: 1.1rem;
+    padding: 0.5rem 0.75rem;
+    width: auto;
+  }
+
+  .header-logo {
+    height: 6.5rem;
+    padding-right: 3rem;
+  }
+
+  /* Restore body padding for desktop */
+  body {
+    padding-top: 100px;
+    font-size: 1.1rem;
+  }
+
+  /* Home section */
+  .home-text h1 {
+    font-size: 4.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .tag-line {
+    font-size: 1.8rem;
+    margin: 1rem 0 2.5rem 0;
+  }
+
+  .cta-button {
+    padding: 1.5rem 3rem;
+    font-size: 1.3rem;
+  }
+
+  /* Section spacing */
+  section {
+    padding: 5rem 3rem;
+  }
+
+  h1 {
+    font-size: 3.5rem;
+    margin-bottom: 4rem;
+  }
+
+  /* Story section */
+  .story-content {
+    flex-direction: row;
+    gap: 4rem;
+  }
+
+  .story-pic {
+    max-width: 400px;
+    flex: 0 1 400px;
+  }
+
+  .story-text {
+    flex: 1 1 500px;
+    font-size: 1.2rem;
+    line-height: 1.9;
+  }
+
+  /* Courses grid */
+  .courses-container {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+    margin-top: 3rem;
+  }
+
+  .course-card {
+    padding: 3rem;
+  }
+
+  .course-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .course-description {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: 2rem;
+  }
+
+  .course-details span {
+    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
+  }
+
+  /* Contact grid */
+  .contact-us-container {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3rem;
+    margin-top: 3rem;
+  }
+
+  .contact-us-container > div {
+    padding: 3rem;
+  }
+
+  .contact-us-container h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .contact-us-container p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+  }
+
+  /* Reviews grid */
+  .reviews-container {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+    margin-top: 3rem;
+  }
+
+  .review-card {
+    padding: 3rem;
+  }
+
+  .review-header h3 {
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .review-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+
+  .rating {
+    font-size: 1.3rem;
+  }
+
+  /* Opening times */
+  .opening-container {
+    flex-direction: row;
+    gap: 4rem;
+  }
+
+  .map-iframe {
+    max-width: 600px;
+    height: 500px;
+  }
+
+  .opening-times {
+    font-size: 1.4rem;
+    margin-bottom: 3rem;
+  }
+
+  .info {
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+
+  /* Footer */
+  .footer {
+    padding: 3rem 2rem;
+  }
+
+  .social-icon {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  /* Accessibility controls */
+  .accessibility-controls {
+    top: 15px;
+    left: 15px;
+    gap: 0.75rem;
+  }
+
+  .accessibility-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  /* Maximum content width */
+  .content {
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+}
+
+/* High Contrast Mode Responsive Adjustments */
+@media screen and (min-width: 768px) {
+  body.high-contrast .accessibility-controls {
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #ffffff;
+    padding: 0.5rem;
+    border-radius: 8px;
+  }
+}
+
+/* Large Text Mode Responsive Adjustments */
+@media screen and (min-width: 768px) {
+  body.large-text .home-text h1 {
+    font-size: 5.4rem;
+  }
+
+  body.large-text h1 {
+    font-size: 4.2rem;
+  }
+
+  body.large-text h3 {
+    font-size: 1.8rem;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .header,
+  .accessibility-controls,
+  .scroll-indicator,
+  .footer {
+    display: none;
+  }
+
+  body {
+    background: white;
+    color: black;
+    font-size: 12pt;
+  }
+
+  .home-container {
+    min-height: auto;
+  }
+
+  .home-pic {
+    display: none;
+  }
+
+  section {
+    page-break-inside: avoid;
+    padding: 1rem 0;
+  }
+
+  .course-card,
+  .review-card,
+  .contact-us-container > div {
+    border: 1px solid #ccc;
+    background: white;
+    color: black;
+    page-break-inside: avoid;
+  }
+}

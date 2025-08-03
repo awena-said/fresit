@@ -1,0 +1,277 @@
+/* Booking page specific styles */
+
+.booking-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  margin-top: 2rem;
+}
+
+.available-classes,
+.application-form {
+  background: rgba(51, 65, 85, 0.2);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(100, 116, 139, 0.2);
+}
+
+.available-classes h2,
+.application-form h2 {
+  color: #f1f5f9;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+/* Classes Grid */
+.classes-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.class-card {
+  background: rgba(26, 26, 46, 0.4);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(100, 116, 139, 0.3);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.class-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  border-color: rgba(100, 116, 139, 0.5);
+}
+
+.class-card.selected {
+  border-color: #64748b;
+  background: rgba(100, 116, 139, 0.2);
+}
+
+.class-card h3 {
+  color: #f1f5f9;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.class-details {
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.class-type {
+  display: inline-block;
+  background: rgba(100, 116, 139, 0.3);
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+  color: #f1f5f9;
+}
+
+.class-time {
+  font-weight: 600;
+  color: #fbbf24;
+}
+
+.class-tutor {
+  font-style: italic;
+  color: #94a3b8;
+}
+
+.available-slots {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #86efac;
+}
+
+/* Form Styles */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  color: #f1f5f9;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 0.8rem;
+  border: 1px solid rgba(100, 116, 139, 0.3);
+  border-radius: 6px;
+  background: rgba(26, 26, 46, 0.4);
+  color: #f8fafc;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #64748b;
+  box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.2);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #94a3b8;
+}
+
+.checkbox-group {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin: 0;
+}
+
+.checkbox-group label {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.submit-btn {
+  background: rgba(100, 116, 139, 0.8);
+  color: #f8fafc;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  margin-top: 1rem;
+}
+
+.submit-btn:hover {
+  background: rgba(100, 116, 139, 1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.submit-btn:disabled {
+  background: rgba(100, 116, 139, 0.3);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Application Status */
+.application-status {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: rgba(51, 65, 85, 0.2);
+  border-radius: 12px;
+  border: 1px solid rgba(100, 116, 139, 0.2);
+}
+
+.application-status h2 {
+  color: #f1f5f9;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.status-content {
+  color: #e2e8f0;
+  line-height: 1.6;
+}
+
+.status-success {
+  color: #86efac;
+  font-weight: 600;
+}
+
+.status-error {
+  color: #fca5a5;
+  font-weight: 600;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .booking-container {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .available-classes,
+  .application-form {
+    padding: 1.5rem;
+  }
+  
+  .checkbox-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .checkbox-group input[type="checkbox"] {
+    align-self: flex-start;
+  }
+}
+
+/* High contrast mode adjustments */
+body.high-contrast .class-card {
+  background: #000000;
+  border: 2px solid #ffffff;
+  color: #ffffff;
+}
+
+body.high-contrast .form-group input,
+body.high-contrast .form-group select,
+body.high-contrast .form-group textarea {
+  background: #000000;
+  border: 2px solid #ffffff;
+  color: #ffffff;
+}
+
+body.high-contrast .submit-btn {
+  background: #ffffff;
+  color: #000000;
+  border: 2px solid #ffffff;
+}
+
+/* Large text mode adjustments */
+body.large-text .form-group label {
+  font-size: 1.1rem;
+}
+
+body.large-text .form-group input,
+body.large-text .form-group select,
+body.large-text .form-group textarea {
+  font-size: 1.1rem;
+  padding: 1rem;
+}
+
+body.large-text .submit-btn {
+  font-size: 1.2rem;
+  padding: 1.2rem 2.5rem;
+} 
