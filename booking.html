@@ -171,19 +171,19 @@
           localStorage.setItem('largeText', isLargeText);
           
           // Update button text
-          const btnText = this.querySelector('.btn-text');
-          btnText.textContent = isLargeText ? 'A-' : 'A+';
+          const buttonText = this.querySelector('.button-text');
+          buttonText.textContent = isLargeText ? 'A-' : 'A+';
         });
         
         // Load saved preferences
         if (localStorage.getItem('highContrast') === 'true') {
           document.body.classList.add('high-contrast');
-          highContrastToggle.querySelector('.button-text').textContent = 'Normal Contrast';
+          highContrast.querySelector('.button-text').textContent = 'Normal Contrast';
         }
         
         if (localStorage.getItem('largeText') === 'true') {
           document.body.classList.add('large-text');
-          fontSizeToggle.querySelector('.button-text').textContent = 'A-';
+          fontSize.querySelector('.button-text').textContent = 'A-';
         }
       });
     </script>

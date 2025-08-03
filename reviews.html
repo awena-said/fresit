@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reviews - Royal Drawing School</title>
+    <title>Reviews</title>
 
     <!--css files-->
     <link rel="stylesheet" href="styles/styles.css">
@@ -24,11 +24,11 @@
     
     <!--accessibility controls-->
     <div class="accessibility-controls">
-      <button id="high-contrast-toggle" class="accessibility-btn" aria-label="Toggle high contrast mode">
-        <span class="btn-text">High Contrast</span>
+      <button id="high-contrast" class="accessibility-button" aria-label="high contrast mode">
+        <span class="button-text">High Contrast</span>
       </button>
-      <button id="font-size-toggle" class="accessibility-btn" aria-label="Increase font size">
-        <span class="btn-text">A+</span>
+      <button id="font-size" class="accessibility-button" aria-label="Increase font size">
+        <span class="button-text">A+</span>
       </button>
     </div>
     
@@ -43,9 +43,6 @@
         </a>
         <a class="link" href="index.html#opening-page" tabindex="0" aria-label="Go to Opening Times">
           OPENING TIMES
-        </a>
-        <a class="link" href="index.html#courses-page" tabindex="0" aria-label="Go to Courses">
-          COURSES
         </a>
         <a class="link" href="index.html#contact-us-page" tabindex="0" aria-label="Go to Contact Page">
           CONTACT US
@@ -153,40 +150,40 @@
     <script>
       // Accessibility controls
       document.addEventListener('DOMContentLoaded', function() {
-        const highContrastToggle = document.getElementById('high-contrast-toggle');
-        const fontSizeToggle = document.getElementById('font-size-toggle');
+        const highContrast = document.getElementById('high-contrast');
+        const fontSize = document.getElementById('font-size');
         
         // High contrast toggle
-        highContrastToggle.addEventListener('click', function() {
+        highContrast.addEventListener('click', function() {
           document.body.classList.toggle('high-contrast');
           const isHighContrast = document.body.classList.contains('high-contrast');
           localStorage.setItem('highContrast', isHighContrast);
           
           // Update button text
-          const btnText = this.querySelector('.btn-text');
-          btnText.textContent = isHighContrast ? 'Normal Contrast' : 'High Contrast';
+          const buttonText = this.querySelector('.button-text');
+          buttonText.textContent = isHighContrast ? 'Normal Contrast' : 'High Contrast';
         });
         
         // Font size toggle
-        fontSizeToggle.addEventListener('click', function() {
+        fontSize.addEventListener('click', function() {
           document.body.classList.toggle('large-text');
           const isLargeText = document.body.classList.contains('large-text');
           localStorage.setItem('largeText', isLargeText);
           
           // Update button text
-          const btnText = this.querySelector('.btn-text');
-          btnText.textContent = isLargeText ? 'A-' : 'A+';
+          const buttonText = this.querySelector('.button-text');
+          buttonText.textContent = isLargeText ? 'A-' : 'A+';
         });
         
         // Load saved preferences
         if (localStorage.getItem('highContrast') === 'true') {
           document.body.classList.add('high-contrast');
-          highContrastToggle.querySelector('.btn-text').textContent = 'Normal Contrast';
+          highContrast.querySelector('.button-text').textContent = 'Normal Contrast';
         }
         
         if (localStorage.getItem('largeText') === 'true') {
           document.body.classList.add('large-text');
-          fontSizeToggle.querySelector('.btn-text').textContent = 'A-';
+          fontSize.querySelector('.button-text').textContent = 'A-';
         }
       });
     </script>
