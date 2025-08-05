@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Create Admin Account - Royal Drawing School{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/styles/staff.css">
+{% endblock %}
+
+{% block content %}
+<section id="login-section" class="login-section">
+    <h1>STAFF PORTAL</h1>
+    <div class="login-container">
+        <h2>Create Admin Account</h2>
+        
+        <div class="alert alert-info">
+            <h3>Welcome to Royal Drawing School!</h3>
+            <p>This appears to be your first time setting up the system. Please create an admin account to get started.</p>
+        </div>
+        
+        {% if errors is defined and errors %}
+            <div class="alert alert-error">
+                <h3>Please correct the following errors:</h3>
+                <ul>
+                    {% for field, error in errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        
+        <form id="create-account-form" class="login-form" method="POST" action="/staff/create-account">
+            <div class="form-group">
+                <label for="full_name">Full Name</label>
+                <input type="text" id="full_name" name="full_name" required value="{{ form_data.full_name|default('') }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required value="{{ form_data.email|default('') }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required minlength="8">
+                <small>Password must be at least 8 characters long</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+            </div>
+            
+            <button type="submit" class="login-btn">Create Account</button>
+        </form>
+        
+        <div class="form-footer">
+            <p>This account will have full administrative privileges.</p>
+        </div>
+    </div>
+</section>
+{% endblock %} 

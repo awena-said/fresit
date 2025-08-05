@@ -6,4 +6,4 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php [QSA,L]
 
 # Allow access to static assets
-RewriteRule ^(styles|icons|Images)/ - [L] 
+RewriteRule ^(styles|assets)/ - [L] 

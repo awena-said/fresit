@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Student Registration - Fresit Art School{% endblock %}
+{% block description %}Create your student account to manage your art class applications{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/styles/student.css">
+{% endblock %}
+
+{% block content %}
+<section class="student-section">
+    <div class="student-container">
+        <div class="form-header">
+            <h1>Create Your Student Account</h1>
+            <p>Join Fresit Art School and start your artistic journey today!</p>
+        </div>
+
+        {% if errors.general %}
+            <div class="alert alert-error">
+                {{ errors.general }}
+            </div>
+        {% endif %}
+
+        <form class="student-form" method="POST" action="/student/register">
+            <div class="form-group">
+                <label for="name">Full Name *</label>
+                <input type="text" id="name" name="name" required 
+                       value="{{ form_data.name }}" minlength="2">
+                {% if errors.name %}
+                    <span class="error-message">{{ errors.name }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" required 
+                       value="{{ form_data.email }}">
+                {% if errors.email %}
+                    <span class="error-message">{{ errors.email }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number *</label>
+                <input type="tel" id="phone" name="phone" required 
+                       value="{{ form_data.phone }}">
+                {% if errors.phone %}
+                    <span class="error-message">{{ errors.phone }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password *</label>
+                <input type="password" id="password" name="password" required 
+                       minlength="6">
+                {% if errors.password %}
+                    <span class="error-message">{{ errors.password }}</span>
+                {% endif %}
+                <small>Must be at least 6 characters long</small>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Create Account</button>
+                <a href="/student/login" class="btn-secondary">Already have an account? Login</a>
+            </div>
+        </form>
+
+        <div class="form-footer">
+            <p>By creating an account, you agree to our <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.</p>
+        </div>
+    </div>
+</section>
+{% endblock %} 

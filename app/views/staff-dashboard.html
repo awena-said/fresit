@@ -1,70 +1,479 @@
 {% extends "base.html" %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="/assets/css/staff.css">
-{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<section id="dashboard-section" class="dashboard-section">
-    <div class="dashboard-header">
-        <h1>STAFF DASHBOARD</h1>
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <h1>Staff Dashboard</h1>
         <div class="user-info">
-            <span id="user-email">{{ user.email }}</span>
+            <span>Welcome, {{ user.name }}</span>
             <a href="/staff/logout" class="logout-btn">Logout</a>
         </div>
+    </header>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Total Applications</h3>
+            <p class="stat-number">{{ stats.total_applications }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Pending Applications</h3>
+            <p class="stat-number">{{ stats.pending_applications }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Total Classes</h3>
+            <p class="stat-number">{{ stats.total_classes }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Upcoming Classes</h3>
+            <p class="stat-number">{{ stats.upcoming_classes }}</p>
+        </div>
     </div>
 
-    <!-- Navigation Tabs -->
-    <div class="dashboard-nav">
-        <a href="/staff/applications" class="nav-tab">Applications</a>
-        <a href="/staff/classes" class="nav-tab">Manage Classes</a>
-        <a href="/staff/schedule" class="nav-tab">Schedule Classes</a>
-        <a href="/staff/roster" class="nav-tab">Class Roster</a>
-        <a href="/staff/emails" class="nav-tab">Email Files</a>
+    <!-- Main Content Tabs -->
+    <div class="dashboard-tabs">
+        <button class="tab-btn active" onclick="showTab('applications')">Student Applications</button>
+        <button class="tab-btn" onclick="showTab('upcoming')">Upcoming Dates</button>
+        <button class="tab-btn" onclick="showTab('classes')">Manage Classes</button>
+        <button class="tab-btn" onclick="showTab('roster')">Class Roster</button>
     </div>
 
-    <!-- Dashboard Content -->
-    <div class="dashboard-content">
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Total Applications</h3>
-                <div class="stat-number">{{ stats.total_applications }}</div>
-            </div>
-            <div class="stat-card">
-                <h3>Pending Applications</h3>
-                <div class="stat-number">{{ stats.pending_applications }}</div>
-            </div>
-            <div class="stat-card">
-                <h3>Accepted Applications</h3>
-                <div class="stat-number">{{ stats.accepted_applications }}</div>
-            </div>
-            <div class="stat-card">
-                <h3>Active Classes</h3>
-                <div class="stat-number">{{ stats.total_classes }}</div>
+    <!-- Applications Tab -->
+    <div id="applications" class="tab-content active">
+        <div class="section-header">
+            <h2>Student Applications</h2>
+            <div class="filters">
+                <select id="statusFilter" onchange="filterApplications()">
+                    <option value="">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="accepted">Accepted</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+                <input type="text" id="searchApplications" placeholder="Search applications..." onkeyup="searchApplications()">
             </div>
         </div>
 
-        <div class="quick-actions">
-            <h2>Quick Actions</h2>
-            <div class="action-buttons">
-                <a href="/staff/applications" class="action-btn">
-                    <i class="fas fa-list"></i>
-                    View Applications
-                </a>
-                <a href="/staff/classes/create" class="action-btn">
-                    <i class="fas fa-plus"></i>
-                    Create New Class
-                </a>
-                <a href="/staff/schedule" class="action-btn">
-                    <i class="fas fa-calendar"></i>
-                    Schedule Classes
-                </a>
-                <a href="/staff/roster" class="action-btn">
-                    <i class="fas fa-users"></i>
-                    View Rosters
-                </a>
+        <div class="applications-list" id="applicationsList">
+            {% for application in applications %}
+            <div class="application-card" data-status="{{ application.status }}" data-search="{{ application.name|lower }} {{ application.email|lower }} {{ application.class_type|lower }}">
+                <div class="application-header">
+                    <h3>{{ application.name }}</h3>
+                    <span class="status-badge status-{{ application.status }}">{{ application.status|title }}</span>
+                </div>
+                <div class="application-details">
+                    <p><strong>Email:</strong> {{ application.email }}</p>
+                    <p><strong>Phone:</strong> {{ application.phone }}</p>
+                    <p><strong>Age:</strong> {{ application.age }}</p>
+                    <p><strong>Class Type:</strong> {{ application.class_type }}</p>
+                    <p><strong>Preferred Date:</strong> {{ application.preferred_date }}</p>
+                    <p><strong>Applied:</strong> {{ application.created_at|date('M d, Y') }}</p>
+                </div>
+                {% if application.message %}
+                <div class="application-message">
+                    <strong>Message:</strong> {{ application.message }}
+                </div>
+                {% endif %}
+                <div class="application-actions">
+                    <button class="btn btn-primary" onclick="viewApplication('{{ application.id }}')">View Details</button>
+                    {% if application.status == 'pending' %}
+                    <button class="btn btn-success" onclick="acceptApplication('{{ application.id }}')">Accept</button>
+                    <button class="btn btn-danger" onclick="rejectApplication('{{ application.id }}')">Reject</button>
+                    {% endif %}
+                </div>
             </div>
+            {% endfor %}
         </div>
     </div>
-</section>
+
+    <!-- Upcoming Dates Tab -->
+    <div id="upcoming" class="tab-content">
+        <div class="section-header">
+            <h2>Upcoming Available Dates</h2>
+            <button class="btn btn-primary" onclick="showCreateClassModal()">Create New Class</button>
+        </div>
+
+        <div class="upcoming-dates">
+            {% for date in upcoming_dates %}
+            <div class="date-card">
+                <h3>{{ date.date|date('l, F d, Y') }}</h3>
+                <p class="date-info">No classes scheduled</p>
+                <button class="btn btn-primary" onclick="createClassForDate('{{ date.date }}')">Schedule Class</button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Classes Management Tab -->
+    <div id="classes" class="tab-content">
+        <div class="section-header">
+            <h2>Manage Classes</h2>
+            <button class="btn btn-primary" onclick="showCreateClassModal()">Create New Class</button>
+        </div>
+
+        <div class="classes-list">
+            {% for class in classes %}
+            <div class="class-card">
+                <div class="class-header">
+                    <h3>{{ class.name }}</h3>
+                    <span class="status-badge status-{{ class.status }}">{{ class.status|title }}</span>
+                </div>
+                <div class="class-details">
+                    <p><strong>Type:</strong> {{ class.class_type }}</p>
+                    <p><strong>Date:</strong> {{ class.start_date|date('M d, Y') }}</p>
+                    <p><strong>Time:</strong> {{ class.start_time }}</p>
+                    <p><strong>Tutor:</strong> {{ class.tutor_name }}</p>
+                    <p><strong>Room:</strong> {{ class.room }}</p>
+                    <p><strong>Enrolled:</strong> {{ class.enrolled_count }}/{{ class.capacity }}</p>
+                </div>
+                <div class="class-actions">
+                    <button class="btn btn-primary" onclick="editClass('{{ class.id }}')">Edit</button>
+                    <button class="btn btn-success" onclick="printRoster('{{ class.id }}')">Print Roster</button>
+                    <button class="btn btn-danger" onclick="deleteClass('{{ class.id }}')">Delete</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Roster Tab -->
+    <div id="roster" class="tab-content">
+        <div class="section-header">
+            <h2>Class Roster</h2>
+            <select id="rosterClassSelect" onchange="loadRoster()">
+                <option value="">Select a class...</option>
+                {% for class in upcoming_classes %}
+                <option value="{{ class.id }}">{{ class.name }} - {{ class.start_date|date('M d, Y') }} {{ class.start_time }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="rosterContent" class="roster-content">
+            <p class="no-selection">Please select a class to view the roster.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Application Detail Modal -->
+<div id="applicationModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('applicationModal')">&times;</span>
+        <div id="applicationDetailContent"></div>
+    </div>
+</div>
+
+<!-- Create Class Modal -->
+<div id="createClassModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('createClassModal')">&times;</span>
+        <h2>Create New Class</h2>
+        <form id="createClassForm" onsubmit="createClass(event)">
+            <div class="form-group">
+                <label for="className">Class Name:</label>
+                <input type="text" id="className" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="classType">Class Type:</label>
+                <select id="classType" name="class_type" required>
+                    <option value="">Select Type</option>
+                    <option value="Foundation">Foundation</option>
+                    <option value="Imagination">Imagination</option>
+                    <option value="Watercolour">Watercolour</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="classDate">Date:</label>
+                <input type="date" id="classDate" name="start_date" required>
+            </div>
+            <div class="form-group">
+                <label for="startTime">Start Time:</label>
+                <input type="time" id="startTime" name="start_time" required>
+            </div>
+            <div class="form-group">
+                <label for="endTime">End Time:</label>
+                <input type="time" id="endTime" name="end_time" required>
+            </div>
+            <div class="form-group">
+                <label for="tutor">Tutor:</label>
+                <select id="tutor" name="tutor_id" required>
+                    <option value="">Select Tutor</option>
+                    {% for tutor in tutors %}
+                    <option value="{{ tutor.id }}">{{ tutor.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="room">Room:</label>
+                <input type="text" id="room" name="room" required>
+            </div>
+            <div class="form-group">
+                <label for="capacity">Capacity:</label>
+                <input type="number" id="capacity" name="capacity" min="1" max="30" value="20" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" rows="3"></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Create Class</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('createClassModal')">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Email Template Modal -->
+<div id="emailModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('emailModal')">&times;</span>
+        <h2>Send Email Notification</h2>
+        <form id="emailForm" onsubmit="sendEmail(event)">
+            <div class="form-group">
+                <label for="emailSubject">Subject:</label>
+                <input type="text" id="emailSubject" name="subject" required>
+            </div>
+            <div class="form-group">
+                <label for="emailMessage">Message:</label>
+                <textarea id="emailMessage" name="message" rows="10" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="calendarLink">Calendar Link:</label>
+                <input type="url" id="calendarLink" name="calendar_link" placeholder="https://calendar.google.com/...">
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Send Email</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal('emailModal')">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Tab functionality
+function showTab(tabName) {
+    // Hide all tab contents
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(content => content.classList.remove('active'));
+    
+    // Remove active class from all tab buttons
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    tabButtons.forEach(btn => btn.classList.remove('active'));
+    
+    // Show selected tab content
+    document.getElementById(tabName).classList.add('active');
+    
+    // Add active class to clicked button
+    event.target.classList.add('active');
+}
+
+// Application filtering and search
+function filterApplications() {
+    const statusFilter = document.getElementById('statusFilter').value;
+    const searchTerm = document.getElementById('searchApplications').value.toLowerCase();
+    const applications = document.querySelectorAll('.application-card');
+    
+    applications.forEach(app => {
+        const status = app.dataset.status;
+        const searchText = app.dataset.search;
+        
+        const statusMatch = !statusFilter || status === statusFilter;
+        const searchMatch = !searchTerm || searchText.includes(searchTerm);
+        
+        app.style.display = statusMatch && searchMatch ? 'block' : 'none';
+    });
+}
+
+function searchApplications() {
+    filterApplications();
+}
+
+// Application actions
+function viewApplication(applicationId) {
+    fetch(`/staff/application/${applicationId}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('applicationDetailContent').innerHTML = `
+                <h2>${data.name}</h2>
+                <div class="application-full-details">
+                    <p><strong>Email:</strong> ${data.email}</p>
+                    <p><strong>Phone:</strong> ${data.phone}</p>
+                    <p><strong>Age:</strong> ${data.age}</p>
+                    <p><strong>Class Type:</strong> ${data.class_type}</p>
+                    <p><strong>Preferred Date:</strong> ${data.preferred_date}</p>
+                    <p><strong>Status:</strong> ${data.status}</p>
+                    <p><strong>Applied:</strong> ${data.created_at}</p>
+                    ${data.message ? `<p><strong>Message:</strong> ${data.message}</p>` : ''}
+                </div>
+            `;
+            document.getElementById('applicationModal').style.display = 'block';
+        });
+}
+
+function acceptApplication(applicationId) {
+    if (confirm('Are you sure you want to accept this application?')) {
+        fetch(`/staff/application/${applicationId}/accept`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Application accepted! Email notification sent.');
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        });
+    }
+}
+
+function rejectApplication(applicationId) {
+    if (confirm('Are you sure you want to reject this application?')) {
+        fetch(`/staff/application/${applicationId}/reject`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Application rejected! Email notification sent.');
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        });
+    }
+}
+
+// Class management
+function showCreateClassModal() {
+    document.getElementById('createClassModal').style.display = 'block';
+}
+
+function createClassForDate(date) {
+    document.getElementById('classDate').value = date;
+    showCreateClassModal();
+}
+
+function createClass(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData);
+    
+    fetch('/staff/classes/create', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Class created successfully!');
+            closeModal('createClassModal');
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    });
+}
+
+function editClass(classId) {
+    // Implementation for editing class
+    alert('Edit class functionality to be implemented');
+}
+
+function deleteClass(classId) {
+    if (confirm('Are you sure you want to delete this class?')) {
+        fetch(`/staff/classes/${classId}/delete`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Class deleted successfully!');
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        });
+    }
+}
+
+// Roster functionality
+function loadRoster() {
+    const classId = document.getElementById('rosterClassSelect').value;
+    if (!classId) {
+        document.getElementById('rosterContent').innerHTML = '<p class="no-selection">Please select a class to view the roster.</p>';
+        return;
+    }
+    
+    fetch(`/staff/classes/${classId}/roster`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('rosterContent').innerHTML = `
+                    <div class="roster-header">
+                        <h3>${data.class.name}</h3>
+                        <p>${data.class.start_date} at ${data.class.start_time}</p>
+                        <p>${data.class.class_type} - ${data.class.tutor_name} - Room ${data.class.room}</p>
+                    </div>
+                    <div class="roster-students">
+                        <h4>Enrolled Students (${data.students.length})</h4>
+                        ${data.students.length > 0 ? `
+                            <table class="roster-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Age</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.students.map(student => `
+                                        <tr>
+                                            <td>${student.name}</td>
+                                            <td>${student.email}</td>
+                                            <td>${student.phone}</td>
+                                            <td>${student.age}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        ` : '<p>No students enrolled yet.</p>'}
+                    </div>
+                    <button class="btn btn-primary" onclick="printRoster('${classId}')">Print Roster</button>
+                `;
+            } else {
+                document.getElementById('rosterContent').innerHTML = '<p class="error">Error loading roster.</p>';
+            }
+        });
+}
+
+function printRoster(classId) {
+    window.open(`/staff/classes/${classId}/roster/print`, '_blank');
+}
+
+// Modal functionality
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+}
+</script>
 {% endblock %} 

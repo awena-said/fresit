@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Student Login - Fresit Art School{% endblock %}
+{% block description %}Login to your student account to manage your applications{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/styles/student.css">
+{% endblock %}
+
+{% block content %}
+<section class="student-section">
+    <div class="student-container">
+        <div class="form-header">
+            <h1>Student Login</h1>
+            <p>Welcome back! Login to your account to manage your applications.</p>
+        </div>
+
+        {% if errors.general %}
+            <div class="alert alert-error">
+                {{ errors.general }}
+            </div>
+        {% endif %}
+
+        {% if _GET.registered %}
+            <div class="alert alert-success">
+                Registration successful! Please login with your email and password.
+            </div>
+        {% endif %}
+
+        <form class="student-form" method="POST" action="/student/login">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required 
+                       value="{{ form_data.email }}">
+                {% if errors.email %}
+                    <span class="error-message">{{ errors.email }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+                {% if errors.password %}
+                    <span class="error-message">{{ errors.password }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Login</button>
+                <a href="/student/register" class="btn-secondary">Create New Account</a>
+            </div>
+        </form>
+
+        <div class="form-footer">
+            <p>Don't have an account? <a href="/student/register">Register here</a></p>
+            <p><a href="/student/forgot-password">Forgot your password?</a></p>
+        </div>
+    </div>
+</section>
+{% endblock %} 

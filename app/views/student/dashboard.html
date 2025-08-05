@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard - Fresit Art School{% endblock %}
+{% block description %}Manage your art class applications{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/styles/student.css">
+{% endblock %}
+
+{% block content %}
+<section class="student-section">
+    <div class="student-container">
+        <div class="dashboard-header">
+            <h1>Student Dashboard</h1>
+            <p>Welcome back, {{ student.name }}!</p>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="welcome-message">
+                <h2>Your Account</h2>
+                <p><strong>Email:</strong> {{ student.email }}</p>
+                <p><strong>Phone:</strong> {{ student.phone }}</p>
+                <p><strong>Member since:</strong> {{ student.created_at|date("F j, Y") }}</p>
+            </div>
+
+            <div class="dashboard-actions">
+                <a href="/student/booking" class="btn-primary">Apply for New Class</a>
+                <a href="/student/change-password" class="btn-secondary">Change Password</a>
+                <a href="/student/logout" class="btn-secondary">Logout</a>
+            </div>
+
+            <div class="applications-list">
+                <h2>Your Applications</h2>
+                
+                {% if applications %}
+                    {% for application in applications %}
+                        <div class="application-card">
+                            <div class="application-header">
+                                <div class="application-title">{{ application.class_name }}</div>
+                                <span class="status-badge status-{{ application.status }}">
+                                    {{ application.status|title }}
+                                </span>
+                            </div>
+                            
+                            <div class="application-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Class Type</span>
+                                    <span class="detail-value">{{ application.class_type }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Date</span>
+                                    <span class="detail-value">{{ application.date|date("F j, Y") }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Time</span>
+                                    <span class="detail-value">{{ application.start_time }} - {{ application.end_time }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Tutor</span>
+                                    <span class="detail-value">{{ application.tutor_name }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Experience Level</span>
+                                    <span class="detail-value">{{ application.experience_level|title }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Applied On</span>
+                                    <span class="detail-value">{{ application.created_at|date("F j, Y") }}</span>
+                                </div>
+                            </div>
+
+                            {% if application.additional_notes %}
+                                <div class="application-notes">
+                                    <strong>Notes:</strong> {{ application.additional_notes }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-applications">
+                        <p>You haven't applied for any classes yet.</p>
+                        <a href="/student/booking" class="btn-primary">Apply for Your First Class</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

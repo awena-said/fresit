@@ -1,38 +1,229 @@
 {% extends "base.html" %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="/public/styles/staff.css">
+<link rel="stylesheet" href="/styles/staff.css">
 {% endblock %}
 
 {% block content %}
-<section id="login-section" class="login-section">
-    <h1>STAFF PORTAL</h1>
-    <div class="login-container">
-        <h2>Login</h2>
+<main id="main-content" role="main">
+    <section id="login-section" class="login-section" aria-labelledby="login-heading">
+        <h1 id="login-heading">STAFF PORTAL</h1>
         
-        {% if login_errors is defined and login_errors %}
-            <div class="alert alert-error">
-                <h3>Please correct the following errors:</h3>
-                <ul>
-                    {% for field, error in login_errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
+        <div class="login-container" role="dialog" aria-labelledby="login-form-heading" aria-describedby="login-description">
+            <h2 id="login-form-heading">Login</h2>
+            <p id="login-description" class="sr-only">Enter your email address and password to access the staff portal.</p>
+            
+            {% if login_errors is defined and login_errors %}
+                <div class="alert alert-error" role="alert" aria-live="polite">
+                    <h3 id="error-heading">Please correct the following errors:</h3>
+                    <ul aria-labelledby="error-heading">
+                        {% for field, error in login_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            
+            <form id="login-form" class="login-form" method="POST" action="/staff/login" novalidate>
+                <fieldset>
+                    <legend class="sr-only">Login Information</legend>
+                    
+                    <div class="form-group">
+                        <label for="email" id="email-label">
+                            Email Address
+                            <span class="required" aria-label="required">*</span>
+                        </label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            required 
+                            aria-required="true"
+                            aria-describedby="email-help"
+                            autocomplete="email"
+                            placeholder="Enter your email address"
+                            aria-invalid="{% if login_errors is defined and login_errors.email %}true{% else %}false{% endif %}"
+                        >
+                        <div id="email-help" class="form-help sr-only">
+                            Please enter a valid email address in the format: yourname@example.com
+                        </div>
+                        {% if login_errors is defined and login_errors.email %}
+                            <div class="field-error" role="alert" aria-live="polite">
+                                {{ login_errors.email }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password" id="password-label">
+                            Password
+                            <span class="required" aria-label="required">*</span>
+                        </label>
+                        <div class="password-input-group">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                required 
+                                aria-required="true"
+                                aria-describedby="password-help"
+                                autocomplete="current-password"
+                                placeholder="Enter your password"
+                                aria-invalid="{% if login_errors is defined and login_errors.password %}true{% else %}false{% endif %}"
+                            >
+                            <button 
+                                type="button" 
+                                id="toggle-password" 
+                                class="toggle-password-btn"
+                                aria-label="Show password"
+                                aria-pressed="false"
+                                aria-describedby="password-toggle-help"
+                            >
+                                <span class="sr-only">Show password</span>
+                                <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="password-help" class="form-help sr-only">
+                            Enter your password. It should be at least 8 characters long.
+                        </div>
+                        <div id="password-toggle-help" class="sr-only">
+                            Click to show or hide your password
+                        </div>
+                        {% if login_errors is defined and login_errors.password %}
+                            <div class="field-error" role="alert" aria-live="polite">
+                                {{ login_errors.password }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </fieldset>
+                
+                <div class="form-actions">
+                    <button 
+                        type="submit" 
+                        class="login-btn"
+                        aria-describedby="submit-help"
+                    >
+                        <span class="btn-text">Login</span>
+                        <span class="btn-loading sr-only">Logging in...</span>
+                    </button>
+                    <div id="submit-help" class="sr-only">
+                        Click to submit your login information
+                    </div>
+                </div>
+            </form>
+            
+            <div id="login-message" class="login-message" role="status" aria-live="polite"></div>
+            
+
+        </div>
+    </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Password visibility toggle
+    const togglePassword = document.getElementById('toggle-password');
+    const passwordInput = document.getElementById('password');
+    
+    if (togglePassword && passwordInput) {
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            const isVisible = type === 'text';
+            this.setAttribute('aria-pressed', isVisible);
+            this.setAttribute('aria-label', isVisible ? 'Hide password' : 'Show password');
+            
+            // Update icon
+            const icon = this.querySelector('svg');
+            if (icon) {
+                if (isVisible) {
+                    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+                } else {
+                    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+                }
+            }
+        });
+    }
+    
+    // Form validation with ARIA
+    const form = document.getElementById('login-form');
+    const emailInput = document.getElementById('email');
+    // passwordInput is already declared above
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            let hasErrors = false;
+            
+            // Clear previous error states
+            [emailInput, passwordInput].forEach(input => {
+                if (input) {
+                    input.setAttribute('aria-invalid', 'false');
+                }
+            });
+            
+            // Validate email
+            if (emailInput && !emailInput.value.trim()) {
+                emailInput.setAttribute('aria-invalid', 'true');
+                hasErrors = true;
+            } else if (emailInput && !isValidEmail(emailInput.value)) {
+                emailInput.setAttribute('aria-invalid', 'true');
+                hasErrors = true;
+            }
+            
+            // Validate password
+            if (passwordInput && !passwordInput.value.trim()) {
+                passwordInput.setAttribute('aria-invalid', 'true');
+                hasErrors = true;
+            }
+            
+            if (hasErrors) {
+                e.preventDefault();
+                // Announce errors to screen readers
+                const errorMessage = 'Please correct the errors in the form';
+                announceToScreenReader(errorMessage);
+            }
+        });
+    }
+    
+    // Email validation function
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+    
+    // Screen reader announcement function
+    function announceToScreenReader(message) {
+        const announcement = document.createElement('div');
+        announcement.setAttribute('aria-live', 'polite');
+        announcement.setAttribute('aria-atomic', 'true');
+        announcement.className = 'sr-only';
+        announcement.textContent = message;
+        document.body.appendChild(announcement);
         
-        <form id="login-form" class="login-form" method="POST" action="/app/views/login.html">
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <button type="submit" class="login-btn">Login</button>
-        </form>
-        <div id="login-message" class="login-message"></div>
-    </div>
-</section>
+        setTimeout(() => {
+            document.body.removeChild(announcement);
+        }, 1000);
+    }
+    
+    // Keyboard navigation enhancements
+    document.addEventListener('keydown', function(e) {
+        // Escape key to clear form
+        if (e.key === 'Escape') {
+            if (document.activeElement.tagName === 'INPUT') {
+                document.activeElement.value = '';
+                document.activeElement.focus();
+            }
+        }
+        
+        // Enter key on password field to submit form
+        if (e.key === 'Enter' && document.activeElement === passwordInput) {
+            form.submit();
+        }
+    });
+});
+</script>
 {% endblock %} 
