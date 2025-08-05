@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Reviews - Royal Drawing School{% endblock %}
+
+{% block content %}
+<section id="reviews-page">
+    <h1>STUDENT REVIEWS</h1>
+    <div class="reviews-container">
+        {% for review in reviews %}
+        <div class="review-card">
+            <div class="review-header">
+                <h3>{{ review.name }}</h3>
+                <div class="rating">
+                    {% for i in 1..5 %}
+                        {% if i <= review.rating %}
+                            ★
+                        {% else %}
+                            ☆
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <span class="review-date">{{ review.date }}</span>
+            </div>
+            <p class="review-text">{{ review.text }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

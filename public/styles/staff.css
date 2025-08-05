@@ -11,6 +11,42 @@
   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
 }
 
+/* Auth Toggle */
+.auth-toggle {
+  display: flex;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(10px);
+}
+
+.toggle-btn {
+  background: transparent;
+  border: none;
+  color: #e2e8f0;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.toggle-btn.active {
+  background: #3b82f6;
+  color: white;
+}
+
+/* Hidden class */
+.hidden {
+  display: none !important;
+}
+
 .login-container {
   background: rgba(255, 255, 255, 0.95);
   padding: 3rem;

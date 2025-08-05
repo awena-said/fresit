@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}Book Classes - Royal Drawing School{% endblock %}
+{% block description %}Apply for drawing classes at Royal Drawing School{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/assets/css/booking.css">
+{% endblock %}
+
+{% block content %}
+<section class="booking-section">
+    <div class="booking-container">
+        <h1>Book Your Class</h1>
+        <p class="booking-intro">Choose from our available classes and apply for enrollment. Classes run on a rolling, continuous basis with 10-week blocks.</p>
+
+        {% if errors.general %}
+            <div class="alert alert-error">
+                {{ errors.general }}
+            </div>
+        {% endif %}
+
+        <!-- Class Selection Form -->
+        <form id="booking-form" class="booking-form" method="POST" action="/booking/apply">
+            <div class="form-section">
+                <h2>Select Your Class</h2>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="class_type">Class Type</label>
+                        <select id="class_type" name="class_type" required>
+                            <option value="">Select class type</option>
+                            {% for type in class_types %}
+                                <option value="{{ type.id }}" {% if form_data.class_type == type.id %}selected{% endif %}>
+                                    {{ type.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        {% if errors.class_type %}
+                            <span class="error-message">{{ errors.class_type }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="start_date">Preferred Start Date</label>
+                        <input type="date" id="start_date" name="start_date" required 
+                               min="{{ "now"|date("Y-m-d") }}" 
+                               max="{{ "now"|date("Y-m-d", "+7 days") }}"
+                               value="{{ form_data.start_date }}">
+                        {% if errors.start_date %}
+                            <span class="error-message">{{ errors.start_date }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="class_id">Available Classes</label>
+                    <select id="class_id" name="class_id" required>
+                        <option value="">Select a class (choose type and date first)</option>
+                    </select>
+                    {% if errors.class_id %}
+                        <span class="error-message">{{ errors.class_id }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Your Details</h2>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="student_name">Full Name</label>
+                        <input type="text" id="student_name" name="student_name" required 
+                               value="{{ form_data.student_name }}" minlength="2">
+                        {% if errors.student_name %}
+                            <span class="error-message">{{ errors.student_name }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="student_email">Email Address</label>
+                        <input type="email" id="student_email" name="student_email" required 
+                               value="{{ form_data.student_email }}">
+                        {% if errors.student_email %}
+                            <span class="error-message">{{ errors.student_email }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="student_phone">Phone Number</label>
+                        <input type="tel" id="student_phone" name="student_phone" required 
+                               value="{{ form_data.student_phone }}">
+                        {% if errors.student_phone %}
+                            <span class="error-message">{{ errors.student_phone }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="experience_level">Experience Level</label>
+                        <select id="experience_level" name="experience_level" required>
+                            <option value="">Select experience level</option>
+                            <option value="beginner" {% if form_data.experience_level == 'beginner' %}selected{% endif %}>Beginner</option>
+                            <option value="intermediate" {% if form_data.experience_level == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                            <option value="advanced" {% if form_data.experience_level == 'advanced' %}selected{% endif %}>Advanced</option>
+                        </select>
+                        {% if errors.experience_level %}
+                            <span class="error-message">{{ errors.experience_level }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="additional_notes">Additional Notes (Optional)</label>
+                    <textarea id="additional_notes" name="additional_notes" rows="3" 
+                              placeholder="Any special requirements or questions...">{{ form_data.additional_notes }}</textarea>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Submit Application</button>
+                <a href="/" class="btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const classTypeSelect = document.getElementById('class_type');
+    const startDateInput = document.getElementById('start_date');
+    const classSelect = document.getElementById('class_id');
+    
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+    startDateInput.min = today;
+    
+    // Set maximum date to 7 days from today
+    const maxDate = new Date();
+    maxDate.setDate(maxDate.getDate() + 7);
+    startDateInput.max = maxDate.toISOString().split('T')[0];
+
+    function loadAvailableClasses() {
+        const classType = classTypeSelect.value;
+        const startDate = startDateInput.value;
+        
+        if (!classType || !startDate) {
+            classSelect.innerHTML = '<option value="">Select a class (choose type and date first)</option>';
+            return;
+        }
+
+        // Show loading state
+        classSelect.innerHTML = '<option value="">Loading available classes...</option>';
+        classSelect.disabled = true;
+
+        // Fetch available classes
+        fetch(`/api/classes?type=${classType}&start_date=${startDate}`)
+            .then(response => response.json())
+            .then(data => {
+                classSelect.innerHTML = '<option value="">Select a class</option>';
+                
+                if (data.length === 0) {
+                    classSelect.innerHTML = '<option value="">No classes available for selected criteria</option>';
+                } else {
+                    data.forEach(classItem => {
+                        const option = document.createElement('option');
+                        option.value = classItem.id;
+                        option.textContent = `${classItem.tutor_name} - ${classItem.day_of_week} ${classItem.start_time}-${classItem.end_time} (${classItem.available_slots} slots available)`;
+                        classSelect.appendChild(option);
+                    });
+                }
+                classSelect.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error loading classes:', error);
+                classSelect.innerHTML = '<option value="">Error loading classes. Please try again.</option>';
+                classSelect.disabled = false;
+            });
+    }
+
+    // Event listeners
+    classTypeSelect.addEventListener('change', loadAvailableClasses);
+    startDateInput.addEventListener('change', loadAvailableClasses);
+});
+</script>
+{% endblock %} 

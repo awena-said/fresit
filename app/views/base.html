@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ page_title|default('Royal Drawing School') }}{% endblock %}</title>
+    
+
+    <!-- CSS files -->
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    <link rel="stylesheet" href="/assets/css/media.css">
+    {% block extra_css %}{% endblock %}
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap" as="style">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Skip navigation for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Accessibility controls -->
+    <div class="accessibility-controls">
+        <button id="high-contrast-toggle" class="accessibility-btn" aria-label="Toggle high contrast mode">
+            <span class="btn-text">High Contrast</span>
+        </button>
+        <button id="font-size-toggle" class="accessibility-btn" aria-label="Increase font size">
+            <span class="btn-text">A+</span>
+        </button>
+    </div>
+    
+    <!-- Header -->
+    <header class="header">
+        <nav class="button-section" role="navigation">
+            <a class="link" href="/" tabindex="0" aria-label="Go to Home Page">
+                HOME
+            </a>
+            <a class="link" href="/#story-page" tabindex="0" aria-label="Go to Our Story">
+                OUR STORY
+            </a>
+            <a class="link" href="/#opening-page" tabindex="0" aria-label="Go to Opening Times">
+                OPENING TIMES
+            </a>
+            <a class="link" href="/#contact-us-page" tabindex="0" aria-label="Go to Contact Page">
+                CONTACT US
+            </a>
+            <a class="link" href="/reviews" tabindex="0" aria-label="Go to Reviews Page">
+                REVIEWS
+            </a>
+            <a class="link" href="/booking" tabindex="0" aria-label="Book Classes">
+                BOOK CLASSES
+            </a>
+            {% if user %}
+                {% if user.type == 'staff' %}
+                    <a class="link" href="/staff/dashboard" tabindex="0" aria-label="Staff Dashboard">
+                        STAFF PORTAL
+                    </a>
+                {% else %}
+                    <a class="link" href="/student/dashboard" tabindex="0" aria-label="Student Dashboard">
+                        MY ACCOUNT
+                    </a>
+                {% endif %}
+            {% else %}
+                <a class="link" href="/staff/login" tabindex="0" aria-label="Staff Login">
+                    STAFF LOGIN
+                </a>
+            {% endif %}
+        </nav>
+        <img class="header-logo" src="/assets/images/logo_black.png" alt="Royal Drawing School's logo">
+    </header>
+
+    <!-- Main content -->
+    <main class="content" id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="social-media-icons" role="list">
+            <a href="https://www.instagram.com/royaldrawingschool" target="_blank" rel="noopener" aria-label="Go to Instagram page" role="listitem">
+                <img class="social-icon instagram-icon" src="/assets/icons/instagram-icon.png" alt="Instagram icon">
+            </a>
+            <a href="https://www.youtube.com/@RoyalDrawingSchool" target="_blank" rel="noopener" aria-label="Go to Youtube Page" role="listitem">
+                <img class="social-icon youtube-icon" src="/assets/icons/youtube-icon.png" alt="youtube icon">
+            </a>
+            <a href="https://www.facebook.com/royaldrawingschool" target="_blank" rel="noopener" aria-label="Go to Facebook Page" role="listitem">
+                <img class="social-icon facebook-icon" src="/assets/icons/facebook-icon.png" alt="facebook icon">
+            </a>
+            <a href="https://www.linkedin.com/company/royaldrawingschool" target="_blank" rel="noopener" aria-label="Go to LinkedIn Page" role="listitem">
+                <img class="social-icon linkedin-icon" src="/assets/icons/linkedin-icon.png" alt="linkedin icon">
+            </a>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="/assets/js/app.js"></script>
+    {% block extra_js %}{% endblock %}
+
+    <script>
+        // Accessibility controls
+        document.addEventListener('DOMContentLoaded', function() {
+            const highContrastToggle = document.getElementById('high-contrast-toggle');
+            const fontSizeToggle = document.getElementById('font-size-toggle');
+            
+            // High contrast toggle
+            highContrastToggle.addEventListener('click', function() {
+                document.body.classList.toggle('high-contrast');
+                const isHighContrast = document.body.classList.contains('high-contrast');
+                localStorage.setItem('highContrast', isHighContrast);
+                
+                // Update button text
+                const btnText = this.querySelector('.btn-text');
+                btnText.textContent = isHighContrast ? 'Normal Contrast' : 'High Contrast';
+            });
+            
+            // Font size toggle
+            fontSizeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('large-text');
+                const isLargeText = document.body.classList.contains('large-text');
+                localStorage.setItem('largeText', isLargeText);
+                
+                // Update button text
+                const btnText = this.querySelector('.btn-text');
+                btnText.textContent = isLargeText ? 'A-' : 'A+';
+            });
+            
+            // Load saved preferences
+            if (localStorage.getItem('highContrast') === 'true') {
+                document.body.classList.add('high-contrast');
+                highContrastToggle.querySelector('.btn-text').textContent = 'Normal Contrast';
+            }
+            
+            if (localStorage.getItem('largeText') === 'true') {
+                document.body.classList.add('large-text');
+                fontSizeToggle.querySelector('.btn-text').textContent = 'A-';
+            }
+        });
+    </script>
+</body>
+</html> 

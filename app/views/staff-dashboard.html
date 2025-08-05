@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/assets/css/staff.css">
+{% endblock %}
+
+{% block content %}
+<section id="dashboard-section" class="dashboard-section">
+    <div class="dashboard-header">
+        <h1>STAFF DASHBOARD</h1>
+        <div class="user-info">
+            <span id="user-email">{{ user.email }}</span>
+            <a href="/staff/logout" class="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="dashboard-nav">
+        <a href="/staff/applications" class="nav-tab">Applications</a>
+        <a href="/staff/classes" class="nav-tab">Manage Classes</a>
+        <a href="/staff/schedule" class="nav-tab">Schedule Classes</a>
+        <a href="/staff/roster" class="nav-tab">Class Roster</a>
+        <a href="/staff/emails" class="nav-tab">Email Files</a>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-content">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Applications</h3>
+                <div class="stat-number">{{ stats.total_applications }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Pending Applications</h3>
+                <div class="stat-number">{{ stats.pending_applications }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Accepted Applications</h3>
+                <div class="stat-number">{{ stats.accepted_applications }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Active Classes</h3>
+                <div class="stat-number">{{ stats.total_classes }}</div>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <h2>Quick Actions</h2>
+            <div class="action-buttons">
+                <a href="/staff/applications" class="action-btn">
+                    <i class="fas fa-list"></i>
+                    View Applications
+                </a>
+                <a href="/staff/classes/create" class="action-btn">
+                    <i class="fas fa-plus"></i>
+                    Create New Class
+                </a>
+                <a href="/staff/schedule" class="action-btn">
+                    <i class="fas fa-calendar"></i>
+                    Schedule Classes
+                </a>
+                <a href="/staff/roster" class="action-btn">
+                    <i class="fas fa-users"></i>
+                    View Rosters
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

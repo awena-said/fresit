@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/assets/css/staff.css">
+{% endblock %}
+
+{% block content %}
+<section id="login-section" class="login-section">
+    <h1>STAFF PORTAL</h1>
+    <div class="login-container">
+        <h2>Login</h2>
+        
+        {% if login_errors is defined and login_errors %}
+            <div class="alert alert-error">
+                <h3>Please correct the following errors:</h3>
+                <ul>
+                    {% for field, error in login_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        
+        <form id="login-form" class="login-form" method="POST" action="/staff/login">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+        <div id="login-message" class="login-message"></div>
+    </div>
+</section>
+{% endblock %} 
