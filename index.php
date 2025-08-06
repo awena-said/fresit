@@ -40,28 +40,44 @@ $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/app/views');
 $cacheDir = __DIR__ . '/cache/twig';
 $cacheOptions = ['debug' => true, 'auto_reload' => true];
 
-// Try to create cache directory if it doesn't exist
-if (!is_dir($cacheDir)) {
-    try {
-        if (!mkdir($cacheDir, 0755, true)) {
-            // If we can't create the cache directory, disable caching
+// Always disable caching by default to avoid permission issues
+$cacheOptions['cache'] = false;
+
+// Only try to enable caching if we can safely create and write to the directory
+try {
+    // Check if cache directory exists
+    if (!is_dir($cacheDir)) {
+        // Try to create parent directories first
+        $parentDir = dirname($cacheDir);
+        if (!is_dir($parentDir)) {
+            if (@mkdir($parentDir, 0755, true)) {
+                error_log("Created parent cache directory: $parentDir");
+            } else {
+                error_log("Warning: Could not create parent cache directory: $parentDir");
+                $cacheOptions['cache'] = false;
+            }
+        }
+        
+        // Now try to create the twig cache directory
+        if (@mkdir($cacheDir, 0755, true)) {
+            error_log("Created cache directory: $cacheDir");
+            $cacheOptions['cache'] = $cacheDir;
+        } else {
             error_log("Warning: Could not create cache directory: $cacheDir");
             $cacheOptions['cache'] = false;
-        } else {
-            $cacheOptions['cache'] = $cacheDir;
         }
-    } catch (Exception $e) {
-        error_log("Warning: Exception creating cache directory: " . $e->getMessage());
-        $cacheOptions['cache'] = false;
-    }
-} else {
-    // Check if directory is writable
-    if (!is_writable($cacheDir)) {
-        error_log("Warning: Cache directory is not writable: $cacheDir");
-        $cacheOptions['cache'] = false;
     } else {
-        $cacheOptions['cache'] = $cacheDir;
+        // Directory exists, check if it's writable
+        if (is_writable($cacheDir)) {
+            $cacheOptions['cache'] = $cacheDir;
+        } else {
+            error_log("Warning: Cache directory exists but is not writable: $cacheDir");
+            $cacheOptions['cache'] = false;
+        }
     }
+} catch (Exception $e) {
+    error_log("Warning: Exception during cache directory setup: " . $e->getMessage());
+    $cacheOptions['cache'] = false;
 }
 
 $twig = new \Twig\Environment($loader, $cacheOptions);
