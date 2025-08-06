@@ -6,12 +6,19 @@ use App\Models\Application;
 
 class HomeController extends BaseController
 {
-    private $application;
+    private $application = null;
 
     public function __construct()
     {
         parent::__construct();
-        $this->application = new Application();
+    }
+    
+    private function getApplication()
+    {
+        if ($this->application === null) {
+            $this->application = new Application();
+        }
+        return $this->application;
     }
 
     /**
@@ -98,7 +105,7 @@ class HomeController extends BaseController
      */
     public function applications()
     {
-        $applications = $this->application->getAll(10, 0);
+        $applications = $this->getApplication()->getAll(10, 0);
 
         $this->render('applications.html', [
             'title' => 'Recent Applications',

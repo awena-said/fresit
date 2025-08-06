@@ -8,16 +8,37 @@ use App\Models\ClassModel;
 
 class StaffController extends BaseController
 {
-    private $staffUser;
-    private $application;
-    private $classModel;
+    private $staffUser = null;
+    private $application = null;
+    private $classModel = null;
 
     public function __construct()
     {
         parent::__construct();
-        $this->staffUser = new StaffUser();
-        $this->application = new Application();
-        $this->classModel = new ClassModel();
+    }
+    
+    private function getStaffUser()
+    {
+        if ($this->staffUser === null) {
+            $this->staffUser = new StaffUser();
+        }
+        return $this->staffUser;
+    }
+    
+    private function getApplicationModel()
+    {
+        if ($this->application === null) {
+            $this->application = new Application();
+        }
+        return $this->application;
+    }
+    
+    private function getClassModel()
+    {
+        if ($this->classModel === null) {
+            $this->classModel = new ClassModel();
+        }
+        return $this->classModel;
     }
 
     public function showLogin()
@@ -27,7 +48,7 @@ class StaffController extends BaseController
             return;
         }
 
-        if (!$this->staffUser->hasUsers()) {
+        if (!$this->getStaffUser()->hasUsers()) {
             $this->redirect('/staff/create-account');
             return;
         }
@@ -47,10 +68,10 @@ class StaffController extends BaseController
             return;
         }
 
-        $user = $this->staffUser->authenticate($email, $password);
+        $user = $this->getStaffUser()->authenticate($email, $password);
         
         if ($user) {
-            $this->staffUser->startSession($user);
+            $this->getStaffUser()->startSession($user);
             $this->redirect('/staff/dashboard');
         } else {
             $this->redirect('/staff/login');
@@ -64,7 +85,7 @@ class StaffController extends BaseController
             return;
         }
 
-        if ($this->staffUser->hasUsers()) {
+        if ($this->getStaffUser()->hasUsers()) {
             $this->redirect('/staff/login');
             return;
         }
@@ -97,9 +118,9 @@ class StaffController extends BaseController
             'role' => 'admin'
         ];
 
-        if ($this->staffUser->create($userData)) {
-            $user = $this->staffUser->getByEmail($email);
-            $this->staffUser->startSession($user);
+        if ($this->getStaffUser()->create($userData)) {
+            $user = $this->getStaffUser()->getByEmail($email);
+            $this->getStaffUser()->startSession($user);
             $this->redirect('/staff/dashboard');
         } else {
             $this->redirect('/staff/create-account');
@@ -108,219 +129,207 @@ class StaffController extends BaseController
 
     public function dashboard()
     {
-        $this->requireAuth();
+        if (!$this->isLoggedIn()) {
+            $this->redirect('/staff/login');
+            return;
+        }
 
-        $user = $this->getCurrentUser();
+        $user = $this->getUser();
         
-        // Get statistics
-        $stats = [
-            'total_applications' => $this->application->getTotalCount(),
-            'pending_applications' => $this->application->getPendingCount(),
-            'total_classes' => $this->classModel->getTotalCount(),
-            'upcoming_classes' => $this->classModel->getUpcomingClassesCount()
+        $dashboardData = [
+            'user' => $user,
+            'total_applications' => $this->getApplicationModel()->getTotalCount(),
+            'pending_applications' => $this->getApplicationModel()->getPendingCount(),
+            'total_classes' => $this->getClassModel()->getTotalCount(),
+            'upcoming_classes' => $this->getClassModel()->getUpcomingClassesCount()
         ];
 
-        // Get applications for display
-        $applications = $this->application->getAll(20, 0);
-
-        // Get upcoming dates (next 30 days without classes)
-        $upcomingDates = $this->getUpcomingAvailableDates();
-
-        // Get all classes
-        $classes = $this->classModel->getAll();
-
-        // Get upcoming classes for roster
-        $upcomingClasses = $this->classModel->getUpcomingClasses();
-
-        // Get tutors for class creation
-        $tutors = $this->getTutors();
-
-        $this->render('staff-dashboard.html', [
+        $this->render('staff/dashboard.html', [
             'title' => 'Staff Dashboard',
-            'user' => $user,
-            'stats' => $stats,
+            'dashboard' => $dashboardData
+        ]);
+    }
+
+    public function applications()
+    {
+        if (!$this->isLoggedIn()) {
+            $this->redirect('/staff/login');
+            return;
+        }
+
+        $applications = $this->getApplicationModel()->getAll(20, 0);
+        $classes = $this->getClassModel()->getAll();
+        $upcomingClasses = $this->getClassModel()->getUpcomingClasses();
+
+        $this->render('staff/applications.html', [
+            'title' => 'Applications',
             'applications' => $applications,
-            'upcoming_dates' => $upcomingDates,
             'classes' => $classes,
-            'upcoming_classes' => $upcomingClasses,
-            'tutors' => $tutors
+            'upcoming_classes' => $upcomingClasses
         ]);
     }
 
     public function getApplication($id)
     {
-        $this->requireAuth();
-        
-        $application = $this->application->getById($id);
-        
-        if (!$application) {
-            http_response_code(404);
-            echo json_encode(['success' => false, 'message' => 'Application not found']);
+        if (!$this->isLoggedIn()) {
+            $this->redirect('/staff/login');
             return;
         }
 
-        echo json_encode(['success' => true, 'data' => $application]);
+        $application = $this->getApplicationModel()->getById($id);
+        if (!$application) {
+            $this->redirect('/staff/applications');
+            return;
+        }
+
+        $this->render('staff/application-detail.html', [
+            'title' => 'Application Details',
+            'application' => $application
+        ]);
     }
 
     public function acceptApplication($id)
     {
-        $this->requireAuth();
-        
-        $user = $this->getCurrentUser();
-        $application = $this->application->getById($id);
-        
-        if (!$application) {
-            echo json_encode(['success' => false, 'message' => 'Application not found']);
+        if (!$this->isLoggedIn()) {
+            $this->redirect('/staff/login');
             return;
         }
 
-        // Update application status
-        $success = $this->application->updateStatus($id, 'accepted', $user['id']);
+        $application = $this->getApplicationModel()->getById($id);
+        if (!$application) {
+            $this->redirect('/staff/applications');
+            return;
+        }
+
+        $user = $this->getUser();
+        $success = $this->getApplicationModel()->updateStatus($id, 'accepted', $user['id']);
         
         if ($success) {
-            // Send acceptance email with calendar link
+            // Send acceptance email
             $this->sendAcceptanceEmail($application);
-            echo json_encode(['success' => true, 'message' => 'Application accepted']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to accept application']);
         }
+
+        $this->redirect('/staff/applications');
     }
 
     public function rejectApplication($id)
     {
-        $this->requireAuth();
-        
-        $user = $this->getCurrentUser();
-        $application = $this->application->getById($id);
-        
-        if (!$application) {
-            echo json_encode(['success' => false, 'message' => 'Application not found']);
+        if (!$this->isLoggedIn()) {
+            $this->redirect('/staff/login');
             return;
         }
 
-        // Update application status
-        $success = $this->application->updateStatus($id, 'rejected', $user['id']);
+        $application = $this->getApplicationModel()->getById($id);
+        if (!$application) {
+            $this->redirect('/staff/applications');
+            return;
+        }
+
+        $user = $this->getUser();
+        $success = $this->getApplicationModel()->updateStatus($id, 'rejected', $user['id']);
         
         if ($success) {
             // Send rejection email
             $this->sendRejectionEmail($application);
-            echo json_encode(['success' => true, 'message' => 'Application rejected']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to reject application']);
         }
+
+        $this->redirect('/staff/applications');
     }
 
     public function createClass()
     {
-        $this->requireAuth();
-        
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+        if (!$this->isLoggedIn()) {
+            $this->redirect('/staff/login');
             return;
         }
 
-        $input = json_decode(file_get_contents('php://input'), true);
-        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/staff/dashboard');
+            return;
+        }
+
         $classData = [
-            'name' => $input['name'] ?? '',
-            'class_type' => $input['class_type'] ?? '',
-            'start_date' => $input['start_date'] ?? '',
-            'end_date' => $input['start_date'] ?? '', // Same as start date for single session
-            'start_time' => $input['start_time'] ?? '',
-            'end_time' => $input['end_time'] ?? '',
-            'tutor_id' => $input['tutor_id'] ?? '',
-            'room' => $input['room'] ?? '',
-            'capacity' => $input['capacity'] ?? 20,
-            'description' => $input['description'] ?? '',
-            'created_by' => $this->getCurrentUser()['id']
+            'name' => $_POST['name'],
+            'type' => $_POST['type'],
+            'date' => $_POST['date'],
+            'start_time' => $_POST['start_time'],
+            'end_time' => $_POST['end_time'],
+            'tutor_id' => $_POST['tutor_id'],
+            'capacity' => $_POST['capacity'] ?? 20
         ];
 
-        // Validate required fields
-        if (empty($classData['name']) || empty($classData['class_type']) || 
-            empty($classData['start_date']) || empty($classData['start_time'])) {
-            echo json_encode(['success' => false, 'message' => 'Missing required fields']);
-            return;
-        }
-
-        $success = $this->classModel->create($classData);
+        $success = $this->getClassModel()->create($classData);
         
         if ($success) {
-            echo json_encode(['success' => true, 'message' => 'Class created successfully']);
+            $this->redirect('/staff/dashboard?class_created=1');
         } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to create class']);
+            $this->redirect('/staff/dashboard?error=1');
         }
     }
 
     public function deleteClass($id)
     {
-        $this->requireAuth();
-        
-        $success = $this->classModel->delete($id);
+        if (!$this->isLoggedIn()) {
+            $this->redirect('/staff/login');
+            return;
+        }
+
+        $success = $this->getClassModel()->delete($id);
         
         if ($success) {
-            echo json_encode(['success' => true, 'message' => 'Class deleted successfully']);
+            $this->redirect('/staff/dashboard?class_deleted=1');
         } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to delete class']);
+            $this->redirect('/staff/dashboard?error=1');
         }
     }
 
     public function getClassRoster($id)
     {
-        $this->requireAuth();
-        
-        $class = $this->classModel->getById($id);
-        
-        if (!$class) {
-            echo json_encode(['success' => false, 'message' => 'Class not found']);
+        if (!$this->isLoggedIn()) {
+            $this->redirect('/staff/login');
             return;
         }
 
-        // Get enrolled students
-        $students = $this->getEnrolledStudents($id);
-        
-        // Get tutor name
-        $tutor = $this->getTutorById($class['created_by']);
-        
-        $rosterData = [
-            'class' => [
-                'name' => $class['name'],
-                'class_type' => $class['class_type'],
-                'start_date' => $class['start_date'],
-                'start_time' => $class['start_time'],
-                'tutor_name' => $tutor ? $tutor['name'] : 'Unknown',
-                'room' => $class['room'] ?? 'TBD'
-            ],
-            'students' => $students
-        ];
+        $class = $this->getClassModel()->getById($id);
+        if (!$class) {
+            $this->redirect('/staff/dashboard');
+            return;
+        }
 
-        echo json_encode(['success' => true, 'data' => $rosterData]);
+        $enrolledStudents = $this->getEnrolledStudents($id);
+
+        $this->render('staff/class-roster.html', [
+            'title' => 'Class Roster',
+            'class' => $class,
+            'students' => $enrolledStudents
+        ]);
     }
 
     public function printRoster($id)
     {
-        $this->requireAuth();
-        
-        $class = $this->classModel->getById($id);
-        
-        if (!$class) {
-            echo 'Class not found';
+        if (!$this->isLoggedIn()) {
+            $this->redirect('/staff/login');
             return;
         }
 
-        $students = $this->getEnrolledStudents($id);
-        $tutor = $this->getTutorById($class['created_by']);
+        $class = $this->getClassModel()->getById($id);
+        if (!$class) {
+            $this->redirect('/staff/dashboard');
+            return;
+        }
 
-        $this->render('roster-print.html', [
-            'title' => 'Class Roster - ' . $class['name'],
+        $enrolledStudents = $this->getEnrolledStudents($id);
+
+        $this->render('staff/print-roster.html', [
+            'title' => 'Class Roster - Print',
             'class' => $class,
-            'students' => $students,
-            'tutor' => $tutor
+            'students' => $enrolledStudents
         ]);
     }
 
     public function logout()
     {
-        $this->staffUser->logout();
+        $this->getStaffUser()->logout();
         $this->redirect('/staff/login');
     }
 
@@ -328,19 +337,17 @@ class StaffController extends BaseController
     private function getUpcomingAvailableDates()
     {
         $dates = [];
-        $startDate = date('Y-m-d');
+        $currentDate = new DateTime();
         
         for ($i = 1; $i <= 30; $i++) {
-            $date = date('Y-m-d', strtotime("+$i days"));
+            $date = clone $currentDate;
+            $date->add(new DateInterval("P{$i}D"));
             
             // Check if there's already a class on this date
-            $existingClass = $this->classModel->getByDate($date);
+            $existingClass = $this->getClassModel()->getByDate($date->format('Y-m-d'));
             
             if (!$existingClass) {
-                $dates[] = [
-                    'date' => $date,
-                    'day_name' => date('l', strtotime($date))
-                ];
+                $dates[] = $date->format('Y-m-d');
             }
         }
         
@@ -349,20 +356,17 @@ class StaffController extends BaseController
 
     private function getTutors()
     {
-        // Get all staff users with instructor role
-        return $this->staffUser->getByRole('instructor');
+        return $this->getStaffUser()->getByRole('instructor');
     }
 
     private function getTutorById($id)
     {
-        return $this->staffUser->getById($id);
+        return $this->getStaffUser()->getById($id);
     }
 
     private function getEnrolledStudents($classId)
     {
-        // This would typically come from a class_enrollments table
-        // For now, we'll return applications that have been accepted for this class type
-        return $this->application->getByStatus('accepted');
+        return $this->getApplicationModel()->getByStatus('accepted');
     }
 
     private function sendAcceptanceEmail($application)

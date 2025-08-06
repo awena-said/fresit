@@ -8,16 +8,37 @@ use App\Models\ClassModel;
 
 class StudentController extends BaseController
 {
-    private $student;
-    private $application;
-    private $classModel;
+    private $student = null;
+    private $application = null;
+    private $classModel = null;
 
     public function __construct()
     {
         parent::__construct();
-        $this->student = new Student();
-        $this->application = new Application();
-        $this->classModel = new ClassModel();
+    }
+    
+    private function getStudent()
+    {
+        if ($this->student === null) {
+            $this->student = new Student();
+        }
+        return $this->student;
+    }
+    
+    private function getApplication()
+    {
+        if ($this->application === null) {
+            $this->application = new Application();
+        }
+        return $this->application;
+    }
+    
+    private function getClassModel()
+    {
+        if ($this->classModel === null) {
+            $this->classModel = new ClassModel();
+        }
+        return $this->classModel;
     }
 
     /**
@@ -66,7 +87,7 @@ class StudentController extends BaseController
                 'phone' => $_POST['phone']
             ];
 
-            $studentId = $this->student->createAccount($studentData);
+            $studentId = $this->getStudent()->createAccount($studentData);
             if ($studentId) {
                 // Send confirmation email
                 $this->sendRegistrationEmail($_POST['email'], $_POST['name']);
@@ -109,9 +130,9 @@ class StudentController extends BaseController
         if (empty($_POST['email']) || empty($_POST['password'])) {
             $errors['general'] = 'Email and password are required';
         } else {
-            $student = $this->student->authenticate($_POST['email'], $_POST['password']);
-            if ($student) {
-                $this->student->startSession($student);
+                    $student = $this->getStudent()->authenticate($_POST['email'], $_POST['password']);
+        if ($student) {
+            $this->getStudent()->startSession($student);
                 header('Location: /student/dashboard');
                 exit;
             } else {
@@ -136,8 +157,8 @@ class StudentController extends BaseController
             exit;
         }
 
-        $student = $this->student->getById($_SESSION['student_id']);
-        $applications = $this->student->getApplications($_SESSION['student_id']);
+        $student = $this->getStudent()->getById($_SESSION['student_id']);
+        $applications = $this->getStudent()->getApplications($_SESSION['student_id']);
 
         $this->render('student/dashboard.html', [
             'title' => 'Student Dashboard',
@@ -183,9 +204,9 @@ class StudentController extends BaseController
         } elseif (strlen($_POST['new_password']) < 6) {
             $errors['general'] = 'New password must be at least 6 characters';
         } else {
-            $student = $this->student->getById($_SESSION['student_id']);
+            $student = $this->getStudent()->getById($_SESSION['student_id']);
             if (password_verify($_POST['current_password'], $student['password'])) {
-                if ($this->student->updatePassword($_SESSION['student_id'], $_POST['new_password'])) {
+                if ($this->getStudent()->updatePassword($_SESSION['student_id'], $_POST['new_password'])) {
                     $success = true;
                 } else {
                     $errors['general'] = 'Failed to update password';
@@ -207,7 +228,7 @@ class StudentController extends BaseController
      */
     public function logout()
     {
-        $this->student->logout();
+        $this->getStudent()->logout();
         header('Location: /');
         exit;
     }
@@ -272,7 +293,7 @@ class StudentController extends BaseController
                 'student_id' => $_SESSION['student_id'] ?? null
             ];
 
-            $applicationId = $this->application->create($applicationData);
+            $applicationId = $this->getApplication()->create($applicationData);
             if ($applicationId) {
                 // Send confirmation email
                 $this->sendApplicationEmail($_POST['student_email'], $_POST['student_name'], $applicationId);
@@ -308,7 +329,7 @@ class StudentController extends BaseController
         $application = null;
         
         if ($applicationId) {
-            $application = $this->application->getById($applicationId);
+            $application = $this->getApplication()->getById($applicationId);
         }
 
         $this->render('student/application-success.html', [
@@ -331,7 +352,7 @@ class StudentController extends BaseController
             return;
         }
 
-        $classes = $this->classModel->getAvailableClasses($classType, $startDate);
+        $classes = $this->getClassModel()->getAvailableClasses($classType, $startDate);
         header('Content-Type: application/json');
         echo json_encode($classes);
     }
