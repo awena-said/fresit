@@ -33,6 +33,16 @@ if (strpos($route, $basePath) === 0) {
     $route = substr($route, strlen($basePath));
 }
 
+// Handle direct file access (like router.php, test.php, etc.)
+if (strpos($route, '.php') !== false) {
+    // If it's a direct PHP file access, serve it directly
+    $filePath = __DIR__ . $route;
+    if (file_exists($filePath)) {
+        include $filePath;
+        exit;
+    }
+}
+
 // Ensure route starts with /
 if (empty($route)) {
     $route = '/';

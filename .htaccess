@@ -8,5 +8,8 @@ RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
+# Allow direct access to PHP files in root
+RewriteRule ^([^/]+\.php)$ $1 [L]
+
 # Redirect all other requests to index.php
 RewriteRule ^(.*)$ index.php [QSA,L] 
