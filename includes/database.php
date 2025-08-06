@@ -75,11 +75,11 @@ class Database {
      */
     private function checkAndCreateTables() {
         try {
-            // Check if staff_users table exists
-            $stmt = $this->connection->query("SHOW TABLES LIKE 'staff_users'");
-            $tableExists = $stmt->fetch();
+            // Check if any tables exist
+            $stmt = $this->connection->query("SHOW TABLES");
+            $tables = $stmt->fetchAll();
             
-            if (!$tableExists) {
+            if (count($tables) == 0) {
                 $this->createTables();
             }
         } catch (PDOException $e) {
@@ -92,23 +92,8 @@ class Database {
      */
     private function createTables() {
         try {
-            // Read and execute the SQL file
-            $sqlFile = __DIR__ . '/../database/tables.sql';
-            if (file_exists($sqlFile)) {
-                $sql = file_get_contents($sqlFile);
-                
-                // Split SQL into individual statements
-                $statements = array_filter(array_map('trim', explode(';', $sql)));
-                
-                foreach ($statements as $statement) {
-                    if (!empty($statement)) {
-                        $this->connection->exec($statement);
-                    }
-                }
-            } else {
-                // Fallback: Create tables manually if SQL file doesn't exist
-                $this->createTablesManually();
-            }
+            // Create tables manually (more reliable than reading SQL file)
+            $this->createTablesManually();
         } catch (PDOException $e) {
             throw new Exception("Failed to create tables: " . $e->getMessage());
         }
