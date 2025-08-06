@@ -77,6 +77,22 @@ class Database {
         try {
             // Always try to create tables - IF NOT EXISTS will handle duplicates
             $this->createTables();
+            
+            // Verify that all required tables exist
+            $requiredTables = ['staff_users', 'students', 'classes', 'applications'];
+            $stmt = $this->connection->query("SHOW TABLES");
+            $existingTables = array_column($stmt->fetchAll(), 0);
+            
+            $missingTables = [];
+            foreach ($requiredTables as $table) {
+                if (!in_array($table, $existingTables)) {
+                    $missingTables[] = $table;
+                }
+            }
+            
+            if (!empty($missingTables)) {
+                throw new Exception("Failed to create tables: " . implode(", ", $missingTables));
+            }
         } catch (PDOException $e) {
             throw new Exception("Failed to check/create tables: " . $e->getMessage());
         }
@@ -143,17 +159,23 @@ class Database {
             )"
         ];
         
+        $errors = [];
         foreach ($tables as $sql) {
             try {
                 $this->connection->exec($sql);
             } catch (PDOException $e) {
-                // Log the error but continue with other tables
+                $errors[] = $e->getMessage();
                 error_log("Table creation warning: " . $e->getMessage());
             }
         }
         
         // Re-enable foreign key checks
         $this->connection->exec("SET FOREIGN_KEY_CHECKS = 1");
+        
+        // If there were errors, throw an exception with details
+        if (!empty($errors)) {
+            throw new Exception("Failed to create some tables: " . implode(", ", $errors));
+        }
     }
     
     public static function getInstance() {
