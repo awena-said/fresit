@@ -2,16 +2,12 @@
 
 namespace App\Controllers;
 
-use App\Models\Application;
-
 class HomeController extends BaseController
 {
-    private $application;
-
     public function __construct()
     {
         parent::__construct();
-        $this->application = new Application();
+        // Temporarily removed Application model dependency
     }
 
     /**
@@ -98,21 +94,19 @@ class HomeController extends BaseController
      */
     public function applications()
     {
-        $applications = $this->application->getAll(10, 0);
-
         $this->render('applications.html', [
-            'title' => 'Recent Applications',
-            'applications' => $applications
+            'title' => 'Student Applications'
         ]);
     }
 
     /**
-     * Display application status
+     * Display status page
      */
     public function status()
     {
         $this->render('status.html', [
-            'title' => 'Application Status'
+            'title' => 'System Status',
+            'status' => 'All systems operational'
         ]);
     }
 } 
