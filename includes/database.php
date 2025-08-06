@@ -118,22 +118,16 @@ class Database {
         // Disable foreign key checks temporarily
         $this->connection->exec("SET FOREIGN_KEY_CHECKS = 0");
         
-        // Drop existing tables if they exist
-        $tablesToDrop = ['applications', 'classes', 'students', 'staff_users'];
-        foreach ($tablesToDrop as $table) {
-            $this->connection->exec("DROP TABLE IF EXISTS `$table`");
-        }
-        
-        // Create tables in correct order
+        // Create tables using IF NOT EXISTS to avoid conflicts
         $tables = [
-            "CREATE TABLE `staff_users` (
+            "CREATE TABLE IF NOT EXISTS `staff_users` (
                 `id` VARCHAR(255) PRIMARY KEY,
                 `name` VARCHAR(255) NOT NULL,
                 `email` VARCHAR(255) UNIQUE NOT NULL,
                 `password` VARCHAR(255) NOT NULL
             )",
             
-            "CREATE TABLE `students` (
+            "CREATE TABLE IF NOT EXISTS `students` (
                 `id` VARCHAR(255) PRIMARY KEY,
                 `name` VARCHAR(255) NOT NULL,
                 `email` VARCHAR(255) UNIQUE NOT NULL,
@@ -141,7 +135,7 @@ class Database {
                 `password` VARCHAR(255) NOT NULL
             )",
             
-            "CREATE TABLE `classes` (
+            "CREATE TABLE IF NOT EXISTS `classes` (
                 `id` VARCHAR(255) PRIMARY KEY,
                 `name` VARCHAR(255) NOT NULL,
                 `type` ENUM('Foundation', 'Imagination', 'Watercolour') NOT NULL,
@@ -153,7 +147,7 @@ class Database {
                 FOREIGN KEY (`tutor_id`) REFERENCES `staff_users`(`id`) ON DELETE CASCADE
             )",
             
-            "CREATE TABLE `applications` (
+            "CREATE TABLE IF NOT EXISTS `applications` (
                 `id` VARCHAR(255) PRIMARY KEY,
                 `class_id` VARCHAR(255) NOT NULL,
                 `student_id` VARCHAR(255) NULL,
@@ -167,7 +161,12 @@ class Database {
         ];
         
         foreach ($tables as $sql) {
-            $this->connection->exec($sql);
+            try {
+                $this->connection->exec($sql);
+            } catch (PDOException $e) {
+                // Log the error but continue with other tables
+                error_log("Table creation warning: " . $e->getMessage());
+            }
         }
         
         // Re-enable foreign key checks
