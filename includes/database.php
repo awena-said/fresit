@@ -117,24 +117,39 @@ class Database {
         // Disable foreign key checks temporarily
         $this->connection->exec("SET FOREIGN_KEY_CHECKS = 0");
         
-        // Create tables using IF NOT EXISTS to avoid conflicts
-        $tables = [
-            "CREATE TABLE IF NOT EXISTS `staff_users` (
+        // Create tables one by one in correct order
+        $errors = [];
+        
+        // 1. Create staff_users table (no dependencies)
+        try {
+            $sql = "CREATE TABLE IF NOT EXISTS `staff_users` (
                 `id` VARCHAR(255) PRIMARY KEY,
                 `name` VARCHAR(255) NOT NULL,
                 `email` VARCHAR(255) UNIQUE NOT NULL,
                 `password` VARCHAR(255) NOT NULL
-            )",
-            
-            "CREATE TABLE IF NOT EXISTS `students` (
+            )";
+            $this->connection->exec($sql);
+        } catch (PDOException $e) {
+            $errors[] = "staff_users: " . $e->getMessage();
+        }
+        
+        // 2. Create students table (no dependencies)
+        try {
+            $sql = "CREATE TABLE IF NOT EXISTS `students` (
                 `id` VARCHAR(255) PRIMARY KEY,
                 `name` VARCHAR(255) NOT NULL,
                 `email` VARCHAR(255) UNIQUE NOT NULL,
                 `phone` VARCHAR(50),
                 `password` VARCHAR(255) NOT NULL
-            )",
-            
-            "CREATE TABLE IF NOT EXISTS `classes` (
+            )";
+            $this->connection->exec($sql);
+        } catch (PDOException $e) {
+            $errors[] = "students: " . $e->getMessage();
+        }
+        
+        // 3. Create classes table (depends on staff_users)
+        try {
+            $sql = "CREATE TABLE IF NOT EXISTS `classes` (
                 `id` VARCHAR(255) PRIMARY KEY,
                 `name` VARCHAR(255) NOT NULL,
                 `type` ENUM('Foundation', 'Imagination', 'Watercolour') NOT NULL,
@@ -144,9 +159,15 @@ class Database {
                 `tutor_id` VARCHAR(255) NOT NULL,
                 `capacity` INT NOT NULL DEFAULT 20,
                 FOREIGN KEY (`tutor_id`) REFERENCES `staff_users`(`id`) ON DELETE CASCADE
-            )",
-            
-            "CREATE TABLE IF NOT EXISTS `applications` (
+            )";
+            $this->connection->exec($sql);
+        } catch (PDOException $e) {
+            $errors[] = "classes: " . $e->getMessage();
+        }
+        
+        // 4. Create applications table (depends on classes and students)
+        try {
+            $sql = "CREATE TABLE IF NOT EXISTS `applications` (
                 `id` VARCHAR(255) PRIMARY KEY,
                 `class_id` VARCHAR(255) NOT NULL,
                 `student_id` VARCHAR(255) NULL,
@@ -156,17 +177,10 @@ class Database {
                 `status` ENUM('pending', 'accepted', 'rejected') DEFAULT 'pending',
                 FOREIGN KEY (`class_id`) REFERENCES `classes`(`id`) ON DELETE CASCADE,
                 FOREIGN KEY (`student_id`) REFERENCES `students`(`id`) ON DELETE SET NULL
-            )"
-        ];
-        
-        $errors = [];
-        foreach ($tables as $sql) {
-            try {
-                $this->connection->exec($sql);
-            } catch (PDOException $e) {
-                $errors[] = $e->getMessage();
-                error_log("Table creation warning: " . $e->getMessage());
-            }
+            )";
+            $this->connection->exec($sql);
+        } catch (PDOException $e) {
+            $errors[] = "applications: " . $e->getMessage();
         }
         
         // Re-enable foreign key checks
