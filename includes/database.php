@@ -93,7 +93,7 @@ class Database {
     private function createTables() {
         try {
             // Read and execute the SQL file
-            $sqlFile = __DIR__ . '/../database/database.sql';
+            $sqlFile = __DIR__ . '/../database/tables.sql';
             if (file_exists($sqlFile)) {
                 $sql = file_get_contents($sqlFile);
                 
