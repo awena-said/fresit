@@ -8,22 +8,8 @@ class BaseController
 
     public function __construct()
     {
-        $this->initializeTwig();
-    }
-
-    /**
-     * Initialize Twig template engine
-     */
-    protected function initializeTwig()
-    {
-        require_once __DIR__ . '/../../vendor/autoload.php';
-        
-        $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../views');
-        $this->twig = new \Twig\Environment($loader, [
-            'cache' => __DIR__ . '/../../cache/twig',
-            'debug' => true,
-            'auto_reload' => true
-        ]);
+        global $twig;
+        $this->twig = $twig;
     }
 
     /**

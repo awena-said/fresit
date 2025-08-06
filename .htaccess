@@ -1,9 +1,12 @@
 RewriteEngine On
 
-# Redirect all requests to index.php except for existing files and directories
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php [QSA,L]
+# Allow direct access to static assets in public directory
+RewriteRule ^public/(styles|assets)/ - [L]
 
-# Allow access to static assets
-RewriteRule ^(public/styles|public/assets)/ - [L] 
+# Allow direct access to existing files and directories
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Redirect all other requests to index.php
+RewriteRule ^(.*)$ index.php [QSA,L] 
