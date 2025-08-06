@@ -81,6 +81,18 @@ class Database {
             
             if (count($tables) == 0) {
                 $this->createTables();
+            } else {
+                // Check if all required tables exist
+                $requiredTables = ['staff_users', 'students', 'classes', 'applications'];
+                $existingTables = array_column($tables, 0);
+                
+                foreach ($requiredTables as $table) {
+                    if (!in_array($table, $existingTables)) {
+                        // Missing table, recreate all tables
+                        $this->createTables();
+                        break;
+                    }
+                }
             }
         } catch (PDOException $e) {
             throw new Exception("Failed to check/create tables: " . $e->getMessage());
@@ -103,6 +115,16 @@ class Database {
      * Create tables manually as fallback
      */
     private function createTablesManually() {
+        // Disable foreign key checks temporarily
+        $this->connection->exec("SET FOREIGN_KEY_CHECKS = 0");
+        
+        // Drop existing tables if they exist
+        $tablesToDrop = ['applications', 'classes', 'students', 'staff_users'];
+        foreach ($tablesToDrop as $table) {
+            $this->connection->exec("DROP TABLE IF EXISTS `$table`");
+        }
+        
+        // Create tables in correct order
         $tables = [
             "CREATE TABLE `staff_users` (
                 `id` VARCHAR(255) PRIMARY KEY,
@@ -147,6 +169,9 @@ class Database {
         foreach ($tables as $sql) {
             $this->connection->exec($sql);
         }
+        
+        // Re-enable foreign key checks
+        $this->connection->exec("SET FOREIGN_KEY_CHECKS = 1");
     }
     
     public static function getInstance() {
