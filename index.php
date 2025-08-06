@@ -13,8 +13,6 @@ require_once __DIR__ . '/app/controllers/HomeController.php';
 require_once __DIR__ . '/app/controllers/StaffController.php';
 require_once __DIR__ . '/app/controllers/StudentController.php';
 
-require_once __DIR__ . '/app/models/Application.php';
-require_once __DIR__ . '/app/models/ClassModel.php';
 require_once __DIR__ . '/app/models/StaffUser.php';
 require_once __DIR__ . '/app/models/Student.php';
 
@@ -226,20 +224,7 @@ switch ($route) {
         $controller->classes();
         break;
 
-    case '/staff/schedule':
-        $controller = new StaffController();
-        $controller->schedule();
-        break;
 
-    case '/staff/roster':
-        $controller = new StaffController();
-        $controller->roster();
-        break;
-
-    case '/staff/emails':
-        $controller = new StaffController();
-        $controller->emails();
-        break;
 
     case '/staff/application':
         $controller = new StaffController();
@@ -266,15 +251,7 @@ switch ($route) {
         $controller->deleteClass($_POST['id'] ?? null);
         break;
 
-    case '/staff/classes/roster':
-        $controller = new StaffController();
-        $controller->getClassRoster($_GET['id'] ?? null);
-        break;
 
-    case '/staff/classes/roster/print':
-        $controller = new StaffController();
-        $controller->printRoster($_GET['id'] ?? null);
-        break;
 
     case '/status':
         $controller = new HomeController();
