@@ -38,58 +38,16 @@ if (empty($route)) {
     $route = '/';
 }
 
-// Debug logging
-error_log("Original URI: " . $_SERVER['REQUEST_URI']);
-error_log("Processed route: " . $route);
+// Debug output
+echo "<h2>Debug Information:</h2>";
+echo "<p><strong>Original URI:</strong> " . $_SERVER['REQUEST_URI'] . "</p>";
+echo "<p><strong>Processed Route:</strong> " . $route . "</p>";
+echo "<p><strong>Base Path:</strong> " . $basePath . "</p>";
+echo "<hr>";
 
 // Initialize Twig
 $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/app/views');
-
-// Ensure cache directory exists with proper error handling
-$cacheDir = __DIR__ . '/cache/twig';
-$cacheOptions = ['debug' => true, 'auto_reload' => true];
-
-// Always disable caching by default to avoid permission issues
-$cacheOptions['cache'] = false;
-
-// Only try to enable caching if we can safely create and write to the directory
-try {
-    // Check if cache directory exists
-    if (!is_dir($cacheDir)) {
-        // Try to create parent directories first
-        $parentDir = dirname($cacheDir);
-        if (!is_dir($parentDir)) {
-            if (@mkdir($parentDir, 0755, true)) {
-                error_log("Created parent cache directory: $parentDir");
-            } else {
-                error_log("Warning: Could not create parent cache directory: $parentDir");
-                $cacheOptions['cache'] = false;
-            }
-        }
-        
-        // Now try to create the twig cache directory
-        if (@mkdir($cacheDir, 0755, true)) {
-            error_log("Created cache directory: $cacheDir");
-            $cacheOptions['cache'] = $cacheDir;
-        } else {
-            error_log("Warning: Could not create cache directory: $cacheDir");
-            $cacheOptions['cache'] = false;
-        }
-    } else {
-        // Directory exists, check if it's writable
-        if (is_writable($cacheDir)) {
-            $cacheOptions['cache'] = $cacheDir;
-        } else {
-            error_log("Warning: Cache directory exists but is not writable: $cacheDir");
-            $cacheOptions['cache'] = false;
-        }
-    }
-} catch (Exception $e) {
-    error_log("Warning: Exception during cache directory setup: " . $e->getMessage());
-    $cacheOptions['cache'] = false;
-}
-
-$twig = new \Twig\Environment($loader, $cacheOptions);
+$twig = new \Twig\Environment($loader, ['debug' => true, 'auto_reload' => true]);
 
 // Route the request
 switch ($route) {
@@ -271,18 +229,11 @@ switch ($route) {
         $controller->status();
         break;
 
-    case '/debug':
-        echo "Debug Info:<br>";
-        echo "Original URI: " . $_SERVER['REQUEST_URI'] . "<br>";
-        echo "Processed Route: " . $route . "<br>";
-        echo "Base Path: " . $basePath . "<br>";
-        echo "Document Root: " . $_SERVER['DOCUMENT_ROOT'] . "<br>";
-        echo "Script Name: " . $_SERVER['SCRIPT_NAME'] . "<br>";
-        exit;
-
     default:
         http_response_code(404);
-        echo $twig->render('404.html', ['title' => 'Page Not Found']);
+        echo "<h1>404 - Page Not Found</h1>";
+        echo "<p>Route not found: " . $route . "</p>";
+        echo "<p><a href='/fresit/'>Go to Home</a></p>";
         break;
 }
 ?> 
