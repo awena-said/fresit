@@ -161,11 +161,70 @@ class StaffController extends BaseController
         $classes = $this->getClassModel()->getAll();
         $upcomingClasses = $this->getClassModel()->getUpcomingClasses();
 
-        $this->render('staff/applications.html', [
+        $this->render('applications.html', [
             'title' => 'Applications',
             'applications' => $applications,
             'classes' => $classes,
-            'upcoming_classes' => $upcomingClasses
+            'upcoming_classes' => $upcomingClasses,
+            'user' => $_SESSION['user'] ?? null
+        ]);
+    }
+
+    public function classes()
+    {
+        if (!$this->isLoggedIn()) {
+            $this->redirect('/staff/login');
+            return;
+        }
+
+        $classes = $this->getClassModel()->getAll();
+        
+        $this->render('staff/classes.html', [
+            'title' => 'Manage Classes',
+            'classes' => $classes,
+            'user' => $_SESSION['user'] ?? null
+        ]);
+    }
+
+    public function schedule()
+    {
+        if (!$this->isLoggedIn()) {
+            $this->redirect('/staff/login');
+            return;
+        }
+
+        $this->render('staff/schedule.html', [
+            'title' => 'Schedule Classes',
+            'user' => $_SESSION['user'] ?? null
+        ]);
+    }
+
+    public function roster()
+    {
+        if (!$this->isLoggedIn()) {
+            $this->redirect('/staff/login');
+            return;
+        }
+
+        $classes = $this->getClassModel()->getAll();
+        
+        $this->render('staff/roster.html', [
+            'title' => 'Class Roster',
+            'classes' => $classes,
+            'user' => $_SESSION['user'] ?? null
+        ]);
+    }
+
+    public function emails()
+    {
+        if (!$this->isLoggedIn()) {
+            $this->redirect('/staff/login');
+            return;
+        }
+
+        $this->render('staff/emails.html', [
+            'title' => 'Email Files',
+            'user' => $_SESSION['user'] ?? null
         ]);
     }
 

@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/fresit/public/styles/staff.css">
+{% endblock %}
+
+{% block content %}
+<section id="dashboard-section" class="dashboard-section">
+    <div class="dashboard-header">
+        <h1>STAFF DASHBOARD</h1>
+        <div class="user-info">
+            <span id="user-email">{{ user.email }}</span>
+            <a href="/fresit/staff/logout" class="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="dashboard-nav">
+        <a href="/fresit/staff/applications" class="nav-tab">Applications</a>
+        <a href="/fresit/staff/classes" class="nav-tab">Manage Classes</a>
+        <a href="/fresit/staff/schedule" class="nav-tab active">Schedule Classes</a>
+        <a href="/fresit/staff/roster" class="nav-tab">Class Roster</a>
+        <a href="/fresit/staff/emails" class="nav-tab">Email Files</a>
+    </div>
+
+    <!-- Schedule Content -->
+    <div class="dashboard-content">
+        <div class="content-header">
+            <h2>Schedule Classes</h2>
+            <p>View and manage class schedules</p>
+        </div>
+
+        <div class="schedule-container">
+            <div class="schedule-filters">
+                <select id="weekFilter" onchange="loadSchedule()">
+                    <option value="">Select Week</option>
+                    <!-- Weeks will be loaded dynamically -->
+                </select>
+            </div>
+
+            <div class="schedule-grid">
+                <div class="schedule-header">
+                    <div class="time-slot">Time</div>
+                    <div class="day-slot">Monday</div>
+                    <div class="day-slot">Tuesday</div>
+                    <div class="day-slot">Wednesday</div>
+                    <div class="day-slot">Thursday</div>
+                    <div class="day-slot">Friday</div>
+                    <div class="day-slot">Saturday</div>
+                    <div class="day-slot">Sunday</div>
+                </div>
+                
+                <div id="scheduleBody" class="schedule-body">
+                    <!-- Schedule will be loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadSchedule();
+});
+
+function loadSchedule() {
+    const weekFilter = document.getElementById('weekFilter').value;
+    
+    fetch(`/fresit/staff/api/schedule?week=${weekFilter}`)
+        .then(response => response.json())
+        .then(data => {
+            displaySchedule(data.schedule);
+        })
+        .catch(error => {
+            console.error('Error loading schedule:', error);
+            displaySchedule([]);
+        });
+}
+
+function displaySchedule(schedule) {
+    const scheduleBody = document.getElementById('scheduleBody');
+    scheduleBody.innerHTML = '';
+    
+    if (schedule.length === 0) {
+        scheduleBody.innerHTML = '<div class="no-schedule">No classes scheduled for this week</div>';
+        return;
+    }
+    
+    // Group classes by time slots
+    const timeSlots = {};
+    schedule.forEach(classItem => {
+        const timeKey = `${classItem.start_time}-${classItem.end_time}`;
+        if (!timeSlots[timeKey]) {
+            timeSlots[timeKey] = {};
+        }
+        timeSlots[timeKey][classItem.day_of_week] = classItem;
+    });
+    
+    // Create schedule rows
+    Object.keys(timeSlots).forEach(timeSlot => {
+        const row = document.createElement('div');
+        row.className = 'schedule-row';
+        
+        const timeCell = document.createElement('div');
+        timeCell.className = 'time-slot';
+        timeCell.textContent = timeSlot;
+        row.appendChild(timeCell);
+        
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        days.forEach(day => {
+            const dayCell = document.createElement('div');
+            dayCell.className = 'day-slot';
+            
+            const classItem = timeSlots[timeSlot][day];
+            if (classItem) {
+                dayCell.innerHTML = `
+                    <div class="class-item">
+                        <div class="class-name">${classItem.name}</div>
+                        <div class="class-tutor">${classItem.tutor_name}</div>
+                        <div class="class-room">${classItem.room}</div>
+                    </div>
+                `;
+            }
+            
+            row.appendChild(dayCell);
+        });
+        
+        scheduleBody.appendChild(row);
+    });
+}
+</script>
+{% endblock %} 

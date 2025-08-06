@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/fresit/public/styles/staff.css">
+{% endblock %}
+
+{% block content %}
+<section id="dashboard-section" class="dashboard-section">
+    <div class="dashboard-header">
+        <h1>STAFF DASHBOARD</h1>
+        <div class="user-info">
+            <span id="user-email">{{ user.email }}</span>
+            <a href="/fresit/staff/logout" class="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="dashboard-nav">
+        <a href="/fresit/staff/applications" class="nav-tab">Applications</a>
+        <a href="/fresit/staff/classes" class="nav-tab">Manage Classes</a>
+        <a href="/fresit/staff/schedule" class="nav-tab">Schedule Classes</a>
+        <a href="/fresit/staff/roster" class="nav-tab active">Class Roster</a>
+        <a href="/fresit/staff/emails" class="nav-tab">Email Files</a>
+    </div>
+
+    <!-- Roster Content -->
+    <div class="dashboard-content">
+        <div class="content-header">
+            <h2>Class Roster</h2>
+            <div class="roster-controls">
+                <select id="classFilter" onchange="loadRoster()">
+                    <option value="">Select Class</option>
+                    {% for class in classes %}
+                        <option value="{{ class.id }}">{{ class.name }} - {{ class.day_of_week }} {{ class.start_time }}</option>
+                    {% endfor %}
+                </select>
+                <button class="btn-secondary" onclick="printRoster()" id="printBtn" style="display: none;">
+                    <i class="fas fa-print"></i> Print Roster
+                </button>
+            </div>
+        </div>
+
+        <div id="rosterContent" class="roster-content">
+            <div class="empty-state">
+                <i class="fas fa-users"></i>
+                <h3>Select a class to view roster</h3>
+                <p>Choose a class from the dropdown above to see enrolled students.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function loadRoster() {
+    const classId = document.getElementById('classFilter').value;
+    const printBtn = document.getElementById('printBtn');
+    const rosterContent = document.getElementById('rosterContent');
+    
+    if (!classId) {
+        printBtn.style.display = 'none';
+        rosterContent.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-users"></i>
+                <h3>Select a class to view roster</h3>
+                <p>Choose a class from the dropdown above to see enrolled students.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    fetch(`/fresit/staff/roster?class_id=${classId}`)
+        .then(response => response.json())
+        .then(data => {
+            displayRoster(data);
+            printBtn.style.display = 'inline-block';
+        })
+        .catch(error => {
+            console.error('Error loading roster:', error);
+            rosterContent.innerHTML = `
+                <div class="error-state">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Error loading roster</h3>
+                    <p>Please try again later.</p>
+                </div>
+            `;
+        });
+}
+
+function displayRoster(data) {
+    const rosterContent = document.getElementById('rosterContent');
+    
+    if (!data.class || !data.students) {
+        rosterContent.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>No data available</h3>
+                <p>Unable to load roster information.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const classInfo = data.class;
+    const students = data.students;
+    
+    let html = `
+        <div class="roster-header">
+            <h3>${classInfo.name}</h3>
+            <div class="class-info">
+                <p><strong>Type:</strong> ${classInfo.type}</p>
+                <p><strong>Tutor:</strong> ${classInfo.tutor_name}</p>
+                <p><strong>Time:</strong> ${classInfo.day_of_week} ${classInfo.start_time}-${classInfo.end_time}</p>
+                <p><strong>Room:</strong> ${classInfo.room}</p>
+                <p><strong>Capacity:</strong> ${students.length}/${classInfo.capacity}</p>
+            </div>
+        </div>
+    `;
+    
+    if (students.length === 0) {
+        html += `
+            <div class="empty-state">
+                <i class="fas fa-user-graduate"></i>
+                <h3>No students enrolled</h3>
+                <p>This class currently has no enrolled students.</p>
+            </div>
+        `;
+    } else {
+        html += `
+            <div class="roster-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Enrolled Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        students.forEach((student, index) => {
+            html += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${student.name}</td>
+                    <td>${student.email}</td>
+                    <td>${student.phone || 'N/A'}</td>
+                    <td>${new Date(student.enrolled_date).toLocaleDateString()}</td>
+                    <td><span class="status-badge status-${student.status}">${student.status}</span></td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+    
+    rosterContent.innerHTML = html;
+}
+
+function printRoster() {
+    const classId = document.getElementById('classFilter').value;
+    if (classId) {
+        window.open(`/fresit/staff/roster/print?class_id=${classId}`, '_blank');
+    }
+}
+</script>
+{% endblock %} 

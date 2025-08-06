@@ -197,6 +197,31 @@ switch ($route) {
         $controller->logout();
         break;
 
+    case '/staff/applications':
+        $controller = new StaffController();
+        $controller->applications();
+        break;
+
+    case '/staff/classes':
+        $controller = new StaffController();
+        $controller->classes();
+        break;
+
+    case '/staff/schedule':
+        $controller = new StaffController();
+        $controller->schedule();
+        break;
+
+    case '/staff/roster':
+        $controller = new StaffController();
+        $controller->roster();
+        break;
+
+    case '/staff/emails':
+        $controller = new StaffController();
+        $controller->emails();
+        break;
+
     case '/staff/application':
         $controller = new StaffController();
         $controller->getApplication($_GET['id'] ?? null);
