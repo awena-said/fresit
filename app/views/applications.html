@@ -10,17 +10,17 @@
         <h1>STAFF DASHBOARD</h1>
         <div class="user-info">
             <span id="user-email">{{ user.email }}</span>
-            <a href="/staff/logout" class="logout-btn">Logout</a>
+            <a href="/fresit/staff/logout" class="logout-btn">Logout</a>
         </div>
     </div>
 
     <!-- Navigation Tabs -->
     <div class="dashboard-nav">
-        <a href="/staff/applications" class="nav-tab active">Applications</a>
-        <a href="/staff/classes" class="nav-tab">Manage Classes</a>
-        <a href="/staff/schedule" class="nav-tab">Schedule Classes</a>
-        <a href="/staff/roster" class="nav-tab">Class Roster</a>
-        <a href="/staff/emails" class="nav-tab">Email Files</a>
+        <a href="/fresit/staff/applications" class="nav-tab active">Applications</a>
+        <a href="/fresit/staff/classes" class="nav-tab">Manage Classes</a>
+        <a href="/fresit/staff/schedule" class="nav-tab">Schedule Classes</a>
+        <a href="/fresit/staff/roster" class="nav-tab">Class Roster</a>
+        <a href="/fresit/staff/emails" class="nav-tab">Email Files</a>
     </div>
 
     <!-- Applications Content -->
@@ -28,10 +28,10 @@
         <div class="content-header">
             <h2>Student Applications</h2>
             <div class="filter-controls">
-                <a href="/staff/applications" class="filter-btn {% if current_status == 'all' %}active{% endif %}">All</a>
-                <a href="/staff/applications?status=pending" class="filter-btn {% if current_status == 'pending' %}active{% endif %}">Pending</a>
-                <a href="/staff/applications?status=accepted" class="filter-btn {% if current_status == 'accepted' %}active{% endif %}">Accepted</a>
-                <a href="/staff/applications?status=rejected" class="filter-btn {% if current_status == 'rejected' %}active{% endif %}">Rejected</a>
+                <a href="/fresit/staff/applications" class="filter-btn {% if current_status == 'all' %}active{% endif %}">All</a>
+                <a href="/fresit/staff/applications?status=pending" class="filter-btn {% if current_status == 'pending' %}active{% endif %}">Pending</a>
+                <a href="/fresit/staff/applications?status=accepted" class="filter-btn {% if current_status == 'accepted' %}active{% endif %}">Accepted</a>
+                <a href="/fresit/staff/applications?status=rejected" class="filter-btn {% if current_status == 'rejected' %}active{% endif %}">Rejected</a>
             </div>
         </div>
 
@@ -66,24 +66,24 @@
                         </div>
 
                         {% if application.status == 'pending' %}
-                            <div class="application-actions">
-                                <button class="action-btn accept-btn" data-application-id="{{ application.id }}">
-                                    <i class="fas fa-check"></i> Accept
-                                </button>
-                                <button class="action-btn reject-btn" data-application-id="{{ application.id }}">
-                                    <i class="fas fa-times"></i> Reject
-                                </button>
-                                <a href="/staff/applications/{{ application.id }}" class="action-btn view-btn">
-                                    <i class="fas fa-eye"></i> View Details
-                                </a>
-                            </div>
-                        {% else %}
-                            <div class="application-actions">
-                                <a href="/staff/applications/{{ application.id }}" class="action-btn view-btn">
-                                    <i class="fas fa-eye"></i> View Details
-                                </a>
-                            </div>
-                        {% endif %}
+                                                         <div class="application-actions">
+                                 <button class="action-btn accept-btn" data-application-id="{{ application.id }}">
+                                     <i class="fas fa-check"></i> Accept
+                                 </button>
+                                 <button class="action-btn reject-btn" data-application-id="{{ application.id }}">
+                                     <i class="fas fa-times"></i> Reject
+                                 </button>
+                                 <a href="/fresit/staff/applications/{{ application.id }}" class="action-btn view-btn">
+                                     <i class="fas fa-eye"></i> View Details
+                                 </a>
+                             </div>
+                                                 {% else %}
+                             <div class="application-actions">
+                                 <a href="/fresit/staff/applications/{{ application.id }}" class="action-btn view-btn">
+                                     <i class="fas fa-eye"></i> View Details
+                                 </a>
+                             </div>
+                         {% endif %}
                     </div>
                 {% endfor %}
             </div>

@@ -35,36 +35,36 @@
     <!-- Header -->
     <header class="header">
         <nav class="button-section" role="navigation">
-            <a class="link" href="/" tabindex="0" aria-label="Go to Home Page">
+            <a class="link" href="/fresit/" tabindex="0" aria-label="Go to Home Page">
                 HOME
             </a>
-            <a class="link" href="/#story-page" tabindex="0" aria-label="Go to Our Story">
+            <a class="link" href="/fresit/#story-page" tabindex="0" aria-label="Go to Our Story">
                 OUR STORY
             </a>
-            <a class="link" href="/#opening-page" tabindex="0" aria-label="Go to Opening Times">
+            <a class="link" href="/fresit/#opening-page" tabindex="0" aria-label="Go to Opening Times">
                 OPENING TIMES
             </a>
-            <a class="link" href="/#contact-us-page" tabindex="0" aria-label="Go to Contact Page">
+            <a class="link" href="/fresit/#contact-us-page" tabindex="0" aria-label="Go to Contact Page">
                 CONTACT US
             </a>
-            <a class="link" href="/reviews" tabindex="0" aria-label="Go to Reviews Page">
+            <a class="link" href="/fresit/reviews" tabindex="0" aria-label="Go to Reviews Page">
                 REVIEWS
             </a>
-            <a class="link" href="/booking" tabindex="0" aria-label="Book Classes">
+            <a class="link" href="/fresit/booking" tabindex="0" aria-label="Book Classes">
                 BOOK CLASSES
             </a>
             {% if user %}
                 {% if user.type == 'staff' %}
-                    <a class="link" href="/staff/dashboard" tabindex="0" aria-label="Staff Dashboard">
+                    <a class="link" href="/fresit/staff/dashboard" tabindex="0" aria-label="Staff Dashboard">
                         STAFF PORTAL
                     </a>
                 {% else %}
-                    <a class="link" href="/student/dashboard" tabindex="0" aria-label="Student Dashboard">
+                    <a class="link" href="/fresit/student/dashboard" tabindex="0" aria-label="Student Dashboard">
                         MY ACCOUNT
                     </a>
                 {% endif %}
             {% else %}
-                <a class="link" href="/staff/login" tabindex="0" aria-label="Staff Login">
+                <a class="link" href="/fresit/staff/login" tabindex="0" aria-label="Staff Login">
                     STAFF LOGIN
                 </a>
             {% endif %}
