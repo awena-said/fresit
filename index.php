@@ -35,17 +35,36 @@ if (strpos($route, $basePath) === 0) {
 
 // Initialize Twig
 $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/app/views');
-$twig = new \Twig\Environment($loader, [
-    'cache' => __DIR__ . '/cache/twig',
-    'debug' => true,
-    'auto_reload' => true
-]);
 
-// Ensure cache directory exists
+// Ensure cache directory exists with proper error handling
 $cacheDir = __DIR__ . '/cache/twig';
+$cacheOptions = ['debug' => true, 'auto_reload' => true];
+
+// Try to create cache directory if it doesn't exist
 if (!is_dir($cacheDir)) {
-    mkdir($cacheDir, 0755, true);
+    try {
+        if (!mkdir($cacheDir, 0755, true)) {
+            // If we can't create the cache directory, disable caching
+            error_log("Warning: Could not create cache directory: $cacheDir");
+            $cacheOptions['cache'] = false;
+        } else {
+            $cacheOptions['cache'] = $cacheDir;
+        }
+    } catch (Exception $e) {
+        error_log("Warning: Exception creating cache directory: " . $e->getMessage());
+        $cacheOptions['cache'] = false;
+    }
+} else {
+    // Check if directory is writable
+    if (!is_writable($cacheDir)) {
+        error_log("Warning: Cache directory is not writable: $cacheDir");
+        $cacheOptions['cache'] = false;
+    } else {
+        $cacheOptions['cache'] = $cacheDir;
+    }
 }
+
+$twig = new \Twig\Environment($loader, $cacheOptions);
 
 // Route the request
 switch ($route) {
