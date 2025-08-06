@@ -103,92 +103,41 @@ class Database {
      */
     private function createTables() {
         try {
-            // Create tables manually (more reliable than reading SQL file)
-            $this->createTablesManually();
+            // Read and execute the SQL file
+            $sqlFile = __DIR__ . '/../database/tables.sql';
+            if (file_exists($sqlFile)) {
+                $sql = file_get_contents($sqlFile);
+                
+                // Disable foreign key checks temporarily
+                $this->connection->exec("SET FOREIGN_KEY_CHECKS = 0");
+                
+                // Split SQL into individual statements
+                $statements = array_filter(array_map('trim', explode(';', $sql)));
+                
+                $errors = [];
+                foreach ($statements as $statement) {
+                    if (!empty($statement)) {
+                        try {
+                            $this->connection->exec($statement);
+                        } catch (PDOException $e) {
+                            $errors[] = $e->getMessage();
+                            error_log("Table creation warning: " . $e->getMessage());
+                        }
+                    }
+                }
+                
+                // Re-enable foreign key checks
+                $this->connection->exec("SET FOREIGN_KEY_CHECKS = 1");
+                
+                // If there were errors, throw an exception with details
+                if (!empty($errors)) {
+                    throw new Exception("Failed to create some tables: " . implode(", ", $errors));
+                }
+            } else {
+                throw new Exception("SQL file not found: " . $sqlFile);
+            }
         } catch (PDOException $e) {
             throw new Exception("Failed to create tables: " . $e->getMessage());
-        }
-    }
-    
-    /**
-     * Create tables manually as fallback
-     */
-    private function createTablesManually() {
-        // Disable foreign key checks temporarily
-        $this->connection->exec("SET FOREIGN_KEY_CHECKS = 0");
-        
-        // Create tables one by one in correct order
-        $errors = [];
-        
-        // 1. Create staff_users table (no dependencies)
-        try {
-            $sql = "CREATE TABLE IF NOT EXISTS `staff_users` (
-                `id` VARCHAR(255) PRIMARY KEY,
-                `name` VARCHAR(255) NOT NULL,
-                `email` VARCHAR(255) UNIQUE NOT NULL,
-                `password` VARCHAR(255) NOT NULL
-            )";
-            $this->connection->exec($sql);
-        } catch (PDOException $e) {
-            $errors[] = "staff_users: " . $e->getMessage();
-        }
-        
-        // 2. Create students table (no dependencies)
-        try {
-            $sql = "CREATE TABLE IF NOT EXISTS `students` (
-                `id` VARCHAR(255) PRIMARY KEY,
-                `name` VARCHAR(255) NOT NULL,
-                `email` VARCHAR(255) UNIQUE NOT NULL,
-                `phone` VARCHAR(50),
-                `password` VARCHAR(255) NOT NULL
-            )";
-            $this->connection->exec($sql);
-        } catch (PDOException $e) {
-            $errors[] = "students: " . $e->getMessage();
-        }
-        
-        // 3. Create classes table (depends on staff_users)
-        try {
-            $sql = "CREATE TABLE IF NOT EXISTS `classes` (
-                `id` VARCHAR(255) PRIMARY KEY,
-                `name` VARCHAR(255) NOT NULL,
-                `type` ENUM('Foundation', 'Imagination', 'Watercolour') NOT NULL,
-                `date` DATE NOT NULL,
-                `start_time` TIME NOT NULL,
-                `end_time` TIME NOT NULL,
-                `tutor_id` VARCHAR(255) NOT NULL,
-                `capacity` INT NOT NULL DEFAULT 20,
-                FOREIGN KEY (`tutor_id`) REFERENCES `staff_users`(`id`) ON DELETE CASCADE
-            )";
-            $this->connection->exec($sql);
-        } catch (PDOException $e) {
-            $errors[] = "classes: " . $e->getMessage();
-        }
-        
-        // 4. Create applications table (depends on classes and students)
-        try {
-            $sql = "CREATE TABLE IF NOT EXISTS `applications` (
-                `id` VARCHAR(255) PRIMARY KEY,
-                `class_id` VARCHAR(255) NOT NULL,
-                `student_id` VARCHAR(255) NULL,
-                `student_name` VARCHAR(255) NOT NULL,
-                `student_email` VARCHAR(255) NOT NULL,
-                `student_phone` VARCHAR(50) NOT NULL,
-                `status` ENUM('pending', 'accepted', 'rejected') DEFAULT 'pending',
-                FOREIGN KEY (`class_id`) REFERENCES `classes`(`id`) ON DELETE CASCADE,
-                FOREIGN KEY (`student_id`) REFERENCES `students`(`id`) ON DELETE SET NULL
-            )";
-            $this->connection->exec($sql);
-        } catch (PDOException $e) {
-            $errors[] = "applications: " . $e->getMessage();
-        }
-        
-        // Re-enable foreign key checks
-        $this->connection->exec("SET FOREIGN_KEY_CHECKS = 1");
-        
-        // If there were errors, throw an exception with details
-        if (!empty($errors)) {
-            throw new Exception("Failed to create some tables: " . implode(", ", $errors));
         }
     }
     
