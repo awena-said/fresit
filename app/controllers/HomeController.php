@@ -96,8 +96,9 @@ class HomeController extends BaseController
      */
     public function bookingSuccess()
     {
-        $this->render('booking-success.html', [
-            'title' => 'Booking Submitted Successfully'
+        $this->render('booking.html', [
+            'title' => 'Booking Submitted Successfully',
+            'success' => true
         ]);
     }
 
@@ -106,11 +107,8 @@ class HomeController extends BaseController
      */
     public function applications()
     {
-        $applications = $this->getApplication()->getAll(10, 0);
-
-        $this->render('applications.html', [
-            'title' => 'Recent Applications',
-            'applications' => $applications
+        $this->render('index.html', [
+            'title' => 'Recent Applications'
         ]);
     }
 
@@ -119,9 +117,8 @@ class HomeController extends BaseController
      */
     public function status()
     {
-        $this->render('status.html', [
-            'title' => 'System Status',
-            'status' => 'All systems operational'
+        $this->render('index.html', [
+            'title' => 'System Status'
         ]);
     }
 } 

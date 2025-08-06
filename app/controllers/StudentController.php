@@ -93,7 +93,7 @@ class StudentController extends BaseController
                 $this->sendRegistrationEmail($_POST['email'], $_POST['name']);
                 
                 // Redirect to login with success message
-                header('Location: /student/login?registered=1');
+                header('Location: /fresit/student/login?registered=1');
                 exit;
             } else {
                 $errors['general'] = 'Registration failed. Email may already be in use.';
@@ -298,7 +298,7 @@ class StudentController extends BaseController
                 // Send confirmation email
                 $this->sendApplicationEmail($_POST['student_email'], $_POST['student_name'], $applicationId);
                 
-                header('Location: /student/application-success?id=' . $applicationId);
+                header('Location: /fresit/student/application-success?id=' . $applicationId);
                 exit;
             } else {
                 $errors['general'] = 'Failed to submit application. Please try again.';
@@ -332,9 +332,10 @@ class StudentController extends BaseController
             $application = $this->getApplication()->getById($applicationId);
         }
 
-        $this->render('student/application-success.html', [
+        $this->render('student/booking.html', [
             'title' => 'Application Submitted Successfully',
-            'application' => $application
+            'application' => $application,
+            'success' => true
         ]);
     }
 

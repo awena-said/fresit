@@ -44,12 +44,12 @@ class StaffController extends BaseController
     public function showLogin()
     {
         if ($this->isLoggedIn()) {
-            $this->redirect('/staff/dashboard');
+            $this->redirect('/fresit/staff/dashboard');
             return;
         }
 
         if (!$this->getStaffUser()->hasUsers()) {
-            $this->redirect('/staff/create-account');
+            $this->redirect('/fresit/staff/create-account');
             return;
         }
 
@@ -72,21 +72,21 @@ class StaffController extends BaseController
         
         if ($user) {
             $this->getStaffUser()->startSession($user);
-            $this->redirect('/staff/dashboard');
+            $this->redirect('/fresit/staff/dashboard');
         } else {
-            $this->redirect('/staff/login');
+            $this->redirect('/fresit/staff/login');
         }
     }
 
     public function showCreateAccount()
     {
         if ($this->isLoggedIn()) {
-            $this->redirect('/staff/dashboard');
+            $this->redirect('/fresit/staff/dashboard');
             return;
         }
 
         if ($this->getStaffUser()->hasUsers()) {
-            $this->redirect('/staff/login');
+            $this->redirect('/fresit/staff/login');
             return;
         }
 
@@ -161,7 +161,7 @@ class StaffController extends BaseController
         $classes = $this->getClassModel()->getAll();
         $upcomingClasses = $this->getClassModel()->getUpcomingClasses();
 
-        $this->render('applications.html', [
+        $this->render('staff-dashboard.html', [
             'title' => 'Applications',
             'applications' => $applications,
             'classes' => $classes,
@@ -179,7 +179,7 @@ class StaffController extends BaseController
 
         $classes = $this->getClassModel()->getAll();
         
-        $this->render('staff/classes.html', [
+        $this->render('staff-dashboard.html', [
             'title' => 'Manage Classes',
             'classes' => $classes,
             'user' => $_SESSION['user'] ?? null
@@ -193,7 +193,7 @@ class StaffController extends BaseController
             return;
         }
 
-        $this->render('staff/schedule.html', [
+        $this->render('staff-dashboard.html', [
             'title' => 'Schedule Classes',
             'user' => $_SESSION['user'] ?? null
         ]);
@@ -208,7 +208,7 @@ class StaffController extends BaseController
 
         $classes = $this->getClassModel()->getAll();
         
-        $this->render('staff/roster.html', [
+        $this->render('staff-dashboard.html', [
             'title' => 'Class Roster',
             'classes' => $classes,
             'user' => $_SESSION['user'] ?? null
@@ -222,7 +222,7 @@ class StaffController extends BaseController
             return;
         }
 
-        $this->render('staff/emails.html', [
+        $this->render('staff-dashboard.html', [
             'title' => 'Email Files',
             'user' => $_SESSION['user'] ?? null
         ]);
@@ -241,7 +241,7 @@ class StaffController extends BaseController
             return;
         }
 
-        $this->render('staff/application-detail.html', [
+        $this->render('staff-dashboard.html', [
             'title' => 'Application Details',
             'application' => $application
         ]);

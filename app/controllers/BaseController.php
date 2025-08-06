@@ -65,10 +65,10 @@ class BaseController
     /**
      * Require authentication
      */
-    protected function requireAuth()
-    {
-        if (!$this->isLoggedIn()) {
-            $this->redirect('/staff/login');
+            protected function requireAuth()
+        {
+            if (!$this->isLoggedIn()) {
+                $this->redirect('/fresit/staff/login');
+            }
         }
-    }
 } 
