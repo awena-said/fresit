@@ -19,41 +19,39 @@ class Database {
     private $connection;
     
     private function __construct() {
-        // Check if MySQL PDO driver is available
-        if (!extension_loaded('pdo_mysql')) {
-            throw new Exception("PDO MySQL extension is not installed. Please install it to use this application.");
-        }
-        
         try {
             // First, connect without specifying database to check if it exists
-            $dsn = "mysql:host=" . DB_HOST . ";charset=" . DB_CHARSET;
-            $tempConnection = new PDO($dsn, DB_USER, DB_PASS, [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES => false,
-            ]);
+            $tempConnection = new mysqli(DB_HOST, DB_USER, DB_PASS);
+            
+            if ($tempConnection->connect_error) {
+                throw new Exception("Database connection failed: " . $tempConnection->connect_error);
+            }
             
             // Check if database exists
-            $stmt = $tempConnection->query("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '" . DB_NAME . "'");
-            $databaseExists = $stmt->fetch();
+            $result = $tempConnection->query("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '" . DB_NAME . "'");
+            $databaseExists = $result->num_rows > 0;
             
             if (!$databaseExists) {
                 // Database doesn't exist, create it
                 $this->createDatabase($tempConnection);
             }
             
+            $tempConnection->close();
+            
             // Now connect to the specific database
-            $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
-            $this->connection = new PDO($dsn, DB_USER, DB_PASS, [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES => false,
-            ]);
+            $this->connection = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+            
+            if ($this->connection->connect_error) {
+                throw new Exception("Database connection failed: " . $this->connection->connect_error);
+            }
+            
+            // Set charset
+            $this->connection->set_charset(DB_CHARSET);
             
             // Check if tables exist, if not create them
             $this->checkAndCreateTables();
             
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             throw new Exception("Database connection failed: " . $e->getMessage() . ". Please ensure MySQL is running and credentials are correct.");
         }
     }
@@ -64,8 +62,10 @@ class Database {
     private function createDatabase($connection) {
         try {
             $sql = "CREATE DATABASE IF NOT EXISTS `" . DB_NAME . "` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
-            $connection->exec($sql);
-        } catch (PDOException $e) {
+            if (!$connection->query($sql)) {
+                throw new Exception("Failed to create database: " . $connection->error);
+            }
+        } catch (Exception $e) {
             throw new Exception("Failed to create database: " . $e->getMessage());
         }
     }
@@ -80,8 +80,11 @@ class Database {
             
             // Verify that all required tables exist
             $requiredTables = ['staff_users', 'students', 'classes', 'applications'];
-            $stmt = $this->connection->query("SHOW TABLES");
-            $existingTables = array_column($stmt->fetchAll(), 0);
+            $result = $this->connection->query("SHOW TABLES");
+            $existingTables = [];
+            while ($row = $result->fetch_array()) {
+                $existingTables[] = $row[0];
+            }
             
             $missingTables = [];
             foreach ($requiredTables as $table) {
@@ -93,13 +96,13 @@ class Database {
             if (!empty($missingTables)) {
                 throw new Exception("Failed to create tables: " . implode(", ", $missingTables));
             }
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             throw new Exception("Failed to check/create tables: " . $e->getMessage());
         }
     }
     
     /**
-     * Create all necessary tables
+     * Create tables from SQL file
      */
     private function createTables() {
         try {
@@ -109,7 +112,7 @@ class Database {
                 $sql = file_get_contents($sqlFile);
                 
                 // Disable foreign key checks temporarily
-                $this->connection->exec("SET FOREIGN_KEY_CHECKS = 0");
+                $this->connection->query("SET FOREIGN_KEY_CHECKS = 0");
                 
                 // Split SQL into individual statements
                 $statements = array_filter(array_map('trim', explode(';', $sql)));
@@ -118,8 +121,11 @@ class Database {
                 foreach ($statements as $statement) {
                     if (!empty($statement)) {
                         try {
-                            $this->connection->exec($statement);
-                        } catch (PDOException $e) {
+                            if (!$this->connection->query($statement)) {
+                                $errors[] = $this->connection->error;
+                                error_log("Table creation warning: " . $this->connection->error);
+                            }
+                        } catch (Exception $e) {
                             $errors[] = $e->getMessage();
                             error_log("Table creation warning: " . $e->getMessage());
                         }
@@ -127,7 +133,7 @@ class Database {
                 }
                 
                 // Re-enable foreign key checks
-                $this->connection->exec("SET FOREIGN_KEY_CHECKS = 1");
+                $this->connection->query("SET FOREIGN_KEY_CHECKS = 1");
                 
                 // If there were errors, throw an exception with details
                 if (!empty($errors)) {
@@ -136,11 +142,14 @@ class Database {
             } else {
                 throw new Exception("SQL file not found: " . $sqlFile);
             }
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             throw new Exception("Failed to create tables: " . $e->getMessage());
         }
     }
     
+    /**
+     * Get singleton instance
+     */
     public static function getInstance() {
         if (self::$instance === null) {
             self::$instance = new self();
@@ -148,52 +157,96 @@ class Database {
         return self::$instance;
     }
     
+    /**
+     * Get database connection
+     */
     public function getConnection() {
         return $this->connection;
     }
     
+    /**
+     * Execute a query and return result
+     */
     public function query($sql, $params = []) {
-        try {
+        if (!empty($params)) {
             $stmt = $this->connection->prepare($sql);
-            $stmt->execute($params);
-            return $stmt;
-        } catch (PDOException $e) {
-            throw new Exception("Query failed: " . $e->getMessage());
+            if (!$stmt) {
+                throw new Exception("Query preparation failed: " . $this->connection->error);
+            }
+            
+            $types = str_repeat('s', count($params));
+            $stmt->bind_param($types, ...$params);
+            $stmt->execute();
+            return $stmt->get_result();
+        } else {
+            $result = $this->connection->query($sql);
+            if (!$result) {
+                throw new Exception("Query failed: " . $this->connection->error);
+            }
+            return $result;
         }
     }
     
+    /**
+     * Fetch all rows
+     */
     public function fetchAll($sql, $params = []) {
-        return $this->query($sql, $params)->fetchAll();
+        $result = $this->query($sql, $params);
+        $rows = [];
+        while ($row = $result->fetch_assoc()) {
+            $rows[] = $row;
+        }
+        return $rows;
     }
     
+    /**
+     * Fetch single row
+     */
     public function fetch($sql, $params = []) {
-        return $this->query($sql, $params)->fetch();
+        $result = $this->query($sql, $params);
+        return $result->fetch_assoc();
     }
     
+    /**
+     * Execute query without returning results
+     */
     public function execute($sql, $params = []) {
-        return $this->query($sql, $params)->rowCount();
+        return $this->query($sql, $params);
     }
     
+    /**
+     * Get last insert ID
+     */
     public function lastInsertId() {
-        return $this->connection->lastInsertId();
+        return $this->connection->insert_id;
     }
     
+    /**
+     * Begin transaction
+     */
     public function beginTransaction() {
-        return $this->connection->beginTransaction();
+        $this->connection->begin_transaction();
     }
     
+    /**
+     * Commit transaction
+     */
     public function commit() {
-        return $this->connection->commit();
+        $this->connection->commit();
     }
     
+    /**
+     * Rollback transaction
+     */
     public function rollback() {
-        return $this->connection->rollback();
+        $this->connection->rollback();
     }
 }
 
 /**
- * Database Helper Functions
+ * Global database helper functions
  */
+
 function db() {
     return Database::getInstance();
 }

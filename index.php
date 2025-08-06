@@ -31,7 +31,37 @@ if (strpos($route, $basePath) === 0) {
     $route = substr($route, strlen($basePath));
 }
 
-// Handle direct file access (like router.php, test.php, etc.)
+// Handle static assets and direct file access
+if (strpos($route, '/public/') === 0) {
+    // Serve static assets from public directory
+    // Decode URL-encoded characters for proper file path handling
+    $decodedRoute = urldecode($route);
+    $filePath = __DIR__ . $decodedRoute;
+    
+    if (file_exists($filePath)) {
+        $extension = pathinfo($filePath, PATHINFO_EXTENSION);
+        $mimeTypes = [
+            'css' => 'text/css',
+            'js' => 'application/javascript',
+            'png' => 'image/png',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'gif' => 'image/gif',
+            'svg' => 'image/svg+xml',
+            'ico' => 'image/x-icon',
+            'webp' => 'image/webp'
+        ];
+        
+        if (isset($mimeTypes[$extension])) {
+            header('Content-Type: ' . $mimeTypes[$extension]);
+        }
+        
+        readfile($filePath);
+        exit;
+    }
+}
+
+// Handle direct PHP file access (like router.php, test.php, etc.)
 if (strpos($route, '.php') !== false) {
     // If it's a direct PHP file access, serve it directly
     $filePath = __DIR__ . $route;
@@ -256,6 +286,18 @@ switch ($route) {
     case '/status':
         $controller = new HomeController();
         $controller->status();
+        break;
+
+    case '/login':
+        // Redirect to staff login
+        header('Location: /fresit/staff/login');
+        exit;
+        break;
+        
+    case '/staff-dashboard':
+        // Redirect to staff dashboard
+        header('Location: /fresit/staff/dashboard');
+        exit;
         break;
 
     case '/debug':
