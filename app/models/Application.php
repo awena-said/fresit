@@ -23,16 +23,14 @@ class Application
             $applicationData['id'] = uniqid('app_', true);
 
             // Insert application
-            $sql = "INSERT INTO applications (id, class_id, student_id, student_name, student_email, student_phone, experience_level, additional_notes, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())";
+            $sql = "INSERT INTO applications (id, class_id, student_id, student_name, student_email, student_phone, status) VALUES (?, ?, ?, ?, ?, ?, 'pending')";
             $this->db->execute($sql, [
                 $applicationData['id'],
                 $applicationData['class_id'],
-                $applicationData['student_id'],
+                $applicationData['student_id'] ?? null,
                 $applicationData['student_name'],
                 $applicationData['student_email'],
-                $applicationData['student_phone'],
-                $applicationData['experience_level'],
-                $applicationData['additional_notes']
+                $applicationData['student_phone']
             ]);
 
             return $applicationData['id'];
@@ -48,10 +46,10 @@ class Application
     public function getAll($limit = null, $offset = 0)
     {
         try {
-            $sql = "SELECT a.*, CONCAT(s.name, ' (', s.role, ')') as processed_by_name 
+            $sql = "SELECT a.*, c.name as class_name, c.type as class_type, c.date as class_date 
                     FROM applications a 
-                    LEFT JOIN staff_users s ON a.processed_by = s.id 
-                    ORDER BY a.created_at DESC";
+                    LEFT JOIN classes c ON a.class_id = c.id 
+                    ORDER BY a.id DESC";
             
             if ($limit !== null) {
                 $sql .= " LIMIT ? OFFSET ?";
@@ -84,11 +82,11 @@ class Application
     public function getByStatus($status, $limit = null, $offset = 0)
     {
         try {
-            $sql = "SELECT a.*, CONCAT(s.name, ' (', s.role, ')') as processed_by_name 
+            $sql = "SELECT a.*, c.name as class_name, c.type as class_type, c.date as class_date 
                     FROM applications a 
-                    LEFT JOIN staff_users s ON a.processed_by = s.id 
+                    LEFT JOIN classes c ON a.class_id = c.id 
                     WHERE a.status = ? 
-                    ORDER BY a.created_at DESC";
+                    ORDER BY a.id DESC";
             
             if ($limit !== null) {
                 $sql .= " LIMIT ? OFFSET ?";
@@ -111,39 +109,19 @@ class Application
             $updates = [];
             $params = [];
 
-            if (isset($applicationData['name'])) {
-                $updates[] = "name = ?";
-                $params[] = $applicationData['name'];
+            if (isset($applicationData['student_name'])) {
+                $updates[] = "student_name = ?";
+                $params[] = $applicationData['student_name'];
             }
 
-            if (isset($applicationData['email'])) {
-                $updates[] = "email = ?";
-                $params[] = $applicationData['email'];
+            if (isset($applicationData['student_email'])) {
+                $updates[] = "student_email = ?";
+                $params[] = $applicationData['student_email'];
             }
 
-            if (isset($applicationData['phone'])) {
-                $updates[] = "phone = ?";
-                $params[] = $applicationData['phone'];
-            }
-
-            if (isset($applicationData['age'])) {
-                $updates[] = "age = ?";
-                $params[] = $applicationData['age'];
-            }
-
-            if (isset($applicationData['class_type'])) {
-                $updates[] = "class_type = ?";
-                $params[] = $applicationData['class_type'];
-            }
-
-            if (isset($applicationData['preferred_date'])) {
-                $updates[] = "preferred_date = ?";
-                $params[] = $applicationData['preferred_date'];
-            }
-
-            if (isset($applicationData['message'])) {
-                $updates[] = "message = ?";
-                $params[] = $applicationData['message'];
+            if (isset($applicationData['student_phone'])) {
+                $updates[] = "student_phone = ?";
+                $params[] = $applicationData['student_phone'];
             }
 
             if (isset($applicationData['status'])) {
@@ -151,18 +129,11 @@ class Application
                 $params[] = $applicationData['status'];
             }
 
-            if (isset($applicationData['processed_by'])) {
-                $updates[] = "processed_by = ?";
-                $params[] = $applicationData['processed_by'];
-            }
-
             if (empty($updates)) {
                 return false;
             }
 
-            $updates[] = "updated_at = NOW()";
             $params[] = $id;
-
             $sql = "UPDATE applications SET " . implode(", ", $updates) . " WHERE id = ?";
             return $this->db->execute($sql, $params) > 0;
         } catch (Exception $e) {
@@ -177,8 +148,8 @@ class Application
     public function updateStatus($id, $status, $processedBy = null)
     {
         try {
-            $sql = "UPDATE applications SET status = ?, processed_by = ?, processed_at = NOW(), updated_at = NOW() WHERE id = ?";
-            return $this->db->execute($sql, [$status, $processedBy, $id]) > 0;
+            $sql = "UPDATE applications SET status = ? WHERE id = ?";
+            return $this->db->execute($sql, [$status, $id]) > 0;
         } catch (Exception $e) {
             error_log("Database error in updateStatus: " . $e->getMessage());
             return false;
@@ -199,7 +170,7 @@ class Application
     }
 
     /**
-     * Get total applications count
+     * Get total count
      */
     public function getTotalCount()
     {
@@ -213,7 +184,7 @@ class Application
     }
 
     /**
-     * Get pending applications count
+     * Get pending count
      */
     public function getPendingCount()
     {
@@ -227,7 +198,7 @@ class Application
     }
 
     /**
-     * Get accepted applications count
+     * Get accepted count
      */
     public function getAcceptedCount()
     {
@@ -241,7 +212,7 @@ class Application
     }
 
     /**
-     * Get rejected applications count
+     * Get rejected count
      */
     public function getRejectedCount()
     {
@@ -275,11 +246,11 @@ class Application
     {
         try {
             $searchTerm = "%{$query}%";
-            $sql = "SELECT a.*, CONCAT(s.name, ' (', s.role, ')') as processed_by_name 
+            $sql = "SELECT a.*, c.name as class_name, c.type as class_type, c.date as class_date 
                     FROM applications a 
-                    LEFT JOIN staff_users s ON a.processed_by = s.id 
-                    WHERE a.name LIKE ? OR a.email LIKE ? OR a.class_type LIKE ? 
-                    ORDER BY a.created_at DESC";
+                    LEFT JOIN classes c ON a.class_id = c.id 
+                    WHERE a.student_name LIKE ? OR a.student_email LIKE ? OR c.name LIKE ? 
+                    ORDER BY a.id DESC";
             
             if ($limit !== null) {
                 $sql .= " LIMIT ? OFFSET ?";
@@ -294,7 +265,7 @@ class Application
     }
 
     /**
-     * Get application statistics
+     * Get statistics
      */
     public function getStatistics()
     {
@@ -304,9 +275,7 @@ class Application
                     COUNT(*) as total,
                     SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
                     SUM(CASE WHEN status = 'accepted' THEN 1 ELSE 0 END) as accepted,
-                    SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected,
-                    SUM(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 ELSE 0 END) as last_7_days,
-                    SUM(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) as last_30_days
+                    SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected
                 FROM applications
             ");
             
@@ -317,9 +286,7 @@ class Application
                 'total' => 0,
                 'pending' => 0,
                 'accepted' => 0,
-                'rejected' => 0,
-                'last_7_days' => 0,
-                'last_30_days' => 0
+                'rejected' => 0
             ];
         }
     }

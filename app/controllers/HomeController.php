@@ -2,12 +2,16 @@
 
 namespace App\Controllers;
 
+use App\Models\Application;
+
 class HomeController extends BaseController
 {
+    private $application;
+
     public function __construct()
     {
         parent::__construct();
-        // Temporarily removed Application model dependency
+        $this->application = new Application();
     }
 
     /**
@@ -94,8 +98,11 @@ class HomeController extends BaseController
      */
     public function applications()
     {
+        $applications = $this->application->getAll(10, 0);
+
         $this->render('applications.html', [
-            'title' => 'Student Applications'
+            'title' => 'Recent Applications',
+            'applications' => $applications
         ]);
     }
 
