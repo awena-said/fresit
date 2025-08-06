@@ -82,12 +82,13 @@ class HomeController extends BaseController
     }
 
     /**
-     * Display booking page - redirect to new student booking system
+     * Display booking page
      */
     public function booking()
     {
-        header('Location: /student/booking');
-        exit;
+        $this->render('booking.html', [
+            'title' => 'Book Classes'
+        ]);
     }
 
     /**
