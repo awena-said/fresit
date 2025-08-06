@@ -75,25 +75,8 @@ class Database {
      */
     private function checkAndCreateTables() {
         try {
-            // Check if any tables exist
-            $stmt = $this->connection->query("SHOW TABLES");
-            $tables = $stmt->fetchAll();
-            
-            if (count($tables) == 0) {
-                $this->createTables();
-            } else {
-                // Check if all required tables exist
-                $requiredTables = ['staff_users', 'students', 'classes', 'applications'];
-                $existingTables = array_column($tables, 0);
-                
-                foreach ($requiredTables as $table) {
-                    if (!in_array($table, $existingTables)) {
-                        // Missing table, recreate all tables
-                        $this->createTables();
-                        break;
-                    }
-                }
-            }
+            // Always try to create tables - IF NOT EXISTS will handle duplicates
+            $this->createTables();
         } catch (PDOException $e) {
             throw new Exception("Failed to check/create tables: " . $e->getMessage());
         }
