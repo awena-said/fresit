@@ -37,7 +37,8 @@ class StaffController extends BaseController
         $this->render('login.html', [
             'title' => 'Staff Login',
             'errors' => $errors,
-            'form_data' => $formData
+            'form_data' => $formData,
+            'csrf_token' => $this->generateCsrfToken()
         ]);
     }
 
@@ -103,7 +104,8 @@ class StaffController extends BaseController
         $this->render('create-account.html', [
             'title' => 'Create Staff Account',
             'errors' => $errors,
-            'form_data' => $formData
+            'form_data' => $formData,
+            'csrf_token' => $this->generateCsrfToken()
         ]);
     }
 
@@ -119,6 +121,7 @@ class StaffController extends BaseController
 
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
         $name = trim($_POST['name'] ?? '');
         $formData = ['email' => $email, 'name' => $name];
         $errors = [];
@@ -129,6 +132,8 @@ class StaffController extends BaseController
             $errors['email'] = 'Invalid email format';
         } elseif (strlen($password) < 8) {
             $errors['password'] = 'Password must be at least 8 characters';
+        } elseif ($password !== $confirmPassword) {
+            $errors['confirm_password'] = 'Passwords do not match';
         } else {
             $userData = ['name' => $name, 'email' => $email, 'password' => $password];
             $user = $this->staffUser->create($userData);

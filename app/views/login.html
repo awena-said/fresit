@@ -24,7 +24,8 @@
                 </div>
             {% endif %}
             
-            <form id="login-form" class="login-form" method="POST" action="/staff/login" novalidate>
+            <form id="login-form" class="login-form" method="POST" action="/fresit/staff/login" novalidate>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                 <fieldset>
                     <legend class="sr-only">Login Information</legend>
                     

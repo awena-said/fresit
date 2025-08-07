@@ -68,7 +68,13 @@ class StaffUser
                 $userData['role'] ?? 'staff'
             ]);
 
-            return true;
+            // Return the created user data (without password)
+            return [
+                'id' => $userData['id'],
+                'name' => $userData['name'],
+                'email' => $userData['email'],
+                'role' => $userData['role'] ?? 'staff'
+            ];
         } catch (Exception $e) {
             error_log("Database error in create: " . $e->getMessage());
             return false;
