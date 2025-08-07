@@ -13,11 +13,11 @@
             <h2 id="login-form-heading">Login</h2>
             <p id="login-description" class="sr-only">Enter your email address and password to access the staff portal.</p>
             
-            {% if login_errors is defined and login_errors %}
+            {% if errors is defined and errors %}
                 <div class="alert alert-error" role="alert" aria-live="polite">
                     <h3 id="error-heading">Please correct the following errors:</h3>
                     <ul aria-labelledby="error-heading">
-                        {% for field, error in login_errors %}
+                        {% for field, error in errors %}
                             <li>{{ error }}</li>
                         {% endfor %}
                     </ul>
@@ -43,14 +43,14 @@
                             aria-describedby="email-help"
                             autocomplete="email"
                             placeholder="Enter your email address"
-                            aria-invalid="{% if login_errors is defined and login_errors.email %}true{% else %}false{% endif %}"
+                            aria-invalid="{% if errors is defined and errors.email %}true{% else %}false{% endif %}"
                         >
                         <div id="email-help" class="form-help sr-only">
                             Please enter a valid email address in the format: yourname@example.com
                         </div>
-                        {% if login_errors is defined and login_errors.email %}
+                        {% if errors is defined and errors.email %}
                             <div class="field-error" role="alert" aria-live="polite">
-                                {{ login_errors.email }}
+                                {{ errors.email }}
                             </div>
                         {% endif %}
                     </div>
@@ -70,7 +70,7 @@
                                 aria-describedby="password-help"
                                 autocomplete="current-password"
                                 placeholder="Enter your password"
-                                aria-invalid="{% if login_errors is defined and login_errors.password %}true{% else %}false{% endif %}"
+                                aria-invalid="{% if errors is defined and errors.password %}true{% else %}false{% endif %}"
                             >
                             <button 
                                 type="button" 
@@ -93,9 +93,9 @@
                         <div id="password-toggle-help" class="sr-only">
                             Click to show or hide your password
                         </div>
-                        {% if login_errors is defined and login_errors.password %}
+                        {% if errors is defined and errors.password %}
                             <div class="field-error" role="alert" aria-live="polite">
-                                {{ login_errors.password }}
+                                {{ errors.password }}
                             </div>
                         {% endif %}
                     </div>
@@ -118,6 +118,74 @@
             
             <div id="login-message" class="login-message" role="status" aria-live="polite"></div>
             
+            <!-- Create Account Section -->
+            {% if errors is defined and errors.show_create_account %}
+                <div class="create-account-section">
+                    <h3>Create New Account</h3>
+                    <p>No account found with this email. You can create a new staff account below.</p>
+                    
+                    {% if errors is defined and errors.create_general %}
+                        <div class="alert alert-error" role="alert" aria-live="polite">
+                            <h4>Account Creation Error:</h4>
+                            <ul>
+                                {% for field, error in errors %}
+                                    {% if field starts with 'create_' %}
+                                        <li>{{ error }}</li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    
+                    <form id="create-account-form" class="create-account-form" method="POST" action="/fresit/staff-login.php">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="hidden" name="create_account" value="1">
+                        
+                        <div class="form-group">
+                            <label for="create_name">Full Name</label>
+                            <input type="text" id="create_name" name="create_name" required value="{{ form_data.name|default('') }}">
+                            {% if errors is defined and errors.create_name %}
+                                <div class="field-error" role="alert" aria-live="polite">
+                                    {{ errors.create_name }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="create_email">Email Address</label>
+                            <input type="email" id="create_email" name="create_email" required value="{{ form_data.email|default('') }}">
+                            {% if errors is defined and errors.create_email %}
+                                <div class="field-error" role="alert" aria-live="polite">
+                                    {{ errors.create_email }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="create_password">Password</label>
+                            <input type="password" id="create_password" name="create_password" required minlength="8">
+                            <small>Password must be at least 8 characters long</small>
+                            {% if errors is defined and errors.create_password %}
+                                <div class="field-error" role="alert" aria-live="polite">
+                                    {{ errors.create_password }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="create_confirm_password">Confirm Password</label>
+                            <input type="password" id="create_confirm_password" name="create_confirm_password" required>
+                            {% if errors is defined and errors.create_confirm_password %}
+                                <div class="field-error" role="alert" aria-live="polite">
+                                    {{ errors.create_confirm_password }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <button type="submit" class="create-account-btn">Create Account</button>
+                    </form>
+                </div>
+            {% endif %}
 
         </div>
     </section>

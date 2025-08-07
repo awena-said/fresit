@@ -72,8 +72,14 @@ $controller = new StaffController();
 
 // Handle the request based on method
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Handle login form submission
-    $controller->login();
+    // Check if this is a create account request
+    if (isset($_POST['create_account']) && $_POST['create_account'] === '1') {
+        // Handle create account form submission
+        $controller->createAccountFromLogin();
+    } else {
+        // Handle login form submission
+        $controller->login();
+    }
 } else {
     // Show login form
     $controller->showLogin();
