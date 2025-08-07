@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Booking Success - Royal Drawing School{% endblock %}
+
+{% block content %}
+<section id="booking-success-page">
+    <div class="success-container">
+        <h1>Booking Submitted Successfully!</h1>
+        <div class="success-message">
+            <p>Thank you for your application to Royal Drawing School!</p>
+            <p>Your application has been received and is being reviewed.</p>
+            <p>We will contact you within 2-3 business days with further details.</p>
+            {% if application_id %}
+                <p><strong>Application ID:</strong> {{ application_id }}</p>
+            {% endif %}
+        </div>
+        <div class="action-buttons">
+            <a href="/fresit/" class="btn btn-primary">Return to Home</a>
+            <a href="/fresit/booking" class="btn btn-secondary">Book Another Class</a>
+        </div>
+    </div>
+</section>
+{% endblock %} 

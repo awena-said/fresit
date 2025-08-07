@@ -4,12 +4,19 @@ namespace App\Controllers;
 
 class BaseController
 {
-    protected $twig;
+    protected static $twig;
+    protected $loginUrl = '/fresit/staff/login';
 
     public function __construct()
     {
-        global $twig;
-        $this->twig = $twig;
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+    }
+
+    public static function setTwig(\Twig\Environment $twig)
+    {
+        self::$twig = $twig;
     }
 
     /**
@@ -17,7 +24,12 @@ class BaseController
      */
     protected function render($template, $data = [])
     {
-        echo $this->twig->render($template, $data);
+        try {
+            echo self::$twig->render($template, $data);
+        } catch (\Twig\Error\Error $e) {
+            http_response_code(500);
+            echo "Error rendering template: " . htmlspecialchars($e->getMessage());
+        }
     }
 
     /**
@@ -34,10 +46,6 @@ class BaseController
      */
     protected function isLoggedIn()
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        
         return isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
     }
 
@@ -50,10 +58,6 @@ class BaseController
             return null;
         }
 
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        
         return [
             'id' => $_SESSION['user_id'] ?? null,
             'name' => $_SESSION['user_name'] ?? null,
@@ -64,10 +68,10 @@ class BaseController
     /**
      * Require authentication
      */
-            protected function requireAuth()
-        {
-            if (!$this->isLoggedIn()) {
-                $this->redirect('/fresit/staff/login');
-            }
+    protected function requireAuth()
+    {
+        if (!$this->isLoggedIn()) {
+            $this->redirect($this->loginUrl);
         }
-} 
+    }
+}

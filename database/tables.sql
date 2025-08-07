@@ -17,6 +17,9 @@ CREATE TABLE IF NOT EXISTS `students` (
     `email` VARCHAR(255) UNIQUE NOT NULL,
     `phone` VARCHAR(50),
     `password` VARCHAR(255) NOT NULL,
+    `reset_token` VARCHAR(255) NULL,
+    `reset_token_expiry` TIMESTAMP NULL,
+    `last_login` TIMESTAMP NULL,
     `is_active` TINYINT(1) DEFAULT 1,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP

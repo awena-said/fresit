@@ -6,19 +6,13 @@ use App\Models\StaffUser;
 
 class StaffController extends BaseController
 {
-    private $staffUser = null;
+    private $staffUser;
+    private $baseUrl = '/fresit/staff';
 
     public function __construct()
     {
         parent::__construct();
-    }
-    
-    private function getStaffUser()
-    {
-        if ($this->staffUser === null) {
-            $this->staffUser = new StaffUser();
-        }
-        return $this->staffUser;
+        $this->staffUser = new StaffUser();
     }
 
     /**
@@ -27,19 +21,23 @@ class StaffController extends BaseController
     public function showLogin()
     {
         if ($this->isLoggedIn()) {
-            $this->redirect('/fresit/staff/dashboard');
+            $this->redirect("{$this->baseUrl}/dashboard");
             return;
         }
 
-        if (!$this->getStaffUser()->hasUsers()) {
-            $this->redirect('/fresit/staff/create-account');
+        if (!$this->staffUser->hasUsers()) {
+            $this->redirect("{$this->baseUrl}/create-account");
             return;
         }
+
+        $errors = $_SESSION['flash_errors'] ?? [];
+        $formData = $_SESSION['flash_form_data'] ?? [];
+        unset($_SESSION['flash_errors'], $_SESSION['flash_form_data']);
 
         $this->render('login.html', [
             'title' => 'Staff Login',
-            'errors' => [],
-            'form_data' => []
+            'errors' => $errors,
+            'form_data' => $formData
         ]);
     }
 
@@ -49,30 +47,38 @@ class StaffController extends BaseController
     public function login()
     {
         if ($this->isLoggedIn()) {
-            $this->redirect('/fresit/staff/dashboard');
+            $this->redirect("{$this->baseUrl}/dashboard");
+            return;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !$this->validateCsrfToken($_POST['csrf_token'] ?? '')) {
+            $this->redirect("{$this->baseUrl}/login");
             return;
         }
 
         $errors = [];
-        $form_data = $_POST;
+        $formData = [
+            'email' => trim($_POST['email'] ?? '')
+        ];
 
         if (empty($_POST['email']) || empty($_POST['password'])) {
             $errors['general'] = 'Email and password are required';
+        } elseif (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+            $errors['email'] = 'Invalid email format';
         } else {
-            $user = $this->getStaffUser()->authenticate($_POST['email'], $_POST['password']);
+            $user = $this->staffUser->authenticate($_POST['email'], $_POST['password']);
             if ($user) {
-                $this->getStaffUser()->startSession($user);
-                $this->redirect('/fresit/staff/dashboard');
+                $this->staffUser->startSession($user);
+                $this->redirect("{$this->baseUrl}/dashboard");
+                return;
             } else {
-                $this->redirect('/fresit/staff/login');
+                $errors['general'] = 'Invalid email or password';
             }
         }
 
-        $this->render('login.html', [
-            'title' => 'Staff Login',
-            'errors' => $errors,
-            'form_data' => $form_data
-        ]);
+        $_SESSION['flash_errors'] = $errors;
+        $_SESSION['flash_form_data'] = $formData;
+        $this->redirect("{$this->baseUrl}/login");
     }
 
     /**
@@ -81,19 +87,23 @@ class StaffController extends BaseController
     public function showCreateAccount()
     {
         if ($this->isLoggedIn()) {
-            $this->redirect('/fresit/staff/dashboard');
+            $this->redirect("{$this->baseUrl}/dashboard");
             return;
         }
 
-        if ($this->getStaffUser()->hasUsers()) {
-            $this->redirect('/fresit/staff/login');
+        if ($this->staffUser->hasUsers()) {
+            $this->redirect("{$this->baseUrl}/login");
             return;
         }
+
+        $errors = $_SESSION['flash_errors'] ?? [];
+        $formData = $_SESSION['flash_form_data'] ?? [];
+        unset($_SESSION['flash_errors'], $_SESSION['flash_form_data']);
 
         $this->render('create-account.html', [
             'title' => 'Create Staff Account',
-            'errors' => [],
-            'form_data' => []
+            'errors' => $errors,
+            'form_data' => $formData
         ]);
     }
 
@@ -102,33 +112,38 @@ class StaffController extends BaseController
      */
     public function createAccount()
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->redirect('/fresit/staff/create-account');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !$this->validateCsrfToken($_POST['csrf_token'] ?? '')) {
+            $this->redirect("{$this->baseUrl}/create-account");
             return;
         }
 
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
         $name = trim($_POST['name'] ?? '');
+        $formData = ['email' => $email, 'name' => $name];
+        $errors = [];
 
         if (empty($email) || empty($password) || empty($name)) {
-            $this->redirect('/fresit/staff/create-account');
-            return;
-        }
-
-        $userData = [
-            'name' => $name,
-            'email' => $email,
-            'password' => $password
-        ];
-
-        $user = $this->getStaffUser()->create($userData);
-        if ($user) {
-            $this->getStaffUser()->startSession($user);
-            $this->redirect('/fresit/staff/dashboard');
+            $errors['general'] = 'All fields are required';
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors['email'] = 'Invalid email format';
+        } elseif (strlen($password) < 8) {
+            $errors['password'] = 'Password must be at least 8 characters';
         } else {
-            $this->redirect('/fresit/staff/create-account');
+            $userData = ['name' => $name, 'email' => $email, 'password' => $password];
+            $user = $this->staffUser->create($userData);
+            if ($user) {
+                $this->staffUser->startSession($user);
+                $this->redirect("{$this->baseUrl}/dashboard");
+                return;
+            } else {
+                $errors['general'] = 'Failed to create account';
+            }
         }
+
+        $_SESSION['flash_errors'] = $errors;
+        $_SESSION['flash_form_data'] = $formData;
+        $this->redirect("{$this->baseUrl}/create-account");
     }
 
     /**
@@ -136,139 +151,11 @@ class StaffController extends BaseController
      */
     public function dashboard()
     {
-        if (!$this->isLoggedIn()) {
-            $this->redirect('/fresit/staff/login');
-            return;
-        }
-
+        $this->requireAuth();
         $this->render('staff-dashboard.html', [
             'title' => 'Staff Dashboard',
-            'user' => [
-                'id' => $_SESSION['user_id'] ?? null,
-                'name' => $_SESSION['user_name'] ?? null,
-                'email' => $_SESSION['user_email'] ?? null,
-                'type' => $_SESSION['user_role'] ?? null
-            ]
+            'user' => $this->getCurrentUser()
         ]);
-    }
-
-    /**
-     * View student applications (business requirement 2.1.2.b.i)
-     */
-    public function applications()
-    {
-        if (!$this->isLoggedIn()) {
-            $this->redirect('/fresit/staff/login');
-            return;
-        }
-
-        $this->render('staff-dashboard.html', [
-            'title' => 'Student Applications',
-            'applications' => [],
-            'available_dates' => [],
-            'user' => [
-                'id' => $_SESSION['user_id'] ?? null,
-                'name' => $_SESSION['user_name'] ?? null,
-                'email' => $_SESSION['user_email'] ?? null,
-                'type' => $_SESSION['user_role'] ?? null
-            ]
-        ]);
-    }
-
-    /**
-     * Manage classes (business requirement 2.1.2.b.v)
-     */
-    public function classes()
-    {
-        if (!$this->isLoggedIn()) {
-            $this->redirect('/fresit/staff/login');
-            return;
-        }
-
-        $this->render('staff-dashboard.html', [
-            'title' => 'Manage Classes',
-            'classes' => [],
-            'user' => [
-                'id' => $_SESSION['user_id'] ?? null,
-                'name' => $_SESSION['user_name'] ?? null,
-                'email' => $_SESSION['user_email'] ?? null,
-                'type' => $_SESSION['user_role'] ?? null
-            ]
-        ]);
-    }
-
-    /**
-     * View individual application (business requirement 2.1.2.b.ii)
-     */
-    public function getApplication($id)
-    {
-        if (!$this->isLoggedIn()) {
-            $this->redirect('/fresit/staff/login');
-            return;
-        }
-
-        $this->render('staff-dashboard.html', [
-            'title' => 'Application Details',
-            'application' => null,
-            'user' => [
-                'id' => $_SESSION['user_id'] ?? null,
-                'name' => $_SESSION['user_name'] ?? null,
-                'email' => $_SESSION['user_email'] ?? null,
-                'type' => $_SESSION['user_role'] ?? null
-            ]
-        ]);
-    }
-
-    /**
-     * Accept application (business requirement 2.1.2.b.iv)
-     */
-    public function acceptApplication($id)
-    {
-        if (!$this->isLoggedIn()) {
-            $this->redirect('/fresit/staff/login');
-            return;
-        }
-
-        $this->redirect('/fresit/staff/applications?accepted=1');
-    }
-
-    /**
-     * Reject application (business requirement 2.1.2.b.iv)
-     */
-    public function rejectApplication($id)
-    {
-        if (!$this->isLoggedIn()) {
-            $this->redirect('/fresit/staff/login');
-            return;
-        }
-
-        $this->redirect('/fresit/staff/applications?rejected=1');
-    }
-
-    /**
-     * Create new class (business requirement 2.1.2.b.v)
-     */
-    public function createClass()
-    {
-        if (!$this->isLoggedIn()) {
-            $this->redirect('/fresit/staff/login');
-            return;
-        }
-
-        $this->redirect('/fresit/staff/dashboard?class_created=1');
-    }
-
-    /**
-     * Delete class
-     */
-    public function deleteClass($id)
-    {
-        if (!$this->isLoggedIn()) {
-            $this->redirect('/fresit/staff/login');
-            return;
-        }
-
-        $this->redirect('/fresit/staff/dashboard?class_deleted=1');
     }
 
     /**
@@ -276,7 +163,7 @@ class StaffController extends BaseController
      */
     public function logout()
     {
-        $this->getStaffUser()->logout();
-        $this->redirect('/fresit/staff/login');
+        $this->staffUser->logout();
+        $this->redirect("{$this->baseUrl}/login");
     }
-} 
+}

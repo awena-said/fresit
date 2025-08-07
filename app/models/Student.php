@@ -169,4 +169,52 @@ class Student
         unset($_SESSION['student_email']);
         unset($_SESSION['student_name']);
     }
+
+    /**
+     * Save password reset token
+     */
+    public function saveResetToken($email, $token, $expiry)
+    {
+        try {
+            return $this->db->execute(
+                "UPDATE students SET reset_token = ?, reset_token_expiry = ?, updated_at = NOW() WHERE email = ? AND is_active = 1",
+                [$token, $expiry, $email]
+            ) > 0;
+        } catch (Exception $e) {
+            error_log("Database error in saveResetToken: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get student by reset token
+     */
+    public function getByResetToken($token)
+    {
+        try {
+            return $this->db->fetch(
+                "SELECT * FROM students WHERE reset_token = ? AND reset_token_expiry > NOW() AND is_active = 1",
+                [$token]
+            );
+        } catch (Exception $e) {
+            error_log("Database error in getByResetToken: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Clear reset token after password reset
+     */
+    public function clearResetToken($email)
+    {
+        try {
+            return $this->db->execute(
+                "UPDATE students SET reset_token = NULL, reset_token_expiry = NULL, updated_at = NOW() WHERE email = ?",
+                [$email]
+            ) > 0;
+        } catch (Exception $e) {
+            error_log("Database error in clearResetToken: " . $e->getMessage());
+            return false;
+        }
+    }
 } 

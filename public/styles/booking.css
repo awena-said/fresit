@@ -1,56 +1,95 @@
-/* Booking Page Styles */
+/* Booking Page Styles - Darker Theme to match student login */
 .booking-section {
-    padding: 2rem 0;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     min-height: 100vh;
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    padding: 2rem 0;
+}
+
+/* Student form styles */
+.student-section {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    padding: 2rem 0;
+}
+
+.student-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #2c3e50;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    border: 1px solid #34495e;
+}
+
+.student-form {
+    padding: 2rem;
+    background: #34495e;
+}
+
+.form-header {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.form-header h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.form-header p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1rem;
 }
 
 .booking-container {
     max-width: 800px;
     margin: 0 auto;
-    padding: 0 1rem;
+    background: #2c3e50;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    border: 1px solid #34495e;
 }
 
 .booking-container h1 {
     text-align: center;
-    color: #2c3e50;
-    font-size: 2.5rem;
+    color: #ecf0f1;
+    font-size: 2rem;
     margin-bottom: 1rem;
-    font-family: 'DM Serif Text', serif;
+    font-weight: 600;
 }
 
 .booking-intro {
     text-align: center;
-    color: #6c757d;
-    font-size: 1.1rem;
+    color: #bdc3c7;
+    font-size: 1rem;
     margin-bottom: 2rem;
     line-height: 1.6;
 }
 
 /* Form Sections */
 .form-section {
-    background: white;
-    border-radius: 12px;
-    padding: 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e9ecef;
 }
 
 .form-section h2 {
-    color: #2c3e50;
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-    font-family: 'DM Serif Text', serif;
-    border-bottom: 2px solid #3498db;
+    color: #ecf0f1;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
     padding-bottom: 0.5rem;
+    border-bottom: 2px solid #2c3e50;
 }
 
 /* Form Rows */
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
+    gap: 1rem;
     margin-bottom: 1.5rem;
 }
 
@@ -69,9 +108,8 @@
 .form-group label {
     display: block;
     margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: #2c3e50;
-    font-size: 0.95rem;
+    font-weight: 500;
+    color: #ecf0f1;
 }
 
 .form-group input,
@@ -79,11 +117,12 @@
 .form-group textarea {
     width: 100%;
     padding: 0.75rem;
-    border: 2px solid #e9ecef;
+    border: 2px solid #2c3e50;
     border-radius: 8px;
     font-size: 1rem;
-    transition: all 0.3s ease;
-    background: #f8f9fa;
+    background: #2c3e50;
+    color: #ecf0f1;
+    transition: border-color 0.3s ease;
 }
 
 .form-group input:focus,
@@ -91,13 +130,25 @@
 .form-group textarea:focus {
     outline: none;
     border-color: #3498db;
-    background: white;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    background: #34495e;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #bdc3c7;
 }
 
 .form-group textarea {
     resize: vertical;
     min-height: 100px;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 0.25rem;
+    color: #bdc3c7;
+    font-size: 0.875rem;
 }
 
 /* Error Messages */
@@ -111,20 +162,20 @@
 .alert {
     padding: 1rem;
     border-radius: 8px;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     font-weight: 500;
 }
 
 .alert-error {
-    background: #fdf2f2;
-    border: 1px solid #fecaca;
-    color: #dc2626;
+    background-color: #c0392b;
+    color: #ecf0f1;
+    border: 1px solid #e74c3c;
 }
 
 .alert-success {
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
-    color: #16a34a;
+    background-color: #27ae60;
+    color: #ecf0f1;
+    border: 1px solid #2ecc71;
 }
 
 /* Form Actions */
@@ -133,17 +184,15 @@
     gap: 1rem;
     justify-content: center;
     margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 1px solid #e9ecef;
 }
 
 .btn-primary,
 .btn-secondary {
-    padding: 0.875rem 2rem;
+    padding: 0.75rem 2rem;
     border: none;
     border-radius: 8px;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 500;
     text-decoration: none;
     text-align: center;
     cursor: pointer;
@@ -157,63 +206,79 @@
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #2980b9 0%, #1f5f8b 100%);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
 }
 
 .btn-secondary {
-    background: #6c757d;
-    color: white;
+    background: #34495e;
+    color: #ecf0f1;
+    border: 2px solid #2c3e50;
 }
 
 .btn-secondary:hover {
-    background: #5a6268;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+    background: #2c3e50;
+    border-color: #3498db;
+}
+
+.form-footer {
+    background: #2c3e50;
+    padding: 1.5rem 2rem;
+    text-align: center;
+    border-top: 1px solid #34495e;
+}
+
+.form-footer p {
+    margin: 0.5rem 0;
+    color: #bdc3c7;
+}
+
+.form-footer a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.form-footer a:hover {
+    text-decoration: underline;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .booking-container {
-        padding: 0 0.5rem;
+    .student-container {
+        margin: 1rem;
+        border-radius: 8px;
     }
     
-    .booking-container h1 {
-        font-size: 2rem;
-    }
-    
-    .form-section {
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
+    .form-row {
+        grid-template-columns: 1fr;
     }
     
     .form-actions {
         flex-direction: column;
-        align-items: center;
     }
     
     .btn-primary,
     .btn-secondary {
         width: 100%;
-        max-width: 300px;
     }
 }
 
 /* Loading States */
-.form-group.loading {
+.loading {
     opacity: 0.6;
     pointer-events: none;
 }
 
-.form-group.loading::after {
+.loading::after {
     content: '';
     position: absolute;
     top: 50%;
-    right: 1rem;
+    left: 50%;
     width: 20px;
     height: 20px;
-    border: 2px solid #e9ecef;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #34495e;
     border-top: 2px solid #3498db;
     border-radius: 50%;
     animation: spin 1s linear infinite;
@@ -222,58 +287,4 @@
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-}
-
-/* Success Animation */
-.form-section.success {
-    animation: slideIn 0.5s ease-out;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Accessibility */
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-    outline: 2px solid #3498db;
-    outline-offset: 2px;
-}
-
-/* High Contrast Mode */
-@media (prefers-contrast: high) {
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-        border-width: 3px;
-    }
-    
-    .btn-primary,
-    .btn-secondary {
-        border: 2px solid currentColor;
-    }
-}
-
-/* Print Styles */
-@media print {
-    .booking-section {
-        background: white;
-    }
-    
-    .form-actions {
-        display: none;
-    }
-    
-    .form-section {
-        box-shadow: none;
-        border: 1px solid #000;
-    }
 } 

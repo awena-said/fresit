@@ -14,9 +14,11 @@ class HomeController extends BaseController
      */
     public function index()
     {
-        $this->render('index.html', [
-            'title' => 'Welcome to Royal Drawing School'
-        ]);
+        $data = [
+            'title' => 'Welcome to Royal Drawing School',
+            'user' => $this->getCurrentUser()
+        ];
+        $this->render('index.html', $data);
     }
 
     /**
@@ -24,9 +26,11 @@ class HomeController extends BaseController
      */
     public function reviews()
     {
-        $this->render('reviews.html', [
-            'title' => 'Student Reviews'
-        ]);
+        $data = [
+            'title' => 'Student Reviews',
+            'user' => $this->getCurrentUser()
+        ];
+        $this->render('reviews.html', $data);
     }
 
     /**
@@ -34,9 +38,20 @@ class HomeController extends BaseController
      */
     public function booking()
     {
-        $this->render('booking.html', [
-            'title' => 'Book Classes'
-        ]);
+        $classTypes = [
+            ['id' => 'foundation', 'name' => 'Foundation'],
+            ['id' => 'imagination', 'name' => 'Imagination'],
+            ['id' => 'watercolour', 'name' => 'Watercolour']
+        ];
+
+        $data = [
+            'title' => 'Apply for Classes',
+            'class_types' => $classTypes,
+            'errors' => [],
+            'form_data' => [],
+            'user' => $this->getCurrentUser()
+        ];
+        $this->render('booking.html', $data);
     }
 
     /**
@@ -44,29 +59,17 @@ class HomeController extends BaseController
      */
     public function bookingSuccess()
     {
-        $this->render('booking.html', [
+        // Add $this->requireAuth() if confirmation requires login
+        $applicationId = $_GET['id'] ?? null;
+        
+        $data = [
             'title' => 'Booking Submitted Successfully',
-            'success' => true
-        ]);
+            'success' => true,
+            'application_id' => $applicationId,
+            'user' => $this->getCurrentUser()
+        ];
+        $this->render('booking-success.html', $data);
     }
 
-    /**
-     * Display applications page (public view)
-     */
-    public function applications()
-    {
-        $this->render('index.html', [
-            'title' => 'Recent Applications'
-        ]);
-    }
 
-    /**
-     * Display status page
-     */
-    public function status()
-    {
-        $this->render('index.html', [
-            'title' => 'System Status'
-        ]);
-    }
-} 
+}

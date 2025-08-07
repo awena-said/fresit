@@ -129,6 +129,9 @@ try {
 
 $twig = new \Twig\Environment($loader, $cacheOptions);
 
+// Pass Twig environment to BaseController
+\App\Controllers\BaseController::setTwig($twig);
+
 // Route the request
 switch ($route) {
     case '/':
@@ -195,10 +198,25 @@ switch ($route) {
         }
         break;
 
-    case '/student/booking':
+    case '/student/forgot-password':
         $controller = new StudentController();
-        $controller->showBooking();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $controller->forgotPassword();
+        } else {
+            $controller->showForgotPassword();
+        }
         break;
+
+    case '/student/reset-password':
+        $controller = new StudentController();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $controller->resetPassword();
+        } else {
+            $controller->showResetPassword();
+        }
+        break;
+
+
 
     case '/student/apply':
         $controller = new StudentController();
