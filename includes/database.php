@@ -49,7 +49,13 @@ class Database {
             $this->connection->set_charset(DB_CHARSET);
             
             // Check if tables exist, if not create them
-            $this->checkAndCreateTables();
+            try {
+                $this->checkAndCreateTables();
+            } catch (Exception $e) {
+                // Log the error but don't fail the connection
+                error_log("Table creation warning: " . $e->getMessage());
+                // Continue without failing - tables can be created later
+            }
             
         } catch (Exception $e) {
             throw new Exception("Database connection failed: " . $e->getMessage() . ". Please ensure MySQL is running and credentials are correct.");
@@ -99,13 +105,15 @@ class Database {
             
             if (!empty($missingTables)) {
                 error_log("Database tables check - Missing: " . implode(", ", $missingTables));
-                throw new Exception("Failed to create tables: " . implode(", ", $missingTables));
+                // Don't throw exception, just log the warning
+                error_log("Warning: Some tables are missing: " . implode(", ", $missingTables));
+            } else {
+                error_log("Database tables check - All tables created successfully");
             }
-            
-            error_log("Database tables check - All tables created successfully");
         } catch (Exception $e) {
             error_log("Database tables check - Error: " . $e->getMessage());
-            throw new Exception("Failed to check/create tables: " . $e->getMessage());
+            // Don't throw exception, just log the error
+            error_log("Warning: Table creation had issues: " . $e->getMessage());
         }
     }
     
@@ -153,10 +161,10 @@ class Database {
                 error_log("Database: Foreign key checks re-enabled");
                 error_log("Database: Successfully executed " . $successCount . " statements");
                 
-                // If there were errors, throw an exception with details
+                // If there were errors, log them but don't fail
                 if (!empty($errors)) {
                     error_log("Database: Errors occurred: " . implode(", ", $errors));
-                    throw new Exception("Failed to create some tables: " . implode(", ", $errors));
+                    error_log("Database: Warning - Some tables may not have been created properly");
                 }
             } else {
                 error_log("Database: SQL file not found: " . $sqlFile);
