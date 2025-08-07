@@ -163,9 +163,119 @@ class StaffController extends BaseController
     public function dashboard()
     {
         $this->requireAuth();
+        
+        // Sample data for demonstration - in a real app, this would come from the database
+        $stats = [
+            'total_applications' => 42,
+            'pending_applications' => 15,
+            'total_classes' => 8,
+            'upcoming_classes' => 3
+        ];
+        
+        $applications = [
+            [
+                'id' => 1,
+                'name' => 'Sarah Johnson',
+                'email' => 'sarah.johnson@email.com',
+                'phone' => '07123456789',
+                'age' => 28,
+                'class_type' => 'Watercolour',
+                'preferred_date' => '2024-02-15',
+                'status' => 'pending',
+                'created_at' => '2024-01-20 10:30:00',
+                'message' => 'I have some experience with drawing and would love to learn watercolor techniques.'
+            ],
+            [
+                'id' => 2,
+                'name' => 'Michael Brown',
+                'email' => 'michael.brown@email.com',
+                'phone' => '07987654321',
+                'age' => 35,
+                'class_type' => 'Foundation',
+                'preferred_date' => '2024-02-20',
+                'status' => 'accepted',
+                'created_at' => '2024-01-18 14:15:00',
+                'message' => 'Complete beginner looking to start my artistic journey.'
+            ],
+            [
+                'id' => 3,
+                'name' => 'Emma Wilson',
+                'email' => 'emma.wilson@email.com',
+                'phone' => '07555123456',
+                'age' => 22,
+                'class_type' => 'Imagination',
+                'preferred_date' => '2024-02-25',
+                'status' => 'pending',
+                'created_at' => '2024-01-22 09:45:00',
+                'message' => null
+            ]
+        ];
+        
+        $classes = [
+            [
+                'id' => 1,
+                'name' => 'Introduction to Watercolour',
+                'class_type' => 'Watercolour',
+                'start_date' => '2024-02-15',
+                'start_time' => '10:00',
+                'tutor_name' => 'Agnes Mitchell',
+                'room' => 'Studio A',
+                'enrolled_count' => 12,
+                'capacity' => 15,
+                'status' => 'active'
+            ],
+            [
+                'id' => 2,
+                'name' => 'Foundation Drawing Skills',
+                'class_type' => 'Foundation',
+                'start_date' => '2024-02-20',
+                'start_time' => '14:00',
+                'tutor_name' => 'Marcus Thompson',
+                'room' => 'Studio B',
+                'enrolled_count' => 8,
+                'capacity' => 12,
+                'status' => 'active'
+            ]
+        ];
+        
+        $upcoming_dates = [
+            ['date' => '2024-02-15'],
+            ['date' => '2024-02-20'],
+            ['date' => '2024-02-25'],
+            ['date' => '2024-03-01']
+        ];
+        
+        $upcoming_classes = [
+            [
+                'id' => 1,
+                'name' => 'Introduction to Watercolour',
+                'start_date' => '2024-02-15',
+                'start_time' => '10:00'
+            ],
+            [
+                'id' => 2,
+                'name' => 'Foundation Drawing Skills',
+                'start_date' => '2024-02-20',
+                'start_time' => '14:00'
+            ]
+        ];
+        
+        $tutors = [
+            ['id' => 1, 'name' => 'Agnes Mitchell'],
+            ['id' => 2, 'name' => 'Marcus Thompson'],
+            ['id' => 3, 'name' => 'Akilah Johnson'],
+            ['id' => 4, 'name' => 'Alexis Parker']
+        ];
+        
         $this->render('staff-dashboard.html', [
             'title' => 'Staff Dashboard',
-            'user' => $this->getCurrentUser()
+            'user' => $this->getCurrentUser(),
+            'stats' => $stats,
+            'applications' => $applications,
+            'classes' => $classes,
+            'upcoming_dates' => $upcoming_dates,
+            'upcoming_classes' => $upcoming_classes,
+            'tutors' => $tutors
         ]);
     }
 
