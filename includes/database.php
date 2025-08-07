@@ -86,6 +86,10 @@ class Database {
                 $existingTables[] = $row[0];
             }
             
+            // Log which tables were created successfully
+            error_log("Database tables check - Required: " . implode(", ", $requiredTables));
+            error_log("Database tables check - Existing: " . implode(", ", $existingTables));
+            
             $missingTables = [];
             foreach ($requiredTables as $table) {
                 if (!in_array($table, $existingTables)) {
@@ -94,9 +98,13 @@ class Database {
             }
             
             if (!empty($missingTables)) {
+                error_log("Database tables check - Missing: " . implode(", ", $missingTables));
                 throw new Exception("Failed to create tables: " . implode(", ", $missingTables));
             }
+            
+            error_log("Database tables check - All tables created successfully");
         } catch (Exception $e) {
+            error_log("Database tables check - Error: " . $e->getMessage());
             throw new Exception("Failed to check/create tables: " . $e->getMessage());
         }
     }
@@ -109,40 +117,53 @@ class Database {
             // Read and execute the SQL file
             $sqlFile = __DIR__ . '/../database/tables.sql';
             if (file_exists($sqlFile)) {
+                error_log("Database: Reading SQL file: " . $sqlFile);
                 $sql = file_get_contents($sqlFile);
                 
                 // Disable foreign key checks temporarily
                 $this->connection->query("SET FOREIGN_KEY_CHECKS = 0");
+                error_log("Database: Foreign key checks disabled");
                 
                 // Split SQL into individual statements
                 $statements = array_filter(array_map('trim', explode(';', $sql)));
+                error_log("Database: Found " . count($statements) . " SQL statements to execute");
                 
                 $errors = [];
-                foreach ($statements as $statement) {
+                $successCount = 0;
+                foreach ($statements as $index => $statement) {
                     if (!empty($statement)) {
                         try {
+                            error_log("Database: Executing statement " . ($index + 1) . ": " . substr($statement, 0, 50) . "...");
                             if (!$this->connection->query($statement)) {
                                 $errors[] = $this->connection->error;
-                                error_log("Table creation warning: " . $this->connection->error);
+                                error_log("Database: Table creation error: " . $this->connection->error);
+                            } else {
+                                $successCount++;
+                                error_log("Database: Statement " . ($index + 1) . " executed successfully");
                             }
                         } catch (Exception $e) {
                             $errors[] = $e->getMessage();
-                            error_log("Table creation warning: " . $e->getMessage());
+                            error_log("Database: Table creation exception: " . $e->getMessage());
                         }
                     }
                 }
                 
                 // Re-enable foreign key checks
                 $this->connection->query("SET FOREIGN_KEY_CHECKS = 1");
+                error_log("Database: Foreign key checks re-enabled");
+                error_log("Database: Successfully executed " . $successCount . " statements");
                 
                 // If there were errors, throw an exception with details
                 if (!empty($errors)) {
+                    error_log("Database: Errors occurred: " . implode(", ", $errors));
                     throw new Exception("Failed to create some tables: " . implode(", ", $errors));
                 }
             } else {
+                error_log("Database: SQL file not found: " . $sqlFile);
                 throw new Exception("SQL file not found: " . $sqlFile);
             }
         } catch (Exception $e) {
+            error_log("Database: createTables exception: " . $e->getMessage());
             throw new Exception("Failed to create tables: " . $e->getMessage());
         }
     }
