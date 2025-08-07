@@ -46,7 +46,8 @@ class BaseController
      */
     protected function isLoggedIn()
     {
-        return isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
+        return (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) || 
+               (isset($_SESSION['student_id']) && !empty($_SESSION['student_id']));
     }
 
     /**
@@ -54,15 +55,27 @@ class BaseController
      */
     protected function getCurrentUser()
     {
-        if (!$this->isLoggedIn()) {
-            return null;
+        // Check for staff user
+        if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
+            return [
+                'id' => $_SESSION['user_id'] ?? null,
+                'name' => $_SESSION['user_name'] ?? null,
+                'email' => $_SESSION['user_email'] ?? null,
+                'type' => $_SESSION['user_role'] ?? 'staff'
+            ];
         }
-
-        return [
-            'id' => $_SESSION['user_id'] ?? null,
-            'name' => $_SESSION['user_name'] ?? null,
-            'email' => $_SESSION['user_email'] ?? null
-        ];
+        
+        // Check for student user
+        if (isset($_SESSION['student_id']) && !empty($_SESSION['student_id'])) {
+            return [
+                'id' => $_SESSION['student_id'] ?? null,
+                'name' => $_SESSION['student_name'] ?? null,
+                'email' => $_SESSION['student_email'] ?? null,
+                'type' => $_SESSION['student_role'] ?? 'student'
+            ];
+        }
+        
+        return null;
     }
 
     /**
