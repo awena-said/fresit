@@ -73,13 +73,7 @@ class StaffController extends BaseController
                 $this->redirect("{$this->baseUrl}/staff-dashboard.php");
                 return;
             } else {
-                // Check if user exists but password is wrong
-                if ($this->staffUser->emailExists($_POST['email'])) {
-                    $errors['general'] = 'Invalid password for this email address';
-                } else {
-                    $errors['general'] = 'No account found with this email address. You can create a new account below.';
-                    $errors['show_create_account'] = true;
-                }
+                $errors['general'] = 'Invalid email or password';
             }
         }
 
@@ -167,55 +161,6 @@ class StaffController extends BaseController
             'title' => 'Staff Dashboard',
             'user' => $this->getCurrentUser()
         ]);
-    }
-
-    /**
-     * Handle account creation from login page
-     */
-    public function createAccountFromLogin()
-    {
-        if ($this->isLoggedIn()) {
-            $this->redirect("{$this->baseUrl}/staff-dashboard.php");
-            return;
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !$this->validateCsrfToken($_POST['csrf_token'] ?? '')) {
-            $this->redirect("{$this->baseUrl}/staff-login.php");
-            return;
-        }
-
-        $email = trim($_POST['create_email'] ?? '');
-        $password = $_POST['create_password'] ?? '';
-        $confirmPassword = $_POST['create_confirm_password'] ?? '';
-        $name = trim($_POST['create_name'] ?? '');
-        $formData = ['email' => $email, 'name' => $name];
-        $errors = [];
-
-        if (empty($email) || empty($password) || empty($name)) {
-            $errors['create_general'] = 'All fields are required';
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors['create_email'] = 'Invalid email format';
-        } elseif (strlen($password) < 8) {
-            $errors['create_password'] = 'Password must be at least 8 characters';
-        } elseif ($password !== $confirmPassword) {
-            $errors['create_confirm_password'] = 'Passwords do not match';
-        } elseif ($this->staffUser->emailExists($email)) {
-            $errors['create_email'] = 'An account with this email already exists';
-        } else {
-            $userData = ['name' => $name, 'email' => $email, 'password' => $password];
-            $user = $this->staffUser->create($userData);
-            if ($user) {
-                $this->staffUser->startSession($user);
-                $this->redirect("{$this->baseUrl}/staff-dashboard.php");
-                return;
-            } else {
-                $errors['create_general'] = 'Failed to create account';
-            }
-        }
-
-        $_SESSION['flash_errors'] = $errors;
-        $_SESSION['flash_form_data'] = $formData;
-        $this->redirect("{$this->baseUrl}/staff-login.php");
     }
 
     /**

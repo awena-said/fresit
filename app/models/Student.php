@@ -154,7 +154,6 @@ class Student
         $_SESSION['student_id'] = $student['id'];
         $_SESSION['student_email'] = $student['email'];
         $_SESSION['student_name'] = $student['name'];
-        $_SESSION['student_role'] = 'student';
     }
 
     /**
@@ -169,7 +168,6 @@ class Student
         unset($_SESSION['student_id']);
         unset($_SESSION['student_email']);
         unset($_SESSION['student_name']);
-        unset($_SESSION['student_role']);
     }
 
     /**
