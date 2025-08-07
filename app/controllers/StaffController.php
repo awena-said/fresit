@@ -7,7 +7,7 @@ use App\Models\StaffUser;
 class StaffController extends BaseController
 {
     private $staffUser;
-    private $baseUrl = '/fresit/staff';
+    private $baseUrl = '/fresit';
 
     public function __construct()
     {
@@ -21,12 +21,12 @@ class StaffController extends BaseController
     public function showLogin()
     {
         if ($this->isLoggedIn()) {
-            $this->redirect("{$this->baseUrl}/dashboard");
+            $this->redirect("{$this->baseUrl}/staff-dashboard.php");
             return;
         }
 
         if (!$this->staffUser->hasUsers()) {
-            $this->redirect("{$this->baseUrl}/create-account");
+            $this->redirect("{$this->baseUrl}/staff-create-account.php");
             return;
         }
 
@@ -53,7 +53,7 @@ class StaffController extends BaseController
         }
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !$this->validateCsrfToken($_POST['csrf_token'] ?? '')) {
-            $this->redirect("{$this->baseUrl}/login");
+            $this->redirect("{$this->baseUrl}/staff-login.php");
             return;
         }
 
@@ -70,7 +70,7 @@ class StaffController extends BaseController
             $user = $this->staffUser->authenticate($_POST['email'], $_POST['password']);
             if ($user) {
                 $this->staffUser->startSession($user);
-                $this->redirect("{$this->baseUrl}/dashboard");
+                $this->redirect("{$this->baseUrl}/staff-dashboard.php");
                 return;
             } else {
                 $errors['general'] = 'Invalid email or password';
@@ -79,7 +79,7 @@ class StaffController extends BaseController
 
         $_SESSION['flash_errors'] = $errors;
         $_SESSION['flash_form_data'] = $formData;
-        $this->redirect("{$this->baseUrl}/login");
+        $this->redirect("{$this->baseUrl}/staff-login.php");
     }
 
     /**
@@ -88,12 +88,12 @@ class StaffController extends BaseController
     public function showCreateAccount()
     {
         if ($this->isLoggedIn()) {
-            $this->redirect("{$this->baseUrl}/dashboard");
+            $this->redirect("{$this->baseUrl}/staff-dashboard.php");
             return;
         }
 
         if ($this->staffUser->hasUsers()) {
-            $this->redirect("{$this->baseUrl}/login");
+            $this->redirect("{$this->baseUrl}/staff-login.php");
             return;
         }
 
@@ -115,7 +115,7 @@ class StaffController extends BaseController
     public function createAccount()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !$this->validateCsrfToken($_POST['csrf_token'] ?? '')) {
-            $this->redirect("{$this->baseUrl}/create-account");
+            $this->redirect("{$this->baseUrl}/staff-create-account.php");
             return;
         }
 
@@ -139,7 +139,7 @@ class StaffController extends BaseController
             $user = $this->staffUser->create($userData);
             if ($user) {
                 $this->staffUser->startSession($user);
-                $this->redirect("{$this->baseUrl}/dashboard");
+                $this->redirect("{$this->baseUrl}/staff-dashboard.php");
                 return;
             } else {
                 $errors['general'] = 'Failed to create account';
@@ -148,7 +148,7 @@ class StaffController extends BaseController
 
         $_SESSION['flash_errors'] = $errors;
         $_SESSION['flash_form_data'] = $formData;
-        $this->redirect("{$this->baseUrl}/create-account");
+        $this->redirect("{$this->baseUrl}/staff-create-account.php");
     }
 
     /**
@@ -169,6 +169,6 @@ class StaffController extends BaseController
     public function logout()
     {
         $this->staffUser->logout();
-        $this->redirect("{$this->baseUrl}/login");
+        $this->redirect("{$this->baseUrl}/staff-login.php");
     }
 }

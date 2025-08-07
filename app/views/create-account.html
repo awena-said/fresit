@@ -28,7 +28,7 @@
             </div>
         {% endif %}
         
-        <form id="create-account-form" class="login-form" method="POST" action="/fresit/staff/create-account">
+        <form id="create-account-form" class="login-form" method="POST" action="/fresit/staff-create-account.php">
             <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
             <div class="form-group">
                 <label for="name">Full Name</label>

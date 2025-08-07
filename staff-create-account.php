@@ -72,10 +72,10 @@ $controller = new StaffController();
 
 // Handle the request based on method
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Handle login form submission
-    $controller->login();
+    // Handle create account form submission
+    $controller->createAccount();
 } else {
-    // Show login form
-    $controller->showLogin();
+    // Show create account form
+    $controller->showCreateAccount();
 }
 ?> 

@@ -70,12 +70,6 @@ $twig = new \Twig\Environment($loader, $cacheOptions);
 // Create staff controller instance
 $controller = new StaffController();
 
-// Handle the request based on method
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Handle login form submission
-    $controller->login();
-} else {
-    // Show login form
-    $controller->showLogin();
-}
+// Show dashboard (this will require authentication)
+$controller->dashboard();
 ?> 
