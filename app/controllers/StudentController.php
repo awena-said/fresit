@@ -77,7 +77,7 @@ class StudentController extends BaseController
                 $_SESSION['new_student_id'] = $studentId;
                 
                 // Redirect to success page
-                header('Location: /fresit/student-registration-success.php');
+                header('Location: /fresit/simple-registration-success.php');
                 exit;
             } else {
                 $errors['general'] = 'Registration failed. Email may already be in use.';

@@ -31,7 +31,7 @@ class Student
             $studentData['id'] = uniqid('student_', true);
 
             // Insert student
-            $sql = "INSERT INTO students (id, name, email, password, phone, created_at) VALUES (?, ?, ?, ?, ?, NOW())";
+            $sql = "INSERT INTO students (id, name, email, password, phone, is_active, created_at) VALUES (?, ?, ?, ?, ?, 1, NOW())";
             $this->db->execute($sql, [
                 $studentData['id'],
                 $studentData['name'],
