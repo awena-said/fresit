@@ -191,22 +191,31 @@ class StaffController extends BaseController
         $nextMonth = clone $currentDate;
         $nextMonth->modify('+1 month');
         
+        // Get the number of days in the next month
+        $daysInMonth = $nextMonth->format('t');
+        
         // Generate 8-12 random dates in the next month
         $numDates = rand(8, 12);
         
         for ($i = 0; $i < $numDates; $i++) {
-            // Random day in the next month (1-28 to avoid month boundary issues)
-            $randomDay = rand(1, 28);
-            $date = new DateTime();
-            $date->setDate($nextMonth->format('Y'), $nextMonth->format('m'), $randomDay);
+            // Random day in the next month (use actual days in month)
+            $randomDay = rand(1, $daysInMonth);
             
-            // Only add weekdays (Monday = 1, Friday = 5)
-            if ($date->format('N') >= 1 && $date->format('N') <= 5) {
-                $dates[] = [
-                    'date' => $date->format('Y-m-d'),
-                    'day_name' => $date->format('l'),
-                    'formatted_date' => $date->format('F d, Y')
-                ];
+            try {
+                $date = new DateTime();
+                $date->setDate($nextMonth->format('Y'), $nextMonth->format('m'), $randomDay);
+                
+                // Only add weekdays (Monday = 1, Friday = 5)
+                if ($date->format('N') >= 1 && $date->format('N') <= 5) {
+                    $dates[] = [
+                        'date' => $date->format('Y-m-d'),
+                        'day_name' => $date->format('l'),
+                        'formatted_date' => $date->format('F d, Y')
+                    ];
+                }
+            } catch (Exception $e) {
+                // Skip invalid dates and continue
+                continue;
             }
         }
         
