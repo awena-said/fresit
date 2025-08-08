@@ -81,6 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Handle login form submission
         $controller->login();
     }
+} else {
     // Show login form
     $controller->showLogin();
 }
