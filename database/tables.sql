@@ -40,8 +40,7 @@ CREATE TABLE IF NOT EXISTS `classes` (
     `description` TEXT,
     `is_active` TINYINT(1) DEFAULT 1,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (`tutor_id`) REFERENCES `staff_users`(`id`) ON DELETE SET NULL
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- Applications Table
@@ -59,10 +58,14 @@ CREATE TABLE IF NOT EXISTS `applications` (
     `reviewed_at` TIMESTAMP NULL,
     `is_active` TINYINT(1) DEFAULT 1,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (`class_id`) REFERENCES `classes`(`id`) ON DELETE SET NULL,
-    FOREIGN KEY (`student_id`) REFERENCES `students`(`id`) ON DELETE SET NULL,
-    FOREIGN KEY (`reviewed_by`) REFERENCES `staff_users`(`id`) ON DELETE SET NULL
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+-- Optional: Add foreign key constraints after tables are created
+-- These can be added later when needed for data integrity
+-- ALTER TABLE `classes` ADD CONSTRAINT `fk_classes_tutor` FOREIGN KEY (`tutor_id`) REFERENCES `staff_users`(`id`) ON DELETE SET NULL;
+-- ALTER TABLE `applications` ADD CONSTRAINT `fk_applications_class` FOREIGN KEY (`class_id`) REFERENCES `classes`(`id`) ON DELETE SET NULL;
+-- ALTER TABLE `applications` ADD CONSTRAINT `fk_applications_student` FOREIGN KEY (`student_id`) REFERENCES `students`(`id`) ON DELETE SET NULL;
+-- ALTER TABLE `applications` ADD CONSTRAINT `fk_applications_reviewer` FOREIGN KEY (`reviewed_by`) REFERENCES `staff_users`(`id`) ON DELETE SET NULL;
 
 

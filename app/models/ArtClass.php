@@ -48,7 +48,7 @@ class ArtClass
      */
     public function getById($id)
     {
-        $sql = "SELECT c.*, s.name as tutor_name 
+        $sql = "SELECT c.*, COALESCE(s.name, c.tutor_id) as tutor_name 
                 FROM classes c 
                 LEFT JOIN staff_users s ON c.tutor_id = s.id 
                 WHERE c.id = ? AND c.is_active = 1";
@@ -61,7 +61,7 @@ class ArtClass
      */
     public function getAll()
     {
-        $sql = "SELECT c.*, s.name as tutor_name 
+        $sql = "SELECT c.*, COALESCE(s.name, c.tutor_id) as tutor_name 
                 FROM classes c 
                 LEFT JOIN staff_users s ON c.tutor_id = s.id 
                 WHERE c.is_active = 1 
@@ -75,7 +75,7 @@ class ArtClass
      */
     public function getUpcoming()
     {
-        $sql = "SELECT c.*, s.name as tutor_name 
+        $sql = "SELECT c.*, COALESCE(s.name, c.tutor_id) as tutor_name 
                 FROM classes c 
                 LEFT JOIN staff_users s ON c.tutor_id = s.id 
                 WHERE c.is_active = 1 AND c.date >= CURDATE()
