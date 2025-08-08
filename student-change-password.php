@@ -1,5 +1,5 @@
 <?php
-// Direct student login page - bypasses routing system
+// Direct student change password page - bypasses routing system
 session_start();
 
 require_once __DIR__ . '/vendor/autoload.php';
@@ -21,8 +21,8 @@ $twig = new \Twig\Environment($loader, ['cache' => false]);
 $controller = new StudentController();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $controller->login();
+    $controller->changePassword();
 } else {
-    $controller->showLogin();
+    $controller->showChangePassword();
 }
-?> 
+?>

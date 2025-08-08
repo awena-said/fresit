@@ -1,5 +1,5 @@
 <?php
-// Direct student login page - bypasses routing system
+// Direct student dashboard page - bypasses routing system
 session_start();
 
 require_once __DIR__ . '/vendor/autoload.php';
@@ -19,10 +19,5 @@ $twig = new \Twig\Environment($loader, ['cache' => false]);
 
 // Create controller and handle the request
 $controller = new StudentController();
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $controller->login();
-} else {
-    $controller->showLogin();
-}
-?> 
+$controller->dashboard();
+?>

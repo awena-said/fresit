@@ -27,7 +27,7 @@
             </div>
         {% endif %}
 
-        <form class="student-form" method="POST" action="/student/login">
+        <form class="student-form" method="POST" action="/fresit/student-login.php">
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input type="email" id="email" name="email" required 
@@ -47,13 +47,13 @@
 
             <div class="form-actions">
                 <button type="submit" class="btn-primary">Login</button>
-                <a href="/fresit/student/register" class="btn-secondary">Create New Account</a>
+                <a href="/fresit/student-register.php" class="btn-secondary">Create New Account</a>
             </div>
         </form>
 
         <div class="form-footer">
-            <p>Don't have an account? <a href="/fresit/student/register">Register here</a></p>
-            <p><a href="/fresit/student/forgot-password">Forgot your password?</a></p>
+            <p>Don't have an account? <a href="/fresit/student-register.php">Register here</a></p>
+            <p><a href="/fresit/student-forgot-password.php">Forgot your password?</a></p>
         </div>
     </div>
 </section>

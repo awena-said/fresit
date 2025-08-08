@@ -49,7 +49,6 @@
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
-                        <th>Age</th>
                         <th>Experience Level</th>
                         <th>Enrollment Date</th>
                     </tr>
@@ -61,7 +60,6 @@
                         <td>{{ student.student_name }}</td>
                         <td>{{ student.student_email }}</td>
                         <td>{{ student.student_phone or 'N/A' }}</td>
-                        <td>{{ student.age or 'N/A' }}</td>
                         <td>{{ student.experience_level|title }}</td>
                         <td>{{ student.created_at|date('M d, Y') }}</td>
                     </tr>

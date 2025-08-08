@@ -192,8 +192,7 @@ class ArtClass
         $sql = "SELECT a.*, 
                        COALESCE(s.name, a.student_name) as student_name,
                        COALESCE(s.email, a.student_email) as student_email,
-                       COALESCE(s.phone, a.student_phone) as student_phone,
-                       s.age
+                       COALESCE(s.phone, a.student_phone) as student_phone
                 FROM applications a 
                 LEFT JOIN students s ON a.student_id = s.id 
                 WHERE a.class_id = ? AND a.status = 'accepted' AND a.is_active = 1

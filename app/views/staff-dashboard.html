@@ -71,7 +71,6 @@
                 <div class="application-details">
                     <p><strong>Email:</strong> {{ application.email }}</p>
                     <p><strong>Phone:</strong> {{ application.phone }}</p>
-                    <p><strong>Age:</strong> {{ application.age }}</p>
                     <p><strong>Class Type:</strong> {{ application.class_type }}</p>
                     <p><strong>Preferred Date:</strong> {{ application.preferred_date }}</p>
                     <p><strong>Applied:</strong> {{ application.created_at|date('M d, Y') }}</p>
@@ -317,7 +316,6 @@ function viewApplication(applicationId) {
                 <div class="application-full-details">
                     <p><strong>Email:</strong> ${data.email}</p>
                     <p><strong>Phone:</strong> ${data.phone}</p>
-                    <p><strong>Age:</strong> ${data.age}</p>
                     <p><strong>Class Type:</strong> ${data.class_type}</p>
                     <p><strong>Preferred Date:</strong> ${data.preferred_date}</p>
                     <p><strong>Status:</strong> ${data.status}</p>
@@ -465,7 +463,6 @@ function loadRoster() {
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Phone</th>
-                                        <th>Age</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -474,7 +471,6 @@ function loadRoster() {
                                             <td>${student.name}</td>
                                             <td>${student.email}</td>
                                             <td>${student.phone}</td>
-                                            <td>${student.age}</td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
