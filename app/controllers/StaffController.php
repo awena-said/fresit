@@ -113,6 +113,7 @@ class StaffController extends BaseController
                 return;
             } else {
                 $errors['create_general'] = 'Failed to create account';
+                error_log("Failed to create account for email: $email");
             }
         }
 
@@ -172,5 +173,24 @@ class StaffController extends BaseController
     {
         $_SESSION['flash_errors'] = $errors;
         $_SESSION['flash_form_data'] = $formData;
+    }
+
+    /**
+     * Ensure user is authenticated and exists in database
+     */
+    protected function requireAuth()
+    {
+        if (!$this->isLoggedIn()) {
+            $this->redirect("{$this->baseUrl}/staff-login.php");
+            return;
+        }
+
+        // Verify user exists in database
+        $user = $this->getCurrentUser();
+        if (!$user || !$this->staffUser->emailExists($user['email'])) {
+            error_log("Invalid session: User {$user['email']} not found in database");
+            $this->staffUser->logout();
+            $this->redirect("{$this->baseUrl}/staff-login.php");
+        }
     }
 }
