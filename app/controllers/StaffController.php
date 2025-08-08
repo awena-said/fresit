@@ -313,7 +313,7 @@ class StaffController extends BaseController
         if ($result) {
             echo json_encode(['success' => true, 'message' => 'Class created successfully', 'class' => $result]);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to create class']);
+            echo json_encode(['success' => false, 'message' => 'Failed to create class - database error']);
         }
     }
 

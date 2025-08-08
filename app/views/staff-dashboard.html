@@ -383,6 +383,8 @@ function createClass(event) {
     const formData = new FormData(event.target);
     const data = Object.fromEntries(formData);
     
+    console.log('Creating class with data:', data);
+    
     fetch('/fresit/staff-create-class.php', {
         method: 'POST',
         headers: {
@@ -390,14 +392,21 @@ function createClass(event) {
         },
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+    })
     .then(data => {
+        console.log('Response data:', data);
         if (data.success) {
             alert('Class created successfully!');
             closeModal('createClassModal');
+            // Clear the form
+            event.target.reset();
+            // Reload the page to show the new class
             location.reload();
         } else {
-            alert('Error: ' + data.message);
+            alert('Error: ' + (data.message || 'Unknown error occurred'));
         }
     })
     .catch(error => {

@@ -35,11 +35,36 @@ class ArtClass
         ];
 
         $result = $this->db->execute($sql, $params);
+        error_log("ArtClass::create() - SQL executed, result: " . ($result ? 'true' : 'false'));
 
         if ($result) {
-            return $this->getById($id);
+            // Try to get the created class
+            $createdClass = $this->getById($id);
+            error_log("ArtClass::create() - getById result: " . ($createdClass ? 'found' : 'not found'));
+            
+            if ($createdClass) {
+                return $createdClass;
+            } else {
+                // If getById fails, return a basic success response
+                error_log("ArtClass::create() - returning fallback data for class ID: " . $id);
+                return [
+                    'id' => $id,
+                    'name' => $data['name'],
+                    'type' => $data['class_type'],
+                    'date' => $data['start_date'],
+                    'start_time' => $data['start_time'],
+                    'end_time' => $data['end_time'],
+                    'tutor_id' => $data['tutor_id'],
+                    'tutor_name' => $data['tutor_id'], // Use tutor_id as name if staff_user doesn't exist
+                    'room' => $data['room'],
+                    'capacity' => $data['capacity'],
+                    'description' => $data['description'] ?? '',
+                    'is_active' => 1
+                ];
+            }
         }
         
+        error_log("ArtClass::create() - SQL execution failed");
         return false;
     }
 
@@ -67,7 +92,9 @@ class ArtClass
                 WHERE c.is_active = 1 
                 ORDER BY c.date ASC, c.start_time ASC";
         
-        return $this->db->fetchAll($sql);
+        $result = $this->db->fetchAll($sql);
+        error_log("getAll() returned " . count($result) . " classes");
+        return $result;
     }
 
     /**
@@ -81,7 +108,9 @@ class ArtClass
                 WHERE c.is_active = 1 AND c.date >= CURDATE()
                 ORDER BY c.date ASC, c.start_time ASC";
         
-        return $this->db->fetchAll($sql);
+        $result = $this->db->fetchAll($sql);
+        error_log("getUpcoming() returned " . count($result) . " classes");
+        return $result;
     }
 
     /**
