@@ -318,6 +318,24 @@ class StaffController extends BaseController
     }
 
     /**
+     * Show class roster page
+     */
+    public function showRoster()
+    {
+        $this->requireAuth();
+        
+        // Get the next scheduled class with enrolled students
+        $nextClassData = $this->artClass->getNextClassWithStudents();
+        
+        $this->render('roster.html', [
+            'title' => 'Class Roster',
+            'user' => $this->getCurrentUser(),
+            'next_class' => $nextClassData,
+            'enrolled_students' => $nextClassData ? $nextClassData['enrolled_students'] : []
+        ]);
+    }
+
+    /**
      * Handle staff logout
      */
     public function logout()

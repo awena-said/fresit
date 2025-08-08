@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\Student;
+use App\Models\ArtClass;
 
 class StudentController extends BaseController
 {
@@ -311,8 +312,9 @@ class StudentController extends BaseController
             return;
         }
 
-        // Return empty array since no classes are available
-        $classes = [];
+        // Get available classes from the database
+        $artClass = new ArtClass();
+        $classes = $artClass->getAvailableClassesForBooking($classType, $startDate);
         
         header('Content-Type: application/json');
         echo json_encode($classes);

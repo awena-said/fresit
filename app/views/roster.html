@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="roster-header">
+        <h1>Class Roster</h1>
+        <div class="roster-actions">
+            <button class="btn btn-primary" onclick="printRoster()">Print Roster</button>
+            <a href="/fresit/staff-dashboard.php" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+    </div>
+
+    {% if next_class %}
+    <div class="class-info">
+        <h2>{{ next_class.name }}</h2>
+        <div class="class-details">
+            <div class="detail-item">
+                <strong>Date:</strong> {{ next_class.date|date('l, F d, Y') }}
+            </div>
+            <div class="detail-item">
+                <strong>Time:</strong> {{ next_class.start_time }} - {{ next_class.end_time }}
+            </div>
+            <div class="detail-item">
+                <strong>Class Type:</strong> {{ next_class.type }}
+            </div>
+            <div class="detail-item">
+                <strong>Tutor:</strong> {{ next_class.tutor_name }}
+            </div>
+            <div class="detail-item">
+                <strong>Room:</strong> {{ next_class.room }}
+            </div>
+            <div class="detail-item">
+                <strong>Capacity:</strong> {{ enrolled_students|length }}/{{ next_class.capacity }}
+            </div>
+        </div>
+    </div>
+
+    <div class="students-section">
+        <h3>Enrolled Students ({{ enrolled_students|length }})</h3>
+        
+        {% if enrolled_students %}
+        <div class="students-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Age</th>
+                        <th>Experience Level</th>
+                        <th>Enrollment Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in enrolled_students %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ student.student_name }}</td>
+                        <td>{{ student.student_email }}</td>
+                        <td>{{ student.student_phone or 'N/A' }}</td>
+                        <td>{{ student.age or 'N/A' }}</td>
+                        <td>{{ student.experience_level|title }}</td>
+                        <td>{{ student.created_at|date('M d, Y') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="no-students">
+            <p>No students are currently enrolled in this class.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if next_class.description %}
+    <div class="class-description">
+        <h3>Class Description</h3>
+        <p>{{ next_class.description }}</p>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="no-class">
+        <h2>No Upcoming Classes</h2>
+        <p>There are no scheduled classes at this time.</p>
+        <a href="/fresit/staff-dashboard.php" class="btn btn-primary">Back to Dashboard</a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.roster-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.roster-header h1 {
+    margin: 0;
+    color: #333;
+}
+
+.roster-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.class-info {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border-left: 4px solid #007bff;
+}
+
+.class-info h2 {
+    margin: 0 0 20px 0;
+    color: #333;
+}
+
+.class-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.detail-item {
+    padding: 10px;
+    background: white;
+    border-radius: 5px;
+    border: 1px solid #e0e0e0;
+}
+
+.detail-item strong {
+    color: #555;
+}
+
+.students-section {
+    margin-bottom: 30px;
+}
+
+.students-section h3 {
+    margin-bottom: 20px;
+    color: #333;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.students-table {
+    overflow-x: auto;
+}
+
+.students-table table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.students-table th,
+.students-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.students-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #333;
+}
+
+.students-table tr:hover {
+    background: #f8f9fa;
+}
+
+.students-table tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.students-table tr:nth-child(even):hover {
+    background: #f0f0f0;
+}
+
+.no-students {
+    text-align: center;
+    padding: 40px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    color: #666;
+}
+
+.class-description {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.class-description h3 {
+    margin: 0 0 15px 0;
+    color: #333;
+}
+
+.no-class {
+    text-align: center;
+    padding: 60px 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.no-class h2 {
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.no-class p {
+    color: #888;
+    margin-bottom: 30px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #545b62;
+}
+
+@media print {
+    .roster-actions,
+    .btn {
+        display: none;
+    }
+    
+    .container {
+        padding: 0;
+    }
+    
+    .class-info,
+    .students-table {
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+    
+    .students-table th {
+        background: #f0f0f0 !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .roster-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .class-details {
+        grid-template-columns: 1fr;
+    }
+    
+    .students-table {
+        font-size: 14px;
+    }
+    
+    .students-table th,
+    .students-table td {
+        padding: 8px;
+    }
+}
+</style>
+
+<script>
+function printRoster() {
+    window.print();
+}
+</script>
+{% endblock %}

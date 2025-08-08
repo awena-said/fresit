@@ -168,4 +168,84 @@ class ArtClass
         $result = $this->db->fetch($sql);
         return $result['total'];
     }
+
+    /**
+     * Get the next scheduled class
+     */
+    public function getNextScheduledClass()
+    {
+        $sql = "SELECT c.*, COALESCE(s.name, c.tutor_id) as tutor_name 
+                FROM classes c 
+                LEFT JOIN staff_users s ON c.tutor_id = s.id 
+                WHERE c.is_active = 1 AND c.date >= CURDATE()
+                ORDER BY c.date ASC, c.start_time ASC 
+                LIMIT 1";
+        
+        return $this->db->fetch($sql);
+    }
+
+    /**
+     * Get enrolled students for a specific class
+     */
+    public function getEnrolledStudents($classId)
+    {
+        $sql = "SELECT a.*, 
+                       COALESCE(s.name, a.student_name) as student_name,
+                       COALESCE(s.email, a.student_email) as student_email,
+                       COALESCE(s.phone, a.student_phone) as student_phone,
+                       s.age
+                FROM applications a 
+                LEFT JOIN students s ON a.student_id = s.id 
+                WHERE a.class_id = ? AND a.status = 'accepted' AND a.is_active = 1
+                ORDER BY a.created_at ASC";
+        
+        return $this->db->fetchAll($sql, [$classId]);
+    }
+
+    /**
+     * Get the next scheduled class with enrolled students
+     */
+    public function getNextClassWithStudents()
+    {
+        $nextClass = $this->getNextScheduledClass();
+        
+        if ($nextClass) {
+            $nextClass['enrolled_students'] = $this->getEnrolledStudents($nextClass['id']);
+        }
+        
+        return $nextClass;
+    }
+
+    /**
+     * Get available classes for booking based on type and date
+     */
+    public function getAvailableClassesForBooking($classType, $startDate)
+    {
+        $sql = "SELECT c.*, 
+                       COALESCE(s.name, c.tutor_id) as tutor_name,
+                       DAYNAME(c.date) as day_of_week,
+                       c.capacity - COALESCE(enrolled_count.count, 0) as available_slots
+                FROM classes c 
+                LEFT JOIN staff_users s ON c.tutor_id = s.id 
+                LEFT JOIN (
+                    SELECT class_id, COUNT(*) as count 
+                    FROM applications 
+                    WHERE status = 'accepted' AND is_active = 1 
+                    GROUP BY class_id
+                ) enrolled_count ON c.id = enrolled_count.class_id
+                WHERE c.is_active = 1 
+                AND c.type = ? 
+                AND c.date = ?
+                AND c.capacity > COALESCE(enrolled_count.count, 0)
+                ORDER BY c.start_time ASC";
+        
+        $classes = $this->db->fetchAll($sql, [$classType, $startDate]);
+        
+        // Ensure available_slots is at least 0
+        foreach ($classes as &$class) {
+            $class['available_slots'] = max(0, (int)$class['available_slots']);
+        }
+        
+        return $classes;
+    }
 }
