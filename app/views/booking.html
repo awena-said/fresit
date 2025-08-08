@@ -56,7 +56,7 @@
 
                 <div class="form-group">
                     <label for="class_id">Available Classes & Cohorts *</label>
-                    <select id="class_id" name="class_id" required>
+                    <select id="class_id" name="class_id" required onchange="loadTimeSlots()">
                         <option value="">Select a class...</option>
                         {% if available_classes is defined and available_classes is not empty %}
                             {% for class in available_classes %}
@@ -73,17 +73,12 @@
                 <div class="form-group">
                     <label for="time_slot">Available Time Slots *</label>
                     <select id="time_slot" name="selected_time_slot" required>
-                        <option value="">Select a time slot...</option>
-                        {% if available_classes is defined and available_classes is not empty %}
-                            {% for class in available_classes %}
-                            <option value="{{ class.id }}">{{ (class.start_time ?? '')|replace(':', '.') }} - {{ (class.end_time ?? '')|replace(':', '.') }} ({{ class.name ?? '' }} - {{ class.type ?? '' }} - {{ class.date|date('M d, Y') }} with {{ class.tutor_name ?? '' }})</option>
-                            {% endfor %}
-                        {% endif %}
+                        <option value="">Select a class first to see available time slots</option>
                     </select>
                     {% if errors.selected_time_slot %}
                         <span class="error-message">{{ errors.selected_time_slot }}</span>
                     {% endif %}
-                    <small>Available time slots from the database</small>
+                    <small>Available time slots will appear after selecting a class</small>
                 </div>
             </div>
 
@@ -160,10 +155,14 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('=== DOM Content Loaded ===');
     const classTypeSelect = document.getElementById('class_type');
     const startDateInput = document.getElementById('start_date');
+    const classSelect = document.getElementById('class_id');
+    const timeSlotSelect = document.getElementById('time_slot');
     
     console.log('Elements found:', {
         classTypeSelect: !!classTypeSelect,
-        startDateInput: !!startDateInput
+        startDateInput: !!startDateInput,
+        classSelect: !!classSelect,
+        timeSlotSelect: !!timeSlotSelect
     });
     
     // Set minimum date to today
@@ -175,8 +174,49 @@ document.addEventListener('DOMContentLoaded', function() {
     maxDate.setDate(maxDate.getDate() + 7);
     startDateInput.max = maxDate.toISOString().split('T')[0];
 
-    // Both classes and time slots are now loaded directly from the database
-    // No need for dynamic loading via JavaScript
+    function loadTimeSlots() {
+        const selectedClassId = classSelect.value;
+        
+        console.log('=== loadTimeSlots called ===');
+        console.log('Selected class ID:', selectedClassId);
+        
+        if (!selectedClassId) {
+            timeSlotSelect.innerHTML = '<option value="">Select a class first to see available time slots</option>';
+            return;
+        }
+
+        // Get the selected option and its data
+        const selectedOption = classSelect.options[classSelect.selectedIndex];
+        const startTime = selectedOption.getAttribute('data-start-time');
+        const endTime = selectedOption.getAttribute('data-end-time');
+        const classText = selectedOption.textContent;
+        
+        console.log('Time data:', { startTime, endTime, classText });
+
+        // Clear and populate the time slot dropdown
+        timeSlotSelect.innerHTML = '';
+        
+        // Add default option
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Select a time slot';
+        timeSlotSelect.appendChild(defaultOption);
+        
+        // Add the time slot option
+        const timeOption = document.createElement('option');
+        timeOption.value = selectedClassId;
+        
+        // Format start time for display (only show start time)
+        const displayStartTime = startTime.replace(':', '.');
+        
+        timeOption.textContent = `${displayStartTime} (${classText})`;
+        timeSlotSelect.appendChild(timeOption);
+        
+        console.log('Time slot dropdown populated for class:', selectedClassId);
+    }
+
+    // Classes are now loaded directly from the database
+    // No need for dynamic loading via API
 });
 </script>
 {% endblock %} 
