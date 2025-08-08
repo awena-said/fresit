@@ -59,7 +59,7 @@
                     <select id="class_id" name="class_id" required onchange="loadTimeSlots()">
                         <option value="">Select a class...</option>
                         {% for class in available_classes %}
-                        <option value="{{ class.id }}">{{ class.name }} - {{ class.type }} - {{ class.date|date('M d, Y') }} {{ class.start_time }}-{{ class.end_time }} with {{ class.tutor_name }}</option>
+                        <option value="{{ class.id }}" data-start-time="{{ class.start_time }}" data-end-time="{{ class.end_time }}">{{ class.name }} - {{ class.type }} - {{ class.date|date('M d, Y') }} with {{ class.tutor_name }}</option>
                         {% endfor %}
                     </select>
                     {% if errors.class_id %}
@@ -195,25 +195,32 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Show loading state
-        timeSlotsContainer.style.display = 'block';
-        noSlotsMessage.style.display = 'none';
-        timeSlotsList.innerHTML = '<p>Loading time slots...</p>';
-
-        // Show the selected class as the time slot
+        // Get the selected option and its data
         const selectedOption = classSelect.options[classSelect.selectedIndex];
+        const startTime = selectedOption.getAttribute('data-start-time');
+        const endTime = selectedOption.getAttribute('data-end-time');
         const classText = selectedOption.textContent;
         
+        console.log('Time data:', { startTime, endTime, classText });
+
+        // Show the time slots container
+        timeSlotsContainer.style.display = 'block';
+        noSlotsMessage.style.display = 'none';
         timeSlotsList.innerHTML = '';
         
+        // Create time slot option
         const slotDiv = document.createElement('div');
         slotDiv.className = 'time-slot-option';
+        
+        // Format time for display
+        const displayStartTime = startTime.replace(':', '.');
+        const displayEndTime = endTime.replace(':', '.');
         
         slotDiv.innerHTML = `
             <input type="radio" name="selected_time_slot" id="slot_${selectedClassId}" value="${selectedClassId}" checked>
             <label for="slot_${selectedClassId}">
-                <strong>✅ ${classText}</strong>
-                <br><small>This is your selected class time slot - Click to confirm</small>
+                <strong>✅ ${displayStartTime} - ${displayEndTime}</strong>
+                <br><small>${classText}</small>
             </label>
         `;
         
