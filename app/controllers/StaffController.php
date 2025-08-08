@@ -3,16 +3,19 @@
 namespace App\Controllers;
 
 use App\Models\StaffUser;
+use App\Models\ArtClass;
 
 class StaffController extends BaseController
 {
     private $staffUser;
+    private $artClass;
     private $baseUrl = '/fresit';
 
     public function __construct()
     {
         parent::__construct();
         $this->staffUser = new StaffUser();
+        $this->artClass = new ArtClass();
     }
 
     /**
@@ -165,6 +168,10 @@ class StaffController extends BaseController
         // Get upcoming available dates
         $upcomingDates = $this->getUpcomingAvailableDates();
         
+        // Get real data from database
+        $classes = $this->artClass->getAll();
+        $upcomingClasses = $this->artClass->getUpcoming();
+        
         $this->render('staff-dashboard.html', [
             'title' => 'Staff Dashboard',
             'user' => $this->getCurrentUser(),
@@ -172,12 +179,12 @@ class StaffController extends BaseController
             'stats' => [
                 'total_applications' => 0,
                 'pending_applications' => 0,
-                'total_classes' => 0,
-                'upcoming_classes' => 0
+                'total_classes' => $this->artClass->getTotalCount(),
+                'upcoming_classes' => $this->artClass->getUpcomingCount()
             ],
             'applications' => [],
-            'classes' => [],
-            'upcoming_classes' => []
+            'classes' => $classes,
+            'upcoming_classes' => $upcomingClasses
         ]);
     }
     
@@ -256,6 +263,58 @@ class StaffController extends BaseController
         ];
         
         return $dates;
+    }
+
+    /**
+     * Handle class creation
+     */
+    public function createClass()
+    {
+        $this->requireAuth();
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'Method not allowed']);
+            return;
+        }
+
+        // Get JSON input
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        if (!$input) {
+            echo json_encode(['success' => false, 'message' => 'Invalid input']);
+            return;
+        }
+
+        // Validate required fields
+        $requiredFields = ['name', 'class_type', 'start_date', 'start_time', 'end_time', 'tutor_id', 'room', 'capacity'];
+        foreach ($requiredFields as $field) {
+            if (empty($input[$field])) {
+                echo json_encode(['success' => false, 'message' => "Missing required field: $field"]);
+                return;
+            }
+        }
+
+        // Create the class
+        $classData = [
+            'name' => $input['name'],
+            'class_type' => $input['class_type'],
+            'start_date' => $input['start_date'],
+            'start_time' => $input['start_time'],
+            'end_time' => $input['end_time'],
+            'tutor_id' => $input['tutor_id'],
+            'room' => $input['room'],
+            'capacity' => (int)$input['capacity'],
+            'description' => $input['description'] ?? ''
+        ];
+
+        $result = $this->artClass->create($classData);
+        
+        if ($result) {
+            echo json_encode(['success' => true, 'message' => 'Class created successfully', 'class' => $result]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to create class']);
+        }
     }
 
     /**

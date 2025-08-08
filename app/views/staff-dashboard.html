@@ -118,27 +118,36 @@
         </div>
 
         <div class="classes-list">
-            {% for class in classes %}
-            <div class="class-card">
-                <div class="class-header">
-                    <h3>{{ class.name }}</h3>
-                    <span class="status-badge status-{{ class.status }}">{{ class.status|title }}</span>
+            {% if classes %}
+                {% for class in classes %}
+                <div class="class-card">
+                    <div class="class-header">
+                        <h3>{{ class.name }}</h3>
+                        <span class="status-badge status-active">Active</span>
+                    </div>
+                    <div class="class-details">
+                        <p><strong>Type:</strong> {{ class.type }}</p>
+                        <p><strong>Date:</strong> {{ class.date|date('M d, Y') }}</p>
+                        <p><strong>Time:</strong> {{ class.start_time }} - {{ class.end_time }}</p>
+                        <p><strong>Tutor:</strong> {{ class.tutor_name ?: 'Not assigned' }}</p>
+                        <p><strong>Room:</strong> {{ class.room ?: 'Not assigned' }}</p>
+                        <p><strong>Capacity:</strong> {{ class.capacity }}</p>
+                        {% if class.description %}
+                        <p><strong>Description:</strong> {{ class.description }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="class-actions">
+                        <button class="btn btn-primary" onclick="editClass('{{ class.id }}')">Edit</button>
+                        <button class="btn btn-success" onclick="printRoster('{{ class.id }}')">Print Roster</button>
+                        <button class="btn btn-danger" onclick="deleteClass('{{ class.id }}')">Delete</button>
+                    </div>
                 </div>
-                <div class="class-details">
-                    <p><strong>Type:</strong> {{ class.class_type }}</p>
-                    <p><strong>Date:</strong> {{ class.start_date|date('M d, Y') }}</p>
-                    <p><strong>Time:</strong> {{ class.start_time }}</p>
-                    <p><strong>Tutor:</strong> {{ class.tutor_name }}</p>
-                    <p><strong>Room:</strong> {{ class.room }}</p>
-                    <p><strong>Enrolled:</strong> {{ class.enrolled_count }}/{{ class.capacity }}</p>
+                {% endfor %}
+            {% else %}
+                <div class="no-classes">
+                    <p>No classes have been created yet. Click "Create New Class" to get started.</p>
                 </div>
-                <div class="class-actions">
-                    <button class="btn btn-primary" onclick="editClass('{{ class.id }}')">Edit</button>
-                    <button class="btn btn-success" onclick="printRoster('{{ class.id }}')">Print Roster</button>
-                    <button class="btn btn-danger" onclick="deleteClass('{{ class.id }}')">Delete</button>
-                </div>
-            </div>
-            {% endfor %}
+            {% endif %}
         </div>
     </div>
 
@@ -149,7 +158,7 @@
             <select id="rosterClassSelect" onchange="loadRoster()">
                 <option value="">Select a class...</option>
                 {% for class in upcoming_classes %}
-                <option value="{{ class.id }}">{{ class.name }} - {{ class.start_date|date('M d, Y') }} {{ class.start_time }}</option>
+                <option value="{{ class.id }}">{{ class.name }} - {{ class.date|date('M d, Y') }} {{ class.start_time }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -374,7 +383,7 @@ function createClass(event) {
     const formData = new FormData(event.target);
     const data = Object.fromEntries(formData);
     
-    fetch('/staff/classes/create', {
+    fetch('/fresit/staff-create-class.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -390,6 +399,10 @@ function createClass(event) {
         } else {
             alert('Error: ' + data.message);
         }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error creating class. Please try again.');
     });
 }
 
