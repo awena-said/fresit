@@ -76,7 +76,7 @@
                         <option value="">Select a time slot...</option>
                         {% if available_classes is defined and available_classes is not empty %}
                             {% for class in available_classes %}
-                            <option value="{{ class.id }}">{{ (class.start_time ?? '')|replace(':', '.') }} ({{ class.name ?? '' }} - {{ class.type ?? '' }} - {{ class.date|date('M d, Y') }} with {{ class.tutor_name ?? '' }})</option>
+                            <option value="{{ class.id }}">{{ class.start_time ? class.start_time|replace(':', '.') : '' }} ({{ class.name ?? '' }} - {{ class.type ?? '' }} - {{ class.date|date('M d, Y') }} with {{ class.tutor_name ?? '' }})</option>
                             {% endfor %}
                         {% endif %}
                     </select>
