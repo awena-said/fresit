@@ -12,7 +12,7 @@
     <div class="student-container">
         <div class="form-header">
             <h1>Apply for Classes</h1>
-            <p>Choose your preferred class type, date, and time slot. You can apply without creating an account, or login to manage your applications.</p>
+            <p>Enroll in our rolling 10-week class blocks. You can enroll up to 7 days in advance, and classes run continuously throughout the term. Choose your preferred class type, date, and time slot.</p>
         </div>
 
         {% if errors.general %}
@@ -45,9 +45,9 @@
                         <label for="start_date">Preferred Start Date *</label>
                         <input type="date" id="start_date" name="start_date" required 
                                min="{{ "now"|date("Y-m-d") }}" 
-                               max="{{ "now"|date_modify("+30 days")|date("Y-m-d") }}"
+                               max="{{ "now"|date_modify("+7 days")|date("Y-m-d") }}"
                                value="{{ form_data.start_date }}">
-                        <small class="form-help">Classes are available Monday-Sunday. <strong>Tip:</strong> Try selecting Monday (Foundation), Tuesday (Foundation), or Saturday (all classes) to see available slots.</small>
+                        <small class="form-help">You can enroll up to 7 days in advance. Each enrollment covers a 10-week block of classes.</small>
                         {% if errors.start_date %}
                             <span class="error-message">{{ errors.start_date }}</span>
                         {% endif %}
@@ -62,7 +62,7 @@
                     {% if errors.class_id %}
                         <span class="error-message">{{ errors.class_id }}</span>
                     {% endif %}
-                    <small>Available time slots and tutors will be shown based on your selection</small>
+                    <small>Available 10-week class blocks will be shown based on your selection</small>
                 </div>
             </div>
 
@@ -151,9 +151,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const today = new Date().toISOString().split('T')[0];
     startDateInput.min = today;
     
-    // Set maximum date to 30 days from today
+    // Set maximum date to 7 days from today (enrollment limit)
     const maxDate = new Date();
-    maxDate.setDate(maxDate.getDate() + 30);
+    maxDate.setDate(maxDate.getDate() + 7);
     startDateInput.max = maxDate.toISOString().split('T')[0];
 
     function loadAvailableClasses() {
@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Fetch available classes
         console.log('Fetching classes for:', classType, startDate);
-        const apiUrl = `/fresit/student/api/classes?type=${classType}&start_date=${startDate}`;
+        const apiUrl = `/fresit/api-classes.php?type=${classType}&start_date=${startDate}`;
         console.log('API URL:', apiUrl);
         fetch(apiUrl)
             .then(response => {
@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 classSelect.innerHTML = '<option value="">Select a class</option>';
                 
                 if (data.length === 0) {
-                    classSelect.innerHTML = '<option value="">No classes available for this date. Try selecting a different date (Monday-Sunday have classes).</option>';
+                    classSelect.innerHTML = '<option value="">No classes available for this date. You can enroll up to 7 days in advance. Try selecting a different date.</option>';
                 } else {
                     data.forEach(classItem => {
                         console.log('Processing class item:', classItem);
@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         const startTime = classItem.start_time.replace(':', '.');
                         const endTime = classItem.end_time.replace(':', '.');
                         
-                        option.textContent = `${classItem.name} with ${classItem.tutor_name} - ${classItem.day_of_week} ${startTime}-${endTime} (${classItem.available_slots} slots available)`;
+                        option.textContent = `${classItem.name} with ${classItem.tutor_name} - ${classItem.day_of_week} ${startTime}-${endTime} (10-week block, ${classItem.available_slots} slots available)`;
                         console.log('Adding option:', option.textContent);
                         classSelect.appendChild(option);
                     });

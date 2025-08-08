@@ -217,13 +217,15 @@ class ArtClass
 
     /**
      * Get available classes for booking based on type and date
+     * Returns classes that are part of a 10-week rolling block system
      */
     public function getAvailableClassesForBooking($classType, $startDate)
     {
         $sql = "SELECT c.*, 
                        COALESCE(s.name, c.tutor_id) as tutor_name,
                        DAYNAME(c.date) as day_of_week,
-                       c.capacity - COALESCE(enrolled_count.count, 0) as available_slots
+                       c.capacity - COALESCE(enrolled_count.count, 0) as available_slots,
+                       '10-week block' as enrollment_type
                 FROM classes c 
                 LEFT JOIN staff_users s ON c.tutor_id = s.id 
                 LEFT JOIN (
@@ -240,9 +242,11 @@ class ArtClass
         
         $classes = $this->db->fetchAll($sql, [$classType, $startDate]);
         
-        // Ensure available_slots is at least 0
+        // Ensure available_slots is at least 0 and add enrollment info
         foreach ($classes as &$class) {
             $class['available_slots'] = max(0, (int)$class['available_slots']);
+            $class['enrollment_type'] = '10-week block';
+            $class['enrollment_period'] = 'Rolling enrollment - classes run continuously';
         }
         
         return $classes;
