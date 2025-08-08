@@ -162,8 +162,8 @@ class StaffController extends BaseController
     {
         $this->requireAuth();
         
-        // Generate random upcoming dates for the next month
-        $upcomingDates = $this->generateUpcomingDates();
+        // Get upcoming available dates
+        $upcomingDates = $this->getUpcomingAvailableDates();
         
         $this->render('staff-dashboard.html', [
             'title' => 'Staff Dashboard',
@@ -182,62 +182,80 @@ class StaffController extends BaseController
     }
     
     /**
-     * Generate random upcoming dates for the next month
+     * Get upcoming available dates for the next 3 months
      */
-    private function generateUpcomingDates()
+    private function getUpcomingAvailableDates()
     {
-        $dates = [];
-        $currentDate = new DateTime();
-        $nextMonth = clone $currentDate;
-        $nextMonth->modify('+1 month');
-        
-        // Get the number of days in the next month
-        $daysInMonth = $nextMonth->format('t');
-        
-        // Generate 8-12 random dates in the next month
-        $numDates = rand(8, 12);
-        
-        for ($i = 0; $i < $numDates; $i++) {
-            // Random day in the next month (use actual days in month)
-            $randomDay = rand(1, $daysInMonth);
+        $dates = [
+            // January 2025
+            ['date' => '2025-01-06', 'day_name' => 'Monday', 'formatted_date' => 'January 6, 2025'],
+            ['date' => '2025-01-07', 'day_name' => 'Tuesday', 'formatted_date' => 'January 7, 2025'],
+            ['date' => '2025-01-08', 'day_name' => 'Wednesday', 'formatted_date' => 'January 8, 2025'],
+            ['date' => '2025-01-09', 'day_name' => 'Thursday', 'formatted_date' => 'January 9, 2025'],
+            ['date' => '2025-01-10', 'day_name' => 'Friday', 'formatted_date' => 'January 10, 2025'],
+            ['date' => '2025-01-13', 'day_name' => 'Monday', 'formatted_date' => 'January 13, 2025'],
+            ['date' => '2025-01-14', 'day_name' => 'Tuesday', 'formatted_date' => 'January 14, 2025'],
+            ['date' => '2025-01-15', 'day_name' => 'Wednesday', 'formatted_date' => 'January 15, 2025'],
+            ['date' => '2025-01-16', 'day_name' => 'Thursday', 'formatted_date' => 'January 16, 2025'],
+            ['date' => '2025-01-17', 'day_name' => 'Friday', 'formatted_date' => 'January 17, 2025'],
+            ['date' => '2025-01-20', 'day_name' => 'Monday', 'formatted_date' => 'January 20, 2025'],
+            ['date' => '2025-01-21', 'day_name' => 'Tuesday', 'formatted_date' => 'January 21, 2025'],
+            ['date' => '2025-01-22', 'day_name' => 'Wednesday', 'formatted_date' => 'January 22, 2025'],
+            ['date' => '2025-01-23', 'day_name' => 'Thursday', 'formatted_date' => 'January 23, 2025'],
+            ['date' => '2025-01-24', 'day_name' => 'Friday', 'formatted_date' => 'January 24, 2025'],
+            ['date' => '2025-01-27', 'day_name' => 'Monday', 'formatted_date' => 'January 27, 2025'],
+            ['date' => '2025-01-28', 'day_name' => 'Tuesday', 'formatted_date' => 'January 28, 2025'],
+            ['date' => '2025-01-29', 'day_name' => 'Wednesday', 'formatted_date' => 'January 29, 2025'],
+            ['date' => '2025-01-30', 'day_name' => 'Thursday', 'formatted_date' => 'January 30, 2025'],
+            ['date' => '2025-01-31', 'day_name' => 'Friday', 'formatted_date' => 'January 31, 2025'],
             
-            try {
-                $date = new DateTime();
-                $date->setDate($nextMonth->format('Y'), $nextMonth->format('m'), $randomDay);
-                
-                // Only add weekdays (Monday = 1, Friday = 5)
-                if ($date->format('N') >= 1 && $date->format('N') <= 5) {
-                    $dates[] = [
-                        'date' => $date->format('Y-m-d'),
-                        'day_name' => $date->format('l'),
-                        'formatted_date' => $date->format('F d, Y')
-                    ];
-                }
-            } catch (Exception $e) {
-                // Skip invalid dates and continue
-                continue;
-            }
-        }
+            // February 2025
+            ['date' => '2025-02-03', 'day_name' => 'Monday', 'formatted_date' => 'February 3, 2025'],
+            ['date' => '2025-02-04', 'day_name' => 'Tuesday', 'formatted_date' => 'February 4, 2025'],
+            ['date' => '2025-02-05', 'day_name' => 'Wednesday', 'formatted_date' => 'February 5, 2025'],
+            ['date' => '2025-02-06', 'day_name' => 'Thursday', 'formatted_date' => 'February 6, 2025'],
+            ['date' => '2025-02-07', 'day_name' => 'Friday', 'formatted_date' => 'February 7, 2025'],
+            ['date' => '2025-02-10', 'day_name' => 'Monday', 'formatted_date' => 'February 10, 2025'],
+            ['date' => '2025-02-11', 'day_name' => 'Tuesday', 'formatted_date' => 'February 11, 2025'],
+            ['date' => '2025-02-12', 'day_name' => 'Wednesday', 'formatted_date' => 'February 12, 2025'],
+            ['date' => '2025-02-13', 'day_name' => 'Thursday', 'formatted_date' => 'February 13, 2025'],
+            ['date' => '2025-02-14', 'day_name' => 'Friday', 'formatted_date' => 'February 14, 2025'],
+            ['date' => '2025-02-17', 'day_name' => 'Monday', 'formatted_date' => 'February 17, 2025'],
+            ['date' => '2025-02-18', 'day_name' => 'Tuesday', 'formatted_date' => 'February 18, 2025'],
+            ['date' => '2025-02-19', 'day_name' => 'Wednesday', 'formatted_date' => 'February 19, 2025'],
+            ['date' => '2025-02-20', 'day_name' => 'Thursday', 'formatted_date' => 'February 20, 2025'],
+            ['date' => '2025-02-21', 'day_name' => 'Friday', 'formatted_date' => 'February 21, 2025'],
+            ['date' => '2025-02-24', 'day_name' => 'Monday', 'formatted_date' => 'February 24, 2025'],
+            ['date' => '2025-02-25', 'day_name' => 'Tuesday', 'formatted_date' => 'February 25, 2025'],
+            ['date' => '2025-02-26', 'day_name' => 'Wednesday', 'formatted_date' => 'February 26, 2025'],
+            ['date' => '2025-02-27', 'day_name' => 'Thursday', 'formatted_date' => 'February 27, 2025'],
+            ['date' => '2025-02-28', 'day_name' => 'Friday', 'formatted_date' => 'February 28, 2025'],
+            
+            // March 2025
+            ['date' => '2025-03-03', 'day_name' => 'Monday', 'formatted_date' => 'March 3, 2025'],
+            ['date' => '2025-03-04', 'day_name' => 'Tuesday', 'formatted_date' => 'March 4, 2025'],
+            ['date' => '2025-03-05', 'day_name' => 'Wednesday', 'formatted_date' => 'March 5, 2025'],
+            ['date' => '2025-03-06', 'day_name' => 'Thursday', 'formatted_date' => 'March 6, 2025'],
+            ['date' => '2025-03-07', 'day_name' => 'Friday', 'formatted_date' => 'March 7, 2025'],
+            ['date' => '2025-03-10', 'day_name' => 'Monday', 'formatted_date' => 'March 10, 2025'],
+            ['date' => '2025-03-11', 'day_name' => 'Tuesday', 'formatted_date' => 'March 11, 2025'],
+            ['date' => '2025-03-12', 'day_name' => 'Wednesday', 'formatted_date' => 'March 12, 2025'],
+            ['date' => '2025-03-13', 'day_name' => 'Thursday', 'formatted_date' => 'March 13, 2025'],
+            ['date' => '2025-03-14', 'day_name' => 'Friday', 'formatted_date' => 'March 14, 2025'],
+            ['date' => '2025-03-17', 'day_name' => 'Monday', 'formatted_date' => 'March 17, 2025'],
+            ['date' => '2025-03-18', 'day_name' => 'Tuesday', 'formatted_date' => 'March 18, 2025'],
+            ['date' => '2025-03-19', 'day_name' => 'Wednesday', 'formatted_date' => 'March 19, 2025'],
+            ['date' => '2025-03-20', 'day_name' => 'Thursday', 'formatted_date' => 'March 20, 2025'],
+            ['date' => '2025-03-21', 'day_name' => 'Friday', 'formatted_date' => 'March 21, 2025'],
+            ['date' => '2025-03-24', 'day_name' => 'Monday', 'formatted_date' => 'March 24, 2025'],
+            ['date' => '2025-03-25', 'day_name' => 'Tuesday', 'formatted_date' => 'March 25, 2025'],
+            ['date' => '2025-03-26', 'day_name' => 'Wednesday', 'formatted_date' => 'March 26, 2025'],
+            ['date' => '2025-03-27', 'day_name' => 'Thursday', 'formatted_date' => 'March 27, 2025'],
+            ['date' => '2025-03-28', 'day_name' => 'Friday', 'formatted_date' => 'March 28, 2025'],
+            ['date' => '2025-03-31', 'day_name' => 'Monday', 'formatted_date' => 'March 31, 2025']
+        ];
         
-        // Sort dates chronologically
-        usort($dates, function($a, $b) {
-            return strcmp($a['date'], $b['date']);
-        });
-        
-        // Remove duplicates and limit to 10 dates
-        $uniqueDates = [];
-        $seen = [];
-        foreach ($dates as $date) {
-            if (!in_array($date['date'], $seen)) {
-                $uniqueDates[] = $date;
-                $seen[] = $date['date'];
-            }
-            if (count($uniqueDates) >= 10) {
-                break;
-            }
-        }
-        
-        return $uniqueDates;
+        return $dates;
     }
 
     /**
