@@ -59,7 +59,7 @@
                     <select id="class_id" name="class_id" required>
                         <option value="">Select a class...</option>
                         {% for class in available_classes %}
-                        <option value="{{ class.id }}" data-start-time="{{ class.start_time }}" data-end-time="{{ class.end_time }}">{{ class.name }} - {{ class.type }} - {{ class.date|date('M d, Y') }} with {{ class.tutor_name }}</option>
+                        <option value="{{ class.id }}" data-start-time="{{ class.start_time ?? '' }}" data-end-time="{{ class.end_time ?? '' }}">{{ class.name ?? '' }} - {{ class.type ?? '' }} - {{ class.date|date('M d, Y') }} with {{ class.tutor_name ?? '' }}</option>
                         {% endfor %}
                     </select>
                     {% if errors.class_id %}
@@ -73,7 +73,7 @@
                     <select id="time_slot" name="selected_time_slot" required>
                         <option value="">Select a time slot...</option>
                         {% for class in available_classes %}
-                        <option value="{{ class.id }}">{{ class.start_time|replace(':', '.') }} - {{ class.end_time|replace(':', '.') }} ({{ class.name }} - {{ class.type }} - {{ class.date|date('M d, Y') }} with {{ class.tutor_name }})</option>
+                        <option value="{{ class.id }}">{{ (class.start_time ?? '')|replace(':', '.') }} - {{ (class.end_time ?? '')|replace(':', '.') }} ({{ class.name ?? '' }} - {{ class.type ?? '' }} - {{ class.date|date('M d, Y') }} with {{ class.tutor_name ?? '' }})</option>
                         {% endfor %}
                     </select>
                     {% if errors.selected_time_slot %}
