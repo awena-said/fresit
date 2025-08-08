@@ -53,21 +53,9 @@
             <a class="link" href="/fresit/booking.php" tabindex="0" aria-label="Book Classes">
                 BOOK CLASSES
             </a>
-            {% if user %}
-                {% if user.type == 'staff' %}
-                    <a class="link" href="/fresit/staff/dashboard" tabindex="0" aria-label="Staff Dashboard">
-                        STAFF PORTAL
-                    </a>
-                {% else %}
-                    <a class="link" href="/fresit/student/dashboard" tabindex="0" aria-label="Student Dashboard">
-                        MY ACCOUNT
-                    </a>
-                {% endif %}
-            {% else %}
-                <a class="link" href="/fresit/staff-login.php" tabindex="0" aria-label="Staff Login">
-                    STAFF LOGIN
-                </a>
-            {% endif %}
+            <a class="link" href="/fresit/staff-login.php" tabindex="0" aria-label="Staff Login">
+                STAFF LOGIN
+            </a>
         </nav>
         <img class="header-logo" src="/fresit/public/assets/Images%20(resit)/logos/logo_black.png" alt="Royal Drawing School's logo">
     </header>
