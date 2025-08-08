@@ -44,9 +44,14 @@ class HomeController extends BaseController
             ['id' => 'Watercolour', 'name' => 'Watercolour']
         ];
 
+        // Get available classes from database
+        $artClass = new \App\Models\ArtClass();
+        $availableClasses = $artClass->getUpcoming();
+
         $data = [
             'title' => 'Apply for Classes',
             'class_types' => $classTypes,
+            'available_classes' => $availableClasses,
             'errors' => [],
             'form_data' => [],
             'user' => $this->getCurrentUser()

@@ -57,12 +57,15 @@
                 <div class="form-group">
                     <label for="class_id">Available Classes & Cohorts *</label>
                     <select id="class_id" name="class_id" required>
-                        <option value="">Select a class (choose type and date first)</option>
+                        <option value="">Select a class...</option>
+                        {% for class in available_classes %}
+                        <option value="{{ class.id }}">{{ class.name }} - {{ class.type }} - {{ class.date|date('M d, Y') }} {{ class.start_time }}-{{ class.end_time }} with {{ class.tutor_name }}</option>
+                        {% endfor %}
                     </select>
                     {% if errors.class_id %}
                         <span class="error-message">{{ errors.class_id }}</span>
                     {% endif %}
-                    <small>Available 10-week class blocks will be shown based on your selection</small>
+                    <small>Available 10-week class blocks from the database</small>
                 </div>
             </div>
 
@@ -156,74 +159,8 @@ document.addEventListener('DOMContentLoaded', function() {
     maxDate.setDate(maxDate.getDate() + 7);
     startDateInput.max = maxDate.toISOString().split('T')[0];
 
-    function loadAvailableClasses() {
-        const classType = classTypeSelect.value;
-        const startDate = startDateInput.value;
-        console.log('=== loadAvailableClasses called ===');
-        console.log('Class type:', classType);
-        console.log('Start date:', startDate);
-        console.log('Start date type:', typeof startDate);
-        
-        if (!classType || !startDate) {
-            classSelect.innerHTML = '<option value="">Select a class (choose type and date first)</option>';
-            return;
-        }
-
-        // Show loading state
-        classSelect.innerHTML = '<option value="">Loading available classes...</option>';
-        classSelect.disabled = true;
-
-        // Fetch available classes
-        console.log('Fetching classes for:', classType, startDate);
-        const apiUrl = `/fresit/api-classes.php?type=${classType}&start_date=${startDate}`;
-        console.log('API URL:', apiUrl);
-        fetch(apiUrl)
-            .then(response => {
-                console.log('Response status:', response.status);
-                return response.json();
-            })
-            .then(data => {
-                console.log('Received data:', data);
-                console.log('Data length:', data.length);
-                classSelect.innerHTML = '<option value="">Select a class</option>';
-                
-                if (data.length === 0) {
-                    classSelect.innerHTML = '<option value="">No classes available for this date. You can enroll up to 7 days in advance. Try selecting a different date.</option>';
-                } else {
-                    data.forEach(classItem => {
-                        console.log('Processing class item:', classItem);
-                        const option = document.createElement('option');
-                        option.value = classItem.id;
-                        
-                        // Format time for better display
-                        const startTime = classItem.start_time.replace(':', '.');
-                        const endTime = classItem.end_time.replace(':', '.');
-                        
-                        option.textContent = `${classItem.name} with ${classItem.tutor_name} - ${classItem.day_of_week} ${startTime}-${endTime} (10-week block, ${classItem.available_slots} slots available)`;
-                        console.log('Adding option:', option.textContent);
-                        classSelect.appendChild(option);
-                    });
-                    console.log(`Found ${data.length} classes for ${classType} on ${startDate}`);
-                    console.log('Final dropdown options count:', classSelect.options.length);
-                }
-                classSelect.disabled = false;
-            })
-            .catch(error => {
-                console.error('Error loading classes:', error);
-                classSelect.innerHTML = '<option value="">Error loading classes. Please try again.</option>';
-                classSelect.disabled = false;
-            });
-    }
-
-    // Event listeners
-    classTypeSelect.addEventListener('change', loadAvailableClasses);
-    startDateInput.addEventListener('change', loadAvailableClasses);
-
-    // Initial fetch if values are pre-filled (e.g., after form submission with errors)
-    if (classTypeSelect.value && startDateInput.value) {
-        console.log('Initial load: values are pre-filled, loading classes...');
-        loadAvailableClasses();
-    }
+    // Classes are now loaded directly from the database
+    // No need for dynamic loading via API
 });
 </script>
 {% endblock %} 
