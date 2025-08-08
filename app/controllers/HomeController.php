@@ -39,9 +39,9 @@ class HomeController extends BaseController
     public function booking()
     {
         $classTypes = [
-            ['id' => 'foundation', 'name' => 'Foundation'],
-            ['id' => 'imagination', 'name' => 'Imagination'],
-            ['id' => 'watercolour', 'name' => 'Watercolour']
+            ['id' => 'Foundation', 'name' => 'Foundation'],
+            ['id' => 'Imagination', 'name' => 'Imagination'],
+            ['id' => 'Watercolour', 'name' => 'Watercolour']
         ];
 
         $data = [

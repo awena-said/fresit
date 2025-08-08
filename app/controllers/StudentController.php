@@ -223,9 +223,9 @@ class StudentController extends BaseController
     public function showBooking()
     {
         $classTypes = [
-            ['id' => 'foundation', 'name' => 'Foundation'],
-            ['id' => 'imagination', 'name' => 'Imagination'],
-            ['id' => 'watercolour', 'name' => 'Watercolour']
+            ['id' => 'Foundation', 'name' => 'Foundation'],
+            ['id' => 'Imagination', 'name' => 'Imagination'],
+            ['id' => 'Watercolour', 'name' => 'Watercolour']
         ];
 
         $this->render('student/booking.html', [
@@ -276,9 +276,9 @@ class StudentController extends BaseController
 
         // Re-render with errors
         $classTypes = [
-            ['id' => 'foundation', 'name' => 'Foundation'],
-            ['id' => 'imagination', 'name' => 'Imagination'],
-            ['id' => 'watercolour', 'name' => 'Watercolour']
+            ['id' => 'Foundation', 'name' => 'Foundation'],
+            ['id' => 'Imagination', 'name' => 'Imagination'],
+            ['id' => 'Watercolour', 'name' => 'Watercolour']
         ];
 
         $this->render('student/booking.html', [
