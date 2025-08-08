@@ -32,7 +32,11 @@ try {
         exit;
     }
     
-    if ($selectedDate < $today) {
+    // Allow today's date (set time to start of day for comparison)
+    $todayStart = (new DateTime())->setTime(0, 0, 0);
+    $selectedDateStart = (new DateTime($startDate))->setTime(0, 0, 0);
+    
+    if ($selectedDateStart < $todayStart) {
         http_response_code(400);
         echo json_encode(['error' => 'Cannot enroll for past dates']);
         exit;

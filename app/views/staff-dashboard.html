@@ -63,7 +63,7 @@
 
         <div class="applications-list" id="applicationsList">
             {% for application in applications %}
-            <div class="application-card" data-status="{{ application.status }}" data-search="{{ application.name|lower }} {{ application.email|lower }} {{ application.class_type|lower }}">
+            <div class="application-card" data-status="{{ application.status }}" data-search="{{ (application.name ?? '')|lower }} {{ (application.email ?? '')|lower }} {{ (application.class_type ?? '')|lower }}">
                 <div class="application-header">
                     <h3>{{ application.name }}</h3>
                     <span class="status-badge status-{{ application.status }}">{{ application.status|title }}</span>
@@ -287,13 +287,13 @@ function showTab(tabName) {
 
 // Application filtering and search
 function filterApplications() {
-    const statusFilter = document.getElementById('statusFilter').value;
-    const searchTerm = document.getElementById('searchApplications').value.toLowerCase();
+    const statusFilter = document.getElementById('statusFilter')?.value || '';
+    const searchTerm = document.getElementById('searchApplications')?.value?.toLowerCase() || '';
     const applications = document.querySelectorAll('.application-card');
     
     applications.forEach(app => {
-        const status = app.dataset.status;
-        const searchText = app.dataset.search;
+        const status = app.dataset.status || '';
+        const searchText = app.dataset.search || '';
         
         const statusMatch = !statusFilter || status === statusFilter;
         const searchMatch = !searchTerm || searchText.includes(searchTerm);
@@ -303,7 +303,11 @@ function filterApplications() {
 }
 
 function searchApplications() {
-    filterApplications();
+    try {
+        filterApplications();
+    } catch (error) {
+        console.error('Error in searchApplications:', error);
+    }
 }
 
 // Application actions
