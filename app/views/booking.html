@@ -151,6 +151,51 @@
 
 {% block extra_js %}
 <script>
+// Global function for loading time slots
+function loadTimeSlots() {
+    const classSelect = document.getElementById('class_id');
+    const timeSlotSelect = document.getElementById('time_slot');
+    
+    const selectedClassId = classSelect.value;
+    
+    console.log('=== loadTimeSlots called ===');
+    console.log('Selected class ID:', selectedClassId);
+    
+    if (!selectedClassId) {
+        timeSlotSelect.innerHTML = '<option value="">Select a class first to see available time slots</option>';
+        return;
+    }
+
+    // Get the selected option and its data
+    const selectedOption = classSelect.options[classSelect.selectedIndex];
+    const startTime = selectedOption.getAttribute('data-start-time');
+    const endTime = selectedOption.getAttribute('data-end-time');
+    const classText = selectedOption.textContent;
+    
+    console.log('Time data:', { startTime, endTime, classText });
+
+    // Clear and populate the time slot dropdown
+    timeSlotSelect.innerHTML = '';
+    
+    // Add default option
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Select a time slot';
+    timeSlotSelect.appendChild(defaultOption);
+    
+    // Add the time slot option
+    const timeOption = document.createElement('option');
+    timeOption.value = selectedClassId;
+    
+    // Format start time for display (only show start time)
+    const displayStartTime = startTime.replace(':', '.');
+    
+    timeOption.textContent = `${displayStartTime} (${classText})`;
+    timeSlotSelect.appendChild(timeOption);
+    
+    console.log('Time slot dropdown populated for class:', selectedClassId);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('=== DOM Content Loaded ===');
     const classTypeSelect = document.getElementById('class_type');
@@ -173,47 +218,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const maxDate = new Date();
     maxDate.setDate(maxDate.getDate() + 7);
     startDateInput.max = maxDate.toISOString().split('T')[0];
-
-    function loadTimeSlots() {
-        const selectedClassId = classSelect.value;
-        
-        console.log('=== loadTimeSlots called ===');
-        console.log('Selected class ID:', selectedClassId);
-        
-        if (!selectedClassId) {
-            timeSlotSelect.innerHTML = '<option value="">Select a class first to see available time slots</option>';
-            return;
-        }
-
-        // Get the selected option and its data
-        const selectedOption = classSelect.options[classSelect.selectedIndex];
-        const startTime = selectedOption.getAttribute('data-start-time');
-        const endTime = selectedOption.getAttribute('data-end-time');
-        const classText = selectedOption.textContent;
-        
-        console.log('Time data:', { startTime, endTime, classText });
-
-        // Clear and populate the time slot dropdown
-        timeSlotSelect.innerHTML = '';
-        
-        // Add default option
-        const defaultOption = document.createElement('option');
-        defaultOption.value = '';
-        defaultOption.textContent = 'Select a time slot';
-        timeSlotSelect.appendChild(defaultOption);
-        
-        // Add the time slot option
-        const timeOption = document.createElement('option');
-        timeOption.value = selectedClassId;
-        
-        // Format start time for display (only show start time)
-        const displayStartTime = startTime.replace(':', '.');
-        
-        timeOption.textContent = `${displayStartTime} (${classText})`;
-        timeSlotSelect.appendChild(timeOption);
-        
-        console.log('Time slot dropdown populated for class:', selectedClassId);
-    }
 
     // Classes are now loaded directly from the database
     // No need for dynamic loading via API
