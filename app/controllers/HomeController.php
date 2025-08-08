@@ -46,7 +46,7 @@ class HomeController extends BaseController
 
         // Get available classes from database
         $artClass = new \App\Models\ArtClass();
-        $availableClasses = $artClass->getUpcoming();
+        $availableClasses = $artClass->getUpcoming() ?: [];
 
         $data = [
             'title' => 'Apply for Classes',
