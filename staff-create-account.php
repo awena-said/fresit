@@ -9,6 +9,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/app/controllers/BaseController.php';
 require_once __DIR__ . '/app/controllers/StaffController.php';
 require_once __DIR__ . '/app/models/StaffUser.php';
+require_once __DIR__ . '/app/models/ArtClass.php';
 require_once __DIR__ . '/includes/database.php';
 
 use App\Controllers\StaffController;
