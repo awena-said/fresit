@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}Registration Successful - Fresit Art School{% endblock %}
+{% block description %}Your student account has been created successfully{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="/fresit/public/styles/student.css">
+{% endblock %}
+
+{% block content %}
+<section class="student-section">
+    <div class="student-container">
+        <div class="success-container">
+            <div class="success-header">
+                <h1>🎉 Registration Successful!</h1>
+                <p>Welcome to Fresit Art School!</p>
+            </div>
+
+            <div class="success-message">
+                <div class="success-icon">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                
+                <h2>Your account has been created successfully!</h2>
+                
+                <div class="account-details">
+                    <p><strong>Name:</strong> {{ student.name }}</p>
+                    <p><strong>Email:</strong> {{ student.email }}</p>
+                    <p><strong>Account ID:</strong> {{ student.id }}</p>
+                </div>
+
+                <div class="email-notification">
+                    <h3>📧 Email Confirmation</h3>
+                    <p>A confirmation email has been sent to <strong>{{ student.email }}</strong></p>
+                    <p>Please check your email and click the verification link to activate your account.</p>
+                    
+                    <div class="email-actions">
+                        <a href="/fresit/view-email.php?file=registration-{{ student.id }}.eml" class="btn btn-secondary" target="_blank">
+                            📄 View Email (.eml)
+                        </a>
+                        <a href="mailto:{{ student.email }}" class="btn btn-outline">
+                            📧 Open Email Client
+                        </a>
+                    </div>
+                </div>
+
+                <div class="next-steps">
+                    <h3>Next Steps</h3>
+                    <ol>
+                        <li>Check your email and click the verification link</li>
+                        <li>Login to your account using your email and password</li>
+                        <li>Start exploring our art classes and apply for your first session!</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="/fresit/student-login.php" class="btn btn-primary">Login to Your Account</a>
+                <a href="/fresit/" class="btn btn-secondary">Return to Home</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.success-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.success-header h1 {
+    color: #28a745;
+    margin-bottom: 10px;
+    font-size: 2.5rem;
+}
+
+.success-header p {
+    color: #666;
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+}
+
+.success-message {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 30px;
+    margin: 30px 0;
+    border-left: 4px solid #28a745;
+}
+
+.success-icon {
+    color: #28a745;
+    margin-bottom: 20px;
+}
+
+.success-message h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.account-details {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: left;
+    border: 1px solid #e0e0e0;
+}
+
+.account-details p {
+    margin: 10px 0;
+    font-size: 1.1rem;
+}
+
+.email-notification {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #e0e0e0;
+}
+
+.email-notification h3 {
+    color: #007bff;
+    margin-bottom: 15px;
+}
+
+.email-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #545b62;
+}
+
+.btn-outline {
+    background: transparent;
+    color: #007bff;
+    border: 2px solid #007bff;
+}
+
+.btn-outline:hover {
+    background: #007bff;
+    color: white;
+}
+
+.next-steps {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #e0e0e0;
+    text-align: left;
+}
+
+.next-steps h3 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.next-steps ol {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.next-steps li {
+    margin: 10px 0;
+    color: #555;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .success-container {
+        padding: 20px 10px;
+    }
+    
+    .success-header h1 {
+        font-size: 2rem;
+    }
+    
+    .email-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+</style>
+{% endblock %}

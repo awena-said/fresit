@@ -1,0 +1,62 @@
+From: Fresit Art School <noreply@fresit.com>
+To: John Doe <john@example.com>
+Subject: Welcome to Fresit Art School - Account Confirmation
+Date: Thu, 08 Aug 2025 10:30:00 +0000
+MIME-Version: 1.0
+Content-Type: text/html; charset=UTF-8
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='UTF-8'>
+    <title>Welcome to Fresit Art School</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #007bff; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background: #f8f9fa; }
+        .button { display: inline-block; padding: 12px 24px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; }
+        .footer { padding: 20px; text-align: center; color: #666; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='header'>
+            <h1>🎨 Welcome to Fresit Art School!</h1>
+        </div>
+        
+        <div class='content'>
+            <h2>Hello John Doe,</h2>
+            
+            <p>Thank you for registering with Fresit Art School! We're excited to have you join our creative community.</p>
+            
+            <p>Your account has been successfully created. To complete your registration and start exploring our art classes, please verify your email address by clicking the button below:</p>
+            
+            <p style='text-align: center; margin: 30px 0;'>
+                <a href='http://localhost/fresit/verify-email.php?token=sample' class='button'>Verify Email Address</a>
+            </p>
+            
+            <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
+            <p style='word-break: break-all; color: #007bff;'>http://localhost/fresit/verify-email.php?token=sample</p>
+            
+            <h3>What's Next?</h3>
+            <ul>
+                <li>Verify your email address</li>
+                <li>Login to your account</li>
+                <li>Browse our available art classes</li>
+                <li>Apply for your first session!</li>
+            </ul>
+            
+            <p>If you have any questions, please don't hesitate to contact us.</p>
+            
+            <p>Best regards,<br>
+            The Fresit Art School Team</p>
+        </div>
+        
+        <div class='footer'>
+            <p>This email was sent to you because you registered for an account at Fresit Art School.</p>
+            <p>If you didn't create this account, please ignore this email.</p>
+        </div>
+    </div>
+</body>
+</html>

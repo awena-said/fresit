@@ -14,7 +14,7 @@ class StudentController extends BaseController
         parent::__construct();
     }
     
-    private function getStudent()
+    public function getStudent()
     {
         if ($this->student === null) {
             $this->student = new Student();
@@ -71,10 +71,13 @@ class StudentController extends BaseController
             $studentId = $this->getStudent()->createAccount($studentData);
             if ($studentId) {
                 // Send confirmation email
-                $this->sendRegistrationEmail($_POST['email'], $_POST['name']);
+                $this->sendRegistrationEmail($_POST['email'], $_POST['name'], $studentId);
                 
-                // Redirect to login with success message
-                header('Location: /fresit/student/login?registered=1');
+                // Store student ID in session for success page
+                $_SESSION['new_student_id'] = $studentId;
+                
+                // Redirect to success page
+                header('Location: /fresit/student-registration-success.php');
                 exit;
             } else {
                 $errors['general'] = 'Registration failed. Email may already be in use.';
@@ -114,7 +117,7 @@ class StudentController extends BaseController
             $student = $this->getStudent()->authenticate($_POST['email'], $_POST['password']);
             if ($student) {
                 $this->getStudent()->startSession($student);
-                header('Location: /fresit/student/dashboard');
+                header('Location: /fresit/student-dashboard.php');
                 exit;
             } else {
                 $errors['general'] = 'Invalid email or password';
@@ -134,15 +137,17 @@ class StudentController extends BaseController
     public function dashboard()
     {
         if (!isset($_SESSION['student_id'])) {
-            header('Location: /fresit/student/login');
+            header('Location: /fresit/student-login.php');
             exit;
         }
 
         $student = $this->getStudent()->getById($_SESSION['student_id']);
+        $applications = $this->getStudent()->getApplications($_SESSION['student_id']);
 
         $this->render('student/dashboard.html', [
             'title' => 'Student Dashboard',
-            'student' => $student
+            'student' => $student,
+            'applications' => $applications
         ]);
     }
 
@@ -152,7 +157,7 @@ class StudentController extends BaseController
     public function showChangePassword()
     {
         if (!isset($_SESSION['student_id'])) {
-            header('Location: /fresit/student/login');
+            header('Location: /fresit/student-login.php');
             exit;
         }
 
@@ -169,7 +174,7 @@ class StudentController extends BaseController
     public function changePassword()
     {
         if (!isset($_SESSION['student_id'])) {
-            header('Location: /fresit/student/login');
+            header('Location: /fresit/student-login.php');
             exit;
         }
 
@@ -265,7 +270,7 @@ class StudentController extends BaseController
             // Application submission logic would go here
             $this->sendApplicationEmail($_POST['student_email'], $_POST['student_name'], 'APP-001');
             
-            header('Location: /fresit/student/application-success?id=APP-001');
+                            header('Location: /fresit/student-application-success.php?id=APP-001');
             exit;
         }
 
@@ -291,10 +296,9 @@ class StudentController extends BaseController
     {
         $applicationId = $_GET['id'] ?? 'APP-001';
 
-        $this->render('student/booking.html', [
+        $this->render('booking-success.html', [
             'title' => 'Application Submitted Successfully',
-            'application' => null,
-            'success' => true
+            'application_id' => $applicationId
         ]);
     }
 
@@ -318,5 +322,188 @@ class StudentController extends BaseController
         
         header('Content-Type: application/json');
         echo json_encode($classes);
+    }
+
+    /**
+     * Send registration confirmation email
+     */
+    private function sendRegistrationEmail($email, $name, $studentId)
+    {
+        $subject = "Welcome to Fresit Art School - Account Confirmation";
+        $verificationLink = "http://localhost/fresit/verify-email.php?token=" . $studentId;
+        
+        $emailContent = $this->generateRegistrationEmailContent($name, $verificationLink);
+        
+        // Save email as .eml file
+        $this->saveEmailAsFile($email, $subject, $emailContent, $studentId);
+        
+        return true;
+    }
+
+    /**
+     * Send application confirmation email
+     */
+    private function sendApplicationEmail($email, $name, $applicationId)
+    {
+        $subject = "Application Received - Fresit Art School";
+        
+        $emailContent = $this->generateApplicationEmailContent($name, $applicationId);
+        
+        // Save email as .eml file
+        $this->saveEmailAsFile($email, $subject, $emailContent, $applicationId);
+        
+        return true;
+    }
+
+    /**
+     * Generate registration email content
+     */
+    private function generateRegistrationEmailContent($name, $verificationLink)
+    {
+        return "
+From: Fresit Art School <noreply@fresit.com>
+To: {$name} <{$name}@example.com>
+Subject: Welcome to Fresit Art School - Account Confirmation
+Date: " . date('r') . "
+MIME-Version: 1.0
+Content-Type: text/html; charset=UTF-8
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='UTF-8'>
+    <title>Welcome to Fresit Art School</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #007bff; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background: #f8f9fa; }
+        .button { display: inline-block; padding: 12px 24px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; }
+        .footer { padding: 20px; text-align: center; color: #666; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='header'>
+            <h1>🎨 Welcome to Fresit Art School!</h1>
+        </div>
+        
+        <div class='content'>
+            <h2>Hello {$name},</h2>
+            
+            <p>Thank you for registering with Fresit Art School! We're excited to have you join our creative community.</p>
+            
+            <p>Your account has been successfully created. To complete your registration and start exploring our art classes, please verify your email address by clicking the button below:</p>
+            
+            <p style='text-align: center; margin: 30px 0;'>
+                <a href='{$verificationLink}' class='button'>Verify Email Address</a>
+            </p>
+            
+            <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
+            <p style='word-break: break-all; color: #007bff;'>{$verificationLink}</p>
+            
+            <h3>What's Next?</h3>
+            <ul>
+                <li>Verify your email address</li>
+                <li>Login to your account</li>
+                <li>Browse our available art classes</li>
+                <li>Apply for your first session!</li>
+            </ul>
+            
+            <p>If you have any questions, please don't hesitate to contact us.</p>
+            
+            <p>Best regards,<br>
+            The Fresit Art School Team</p>
+        </div>
+        
+        <div class='footer'>
+            <p>This email was sent to you because you registered for an account at Fresit Art School.</p>
+            <p>If you didn't create this account, please ignore this email.</p>
+        </div>
+    </div>
+</body>
+</html>
+        ";
+    }
+
+    /**
+     * Generate application email content
+     */
+    private function generateApplicationEmailContent($name, $applicationId)
+    {
+        return "
+From: Fresit Art School <noreply@fresit.com>
+To: {$name} <{$name}@example.com>
+Subject: Application Received - Fresit Art School
+Date: " . date('r') . "
+MIME-Version: 1.0
+Content-Type: text/html; charset=UTF-8
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='UTF-8'>
+    <title>Application Received</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #007bff; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background: #f8f9fa; }
+        .footer { padding: 20px; text-align: center; color: #666; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <div class='header'>
+            <h1>📝 Application Received</h1>
+        </div>
+        
+        <div class='content'>
+            <h2>Hello {$name},</h2>
+            
+            <p>Thank you for your application to Fresit Art School!</p>
+            
+            <p>We have received your application and it is currently being reviewed by our team.</p>
+            
+            <p><strong>Application ID:</strong> {$applicationId}</p>
+            
+            <h3>What happens next?</h3>
+            <ul>
+                <li>Our team will review your application within 2-3 business days</li>
+                <li>You will receive an email with the status of your application</li>
+                <li>If approved, you'll receive details about your class schedule</li>
+            </ul>
+            
+            <p>If you have any questions about your application, please contact us.</p>
+            
+            <p>Best regards,<br>
+            The Fresit Art School Team</p>
+        </div>
+        
+        <div class='footer'>
+            <p>This email confirms that we have received your application to Fresit Art School.</p>
+        </div>
+    </div>
+</body>
+</html>
+        ";
+    }
+
+    /**
+     * Save email as .eml file
+     */
+    private function saveEmailAsFile($email, $subject, $content, $id)
+    {
+        $emailsDir = __DIR__ . '/../../emails/';
+        
+        // Create emails directory if it doesn't exist
+        if (!is_dir($emailsDir)) {
+            mkdir($emailsDir, 0755, true);
+        }
+        
+        $filename = $emailsDir . 'registration-' . $id . '.eml';
+        file_put_contents($filename, $content);
+        
+        return $filename;
     }
 } 
