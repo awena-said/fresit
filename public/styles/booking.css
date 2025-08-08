@@ -289,97 +289,27 @@
     100% { transform: rotate(360deg); }
 }
 
-/* Time Slots Styles */
-.time-slots-container {
+/* Time Slots Dropdown Styles */
+#time_slot {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #2c3e50;
+    border-radius: 8px;
+    font-size: 1rem;
     background: #2c3e50;
-    border: 1px solid #34495e;
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-top: 0.5rem;
-}
-
-.slots-info {
     color: #ecf0f1;
-    font-weight: 500;
-    margin-bottom: 1rem;
-    font-size: 1rem;
+    transition: border-color 0.3s ease;
 }
 
-.time-slots-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.time-slot-option {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    padding: 1rem;
-    background: #34495e;
-    border: 2px solid #34495e;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.time-slot-option:hover {
+#time_slot:focus {
+    outline: none;
     border-color: #3498db;
-    background: #3a5a6b;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    background: #34495e;
 }
 
-.time-slot-option input[type="radio"] {
-    margin: 0;
-    margin-top: 0.25rem;
-    accent-color: #3498db;
-}
-
-.time-slot-option label {
+#time_slot option {
+    background: #2c3e50;
     color: #ecf0f1;
-    cursor: pointer;
-    flex: 1;
-    margin: 0;
-    line-height: 1.4;
-}
-
-.time-slot-option label strong {
-    color: #3498db;
-    font-size: 1.1rem;
-}
-
-.time-slot-option label small {
-    color: #bdc3c7;
-    font-size: 0.9rem;
-    display: block;
-    margin-top: 0.25rem;
-}
-
-.time-slot-option input[type="radio"]:checked + label {
-    color: #3498db;
-}
-
-.time-slot-option input[type="radio"]:checked {
-    background: #3498db;
-}
-
-.no-slots-message {
-    background: #e74c3c;
-    color: white;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-top: 0.5rem;
-    text-align: center;
-}
-
-.no-slots-message p {
-    margin: 0;
-    font-size: 1rem;
-}
-
-.time-slots-list .error {
-    color: #e74c3c;
-    text-align: center;
-    padding: 1rem;
-    background: rgba(231, 76, 60, 0.1);
-    border-radius: 8px;
+    padding: 0.5rem;
 } 
