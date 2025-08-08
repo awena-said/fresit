@@ -47,12 +47,6 @@ class HomeController extends BaseController
         // Get available classes from database
         $artClass = new \App\Models\ArtClass();
         $availableClasses = $artClass->getUpcoming() ?: [];
-        
-        // Debug: Log the classes
-        error_log("HomeController::booking() - Available classes count: " . count($availableClasses));
-        if (!empty($availableClasses)) {
-            error_log("HomeController::booking() - First class: " . json_encode($availableClasses[0]));
-        }
 
         $data = [
             'title' => 'Apply for Classes',

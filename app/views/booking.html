@@ -62,8 +62,6 @@
                             {% for class in available_classes %}
                             <option value="{{ class.id }}" data-start-time="{{ class.start_time ?? '' }}" data-end-time="{{ class.end_time ?? '' }}">{{ class.name ?? '' }} - {{ class.type ?? '' }} - {{ class.date|date('M d, Y') }} with {{ class.tutor_name ?? '' }}</option>
                             {% endfor %}
-                        {% else %}
-                            <option value="">No classes available</option>
                         {% endif %}
                     </select>
                     {% if errors.class_id %}
@@ -175,8 +173,6 @@ function loadTimeSlots() {
     const classText = selectedOption.textContent;
     
     console.log('Time data:', { startTime, endTime, classText });
-    console.log('Selected option:', selectedOption);
-    console.log('All options:', classSelect.options);
 
     // Clear and populate the time slot dropdown
     timeSlotSelect.innerHTML = '';
