@@ -161,10 +161,74 @@ class StaffController extends BaseController
     public function dashboard()
     {
         $this->requireAuth();
+        
+        // Generate random upcoming dates for the next month
+        $upcomingDates = $this->generateUpcomingDates();
+        
         $this->render('staff-dashboard.html', [
             'title' => 'Staff Dashboard',
-            'user' => $this->getCurrentUser()
+            'user' => $this->getCurrentUser(),
+            'upcoming_dates' => $upcomingDates,
+            'stats' => [
+                'total_applications' => 0,
+                'pending_applications' => 0,
+                'total_classes' => 0,
+                'upcoming_classes' => 0
+            ],
+            'applications' => [],
+            'classes' => [],
+            'upcoming_classes' => []
         ]);
+    }
+    
+    /**
+     * Generate random upcoming dates for the next month
+     */
+    private function generateUpcomingDates()
+    {
+        $dates = [];
+        $currentDate = new DateTime();
+        $nextMonth = clone $currentDate;
+        $nextMonth->modify('+1 month');
+        
+        // Generate 8-12 random dates in the next month
+        $numDates = rand(8, 12);
+        
+        for ($i = 0; $i < $numDates; $i++) {
+            // Random day in the next month (1-28 to avoid month boundary issues)
+            $randomDay = rand(1, 28);
+            $date = new DateTime();
+            $date->setDate($nextMonth->format('Y'), $nextMonth->format('m'), $randomDay);
+            
+            // Only add weekdays (Monday = 1, Friday = 5)
+            if ($date->format('N') >= 1 && $date->format('N') <= 5) {
+                $dates[] = [
+                    'date' => $date->format('Y-m-d'),
+                    'day_name' => $date->format('l'),
+                    'formatted_date' => $date->format('F d, Y')
+                ];
+            }
+        }
+        
+        // Sort dates chronologically
+        usort($dates, function($a, $b) {
+            return strcmp($a['date'], $b['date']);
+        });
+        
+        // Remove duplicates and limit to 10 dates
+        $uniqueDates = [];
+        $seen = [];
+        foreach ($dates as $date) {
+            if (!in_array($date['date'], $seen)) {
+                $uniqueDates[] = $date;
+                $seen[] = $date['date'];
+            }
+            if (count($uniqueDates) >= 10) {
+                break;
+            }
+        }
+        
+        return $uniqueDates;
     }
 
     /**
