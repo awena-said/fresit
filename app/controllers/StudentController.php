@@ -267,11 +267,31 @@ class StudentController extends BaseController
         }
 
         if (empty($errors)) {
-            // Application submission logic would go here
-            $this->sendApplicationEmail($_POST['student_email'], $_POST['student_name'], 'APP-001');
+            // Save application to database
+            $student = new \App\Models\Student();
+            $applicationData = [
+                'student_name' => $_POST['student_name'],
+                'student_email' => $_POST['student_email'],
+                'student_phone' => $_POST['student_phone'],
+                'class_id' => $_POST['class_id'],
+                'class_type' => $_POST['class_type'],
+                'start_date' => $_POST['start_date'],
+                'experience_level' => $_POST['experience_level'],
+                'additional_notes' => $_POST['additional_notes'] ?? null
+            ];
             
-                            header('Location: /fresit/student-application-success.php?id=APP-001');
-            exit;
+            $applicationId = $student->createApplication($applicationData);
+            
+            if ($applicationId) {
+                // Send confirmation email
+                $this->sendApplicationEmail($_POST['student_email'], $_POST['student_name'], $applicationId);
+                
+                // Redirect to success page
+                header('Location: /fresit/student-application-success.php?id=' . $applicationId);
+                exit;
+            } else {
+                $errors['general'] = 'Failed to submit application. Please try again.';
+            }
         }
 
         // Re-render with errors
@@ -501,7 +521,9 @@ Content-Type: text/html; charset=UTF-8
             mkdir($emailsDir, 0755, true);
         }
         
-        $filename = $emailsDir . 'registration-' . $id . '.eml';
+        // Determine if this is a registration or application email based on the subject
+        $prefix = (strpos($subject, 'Application') !== false) ? 'application' : 'registration';
+        $filename = $emailsDir . $prefix . '-' . $id . '.eml';
         file_put_contents($filename, $content);
         
         return $filename;

@@ -172,22 +172,58 @@ class StaffController extends BaseController
         $classes = $this->artClass->getAll();
         $upcomingClasses = $this->artClass->getUpcoming();
         
+        // Get applications
+        $applications = $this->getApplications();
+        $totalApplications = count($applications);
+        $pendingApplications = count(array_filter($applications, function($app) {
+            return $app['status'] === 'pending';
+        }));
+        
         $this->render('staff-dashboard.html', [
             'title' => 'Staff Dashboard',
             'user' => $this->getCurrentUser(),
             'upcoming_dates' => $upcomingDates,
             'stats' => [
-                'total_applications' => 0,
-                'pending_applications' => 0,
+                'total_applications' => $totalApplications,
+                'pending_applications' => $pendingApplications,
                 'total_classes' => $this->artClass->getTotalCount(),
                 'upcoming_classes' => $this->artClass->getUpcomingCount()
             ],
-            'applications' => [],
+            'applications' => $applications,
             'classes' => $classes,
             'upcoming_classes' => $upcomingClasses
         ]);
     }
     
+    /**
+     * Get all applications with class and tutor information
+     */
+    private function getApplications()
+    {
+        try {
+            require_once __DIR__ . '/../../includes/database.php';
+            $db = db();
+            return $db->fetchAll("
+                SELECT 
+                    a.*,
+                    c.name as class_name,
+                    c.type as class_type,
+                    c.date as class_date,
+                    c.start_time,
+                    c.end_time,
+                    s.name as tutor_name
+                FROM applications a
+                LEFT JOIN classes c ON a.class_id = c.id
+                LEFT JOIN staff_users s ON c.tutor_id = s.id
+                WHERE a.is_active = 1
+                ORDER BY a.created_at DESC
+            ");
+        } catch (Exception $e) {
+            error_log("Database error in getApplications: " . $e->getMessage());
+            return [];
+        }
+    }
+
     /**
      * Get upcoming available dates for the next 3 months
      */
@@ -333,6 +369,78 @@ class StaffController extends BaseController
             'next_class' => $nextClassData,
             'enrolled_students' => $nextClassData ? $nextClassData['enrolled_students'] : []
         ]);
+    }
+
+    /**
+     * Accept application
+     */
+    public function acceptApplication()
+    {
+        $this->requireAuth();
+        
+        $applicationId = $_POST['application_id'] ?? '';
+        
+        if (empty($applicationId)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Application ID is required']);
+            return;
+        }
+        
+        try {
+            require_once __DIR__ . '/../../includes/database.php';
+            $db = db();
+            
+            $result = $db->execute(
+                "UPDATE applications SET status = 'accepted', updated_at = NOW() WHERE id = ? AND is_active = 1",
+                [$applicationId]
+            );
+            
+            if ($result > 0) {
+                echo json_encode(['success' => true, 'message' => 'Application accepted successfully']);
+            } else {
+                echo json_encode(['error' => 'Application not found or already processed']);
+            }
+        } catch (Exception $e) {
+            error_log("Database error in acceptApplication: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to accept application']);
+        }
+    }
+
+    /**
+     * Reject application
+     */
+    public function rejectApplication()
+    {
+        $this->requireAuth();
+        
+        $applicationId = $_POST['application_id'] ?? '';
+        
+        if (empty($applicationId)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Application ID is required']);
+            return;
+        }
+        
+        try {
+            require_once __DIR__ . '/../../includes/database.php';
+            $db = db();
+            
+            $result = $db->execute(
+                "UPDATE applications SET status = 'rejected', updated_at = NOW() WHERE id = ? AND is_active = 1",
+                [$applicationId]
+            );
+            
+            if ($result > 0) {
+                echo json_encode(['success' => true, 'message' => 'Application rejected successfully']);
+            } else {
+                echo json_encode(['error' => 'Application not found or already processed']);
+            }
+        } catch (Exception $e) {
+            error_log("Database error in rejectApplication: " . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to reject application']);
+        }
     }
 
     /**

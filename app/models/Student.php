@@ -123,6 +123,41 @@ class Student
     }
 
     /**
+     * Create a new application
+     */
+    public function createApplication($applicationData)
+    {
+        try {
+            // Generate unique application ID
+            $applicationId = 'APP-' . strtoupper(uniqid());
+            
+            // Insert application
+            $sql = "INSERT INTO applications (id, student_name, student_email, student_phone, class_id, class_type, start_date, experience_level, additional_notes, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())";
+            
+            $result = $this->db->execute($sql, [
+                $applicationId,
+                $applicationData['student_name'],
+                $applicationData['student_email'],
+                $applicationData['student_phone'],
+                $applicationData['class_id'],
+                $applicationData['class_type'],
+                $applicationData['start_date'],
+                $applicationData['experience_level'],
+                $applicationData['additional_notes'] ?? null
+            ]);
+            
+            if ($result > 0) {
+                return $applicationId;
+            }
+            
+            return false;
+        } catch (Exception $e) {
+            error_log("Database error in createApplication: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Get student applications
      */
     public function getApplications($studentId)

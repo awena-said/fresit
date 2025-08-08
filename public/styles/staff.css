@@ -1137,6 +1137,12 @@ legend {
 
 .application-details {
     margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.detail-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1rem;
@@ -1170,6 +1176,20 @@ legend {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
+}
+
+.no-applications {
+    text-align: center;
+    padding: 3rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 2px dashed #dee2e6;
+}
+
+.no-applications p {
+    color: #6c757d;
+    font-size: 1.1rem;
+    margin: 0;
 }
 
 /* Class Cards */

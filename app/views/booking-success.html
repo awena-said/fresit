@@ -1,22 +1,66 @@
 {% extends "base.html" %}
 
-{% block title %}Booking Success - Royal Drawing School{% endblock %}
+{% block title %}Application Submitted Successfully - Fresit Art School{% endblock %}
+{% block description %}Your application has been submitted successfully{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="/fresit/public/styles/application-success.css">
+{% endblock %}
 
 {% block content %}
-<section id="booking-success-page">
-    <div class="success-container">
-        <h1>Booking Submitted Successfully!</h1>
+<section class="application-success-section">
+    <div class="application-success-container">
+        <div class="success-header">
+            <span class="success-icon">🎨</span>
+            <h1>Application Submitted Successfully!</h1>
+        </div>
+        
         <div class="success-message">
-            <p>Thank you for your application to Royal Drawing School!</p>
-            <p>Your application has been received and is being reviewed.</p>
+            <p>Thank you for your application to Fresit Art School!</p>
+            <p>Your application has been received and is being reviewed by our team.</p>
             <p>We will contact you within 2-3 business days with further details.</p>
+            
             {% if application_id %}
-                <p><strong>Application ID:</strong> {{ application_id }}</p>
+            <div class="application-id">
+                <strong>Application ID:</strong> <span>{{ application_id }}</span>
+            </div>
             {% endif %}
         </div>
+
+        <div class="email-section">
+            <h3>
+                <span class="email-icon">📧</span>
+                Confirmation Email Sent
+            </h3>
+            <p>A confirmation email has been sent to your email address with details about your application.</p>
+            <a href="/fresit/view-email.php?type=application&id={{ application_id }}" class="email-link" target="_blank">
+                📧 View Confirmation Email
+            </a>
+        </div>
+
+        <div class="next-steps">
+            <h3>
+                <span class="steps-icon">📋</span>
+                What Happens Next?
+            </h3>
+            <ul>
+                <li>Our team will review your application within 2-3 business days</li>
+                <li>You will receive an email with the status of your application</li>
+                <li>If approved, you'll receive details about your class schedule</li>
+                <li>Payment instructions will be provided upon approval</li>
+            </ul>
+        </div>
+
         <div class="action-buttons">
-            <a href="/fresit/" class="btn btn-primary">Return to Home</a>
-            <a href="/fresit/booking.php" class="btn btn-secondary">Book Another Class</a>
+            <a href="/fresit/" class="btn btn-primary">
+                🏠 Return to Home
+            </a>
+            <a href="/fresit/booking.php" class="btn btn-secondary">
+                📝 Book Another Class
+            </a>
+            <a href="/fresit/student-login.php" class="btn btn-outline">
+                👤 Student Login
+            </a>
         </div>
     </div>
 </section>

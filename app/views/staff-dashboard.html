@@ -62,22 +62,45 @@
         </div>
 
         <div class="applications-list" id="applicationsList">
+            {% if applications is empty %}
+            <div class="no-applications">
+                <p>No applications found.</p>
+            </div>
+            {% else %}
             {% for application in applications %}
-            <div class="application-card" data-status="{{ application.status }}" data-search="{{ (application.name ?? '')|lower }} {{ (application.email ?? '')|lower }} {{ (application.class_type ?? '')|lower }}">
+            <div class="application-card" data-status="{{ application.status }}" data-search="{{ (application.student_name ?? '')|lower }} {{ (application.student_email ?? '')|lower }} {{ (application.class_type ?? '')|lower }}">
                 <div class="application-header">
-                    <h3>{{ application.name }}</h3>
+                    <h3>{{ application.student_name ?? 'Unknown Student' }}</h3>
                     <span class="status-badge status-{{ application.status }}">{{ application.status|title }}</span>
                 </div>
                 <div class="application-details">
-                    <p><strong>Email:</strong> {{ application.email }}</p>
-                    <p><strong>Phone:</strong> {{ application.phone }}</p>
-                    <p><strong>Class Type:</strong> {{ application.class_type }}</p>
-                    <p><strong>Preferred Date:</strong> {{ application.preferred_date }}</p>
-                    <p><strong>Applied:</strong> {{ application.created_at|date('M d, Y') }}</p>
+                    <div class="detail-row">
+                        <p><strong>Application ID:</strong> {{ application.id }}</p>
+                        <p><strong>Email:</strong> {{ application.student_email ?? 'N/A' }}</p>
+                    </div>
+                    <div class="detail-row">
+                        <p><strong>Phone:</strong> {{ application.student_phone ?? 'N/A' }}</p>
+                        <p><strong>Experience Level:</strong> {{ application.experience_level ?? 'N/A' }}</p>
+                    </div>
+                    <div class="detail-row">
+                        <p><strong>Class Type:</strong> {{ application.class_type ?? 'N/A' }}</p>
+                        <p><strong>Class Name:</strong> {{ application.class_name ?? 'N/A' }}</p>
+                    </div>
+                    <div class="detail-row">
+                        <p><strong>Class Date:</strong> {{ application.class_date ? application.class_date|date('M d, Y') : 'N/A' }}</p>
+                        <p><strong>Class Time:</strong> {{ application.start_time ? application.start_time ~ ' - ' ~ application.end_time : 'N/A' }}</p>
+                    </div>
+                    <div class="detail-row">
+                        <p><strong>Tutor:</strong> {{ application.tutor_name ?? 'N/A' }}</p>
+                        <p><strong>Start Date:</strong> {{ application.start_date ? application.start_date|date('M d, Y') : 'N/A' }}</p>
+                    </div>
+                    <div class="detail-row">
+                        <p><strong>Applied:</strong> {{ application.created_at|date('M d, Y g:i A') }}</p>
+                    </div>
                 </div>
-                {% if application.message %}
+                {% if application.additional_notes %}
                 <div class="application-message">
-                    <strong>Message:</strong> {{ application.message }}
+                    <strong>Additional Notes:</strong> {{ application.additional_notes }}
                 </div>
                 {% endif %}
                 <div class="application-actions">
@@ -89,6 +112,7 @@
                 </div>
             </div>
             {% endfor %}
+            {% endif %}
         </div>
     </div>
 
@@ -335,40 +359,50 @@ function viewApplication(applicationId) {
 
 function acceptApplication(applicationId) {
     if (confirm('Are you sure you want to accept this application?')) {
-        fetch(`/staff/application/${applicationId}/accept`, {
+        const formData = new FormData();
+        formData.append('application_id', applicationId);
+        
+        fetch('/fresit/staff-accept-application.php', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            body: formData
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Application accepted! Email notification sent.');
+                alert('Application accepted successfully!');
                 location.reload();
             } else {
-                alert('Error: ' + data.message);
+                alert('Error: ' + (data.error || 'Failed to accept application'));
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error: Failed to accept application');
         });
     }
 }
 
 function rejectApplication(applicationId) {
     if (confirm('Are you sure you want to reject this application?')) {
-        fetch(`/staff/application/${applicationId}/reject`, {
+        const formData = new FormData();
+        formData.append('application_id', applicationId);
+        
+        fetch('/fresit/staff-reject-application.php', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            body: formData
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Application rejected! Email notification sent.');
+                alert('Application rejected successfully!');
                 location.reload();
             } else {
-                alert('Error: ' + data.message);
+                alert('Error: ' + (data.error || 'Failed to reject application'));
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error: Failed to reject application');
         });
     }
 }
