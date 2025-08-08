@@ -57,12 +57,15 @@
                 <div class="form-group">
                     <label for="class_id">Available Classes & Cohorts *</label>
                     <select id="class_id" name="class_id" required onchange="loadTimeSlots()">
-                        <option value="">Select a class (choose type and date first)</option>
+                        <option value="">Select a class...</option>
+                        {% for class in available_classes %}
+                        <option value="{{ class.id }}">{{ class.name }} - {{ class.type }} - {{ class.date|date('M d, Y') }} {{ class.start_time }}-{{ class.end_time }} with {{ class.tutor_name }}</option>
+                        {% endfor %}
                     </select>
                     {% if errors.class_id %}
                         <span class="error-message">{{ errors.class_id }}</span>
                     {% endif %}
-                    <small>Available 10-week class blocks will be shown based on your selection</small>
+                    <small>Available 10-week class blocks from the database</small>
                 </div>
 
                 <div class="form-group">
@@ -179,69 +182,6 @@ document.addEventListener('DOMContentLoaded', function() {
     maxDate.setDate(maxDate.getDate() + 7);
     startDateInput.max = maxDate.toISOString().split('T')[0];
 
-    function loadAvailableClasses() {
-        const classType = classTypeSelect.value;
-        const startDate = startDateInput.value;
-        
-        console.log('=== loadAvailableClasses called ===');
-        console.log('Class type:', classType);
-        console.log('Start date:', startDate);
-        
-        if (!classType || !startDate) {
-            classSelect.innerHTML = '<option value="">Select a class (choose type and date first)</option>';
-            timeSlotsContainer.style.display = 'none';
-            noSlotsMessage.style.display = 'none';
-            selectedTimeSlot.value = '';
-            return;
-        }
-
-        // Show loading state
-        classSelect.innerHTML = '<option value="">Loading available classes...</option>';
-        classSelect.disabled = true;
-
-        // Fetch available classes for the selected type and date
-        const apiUrl = `/fresit/api-classes.php?type=${encodeURIComponent(classType)}&start_date=${encodeURIComponent(startDate)}`;
-        console.log('API URL:', apiUrl);
-        
-        fetch(apiUrl)
-            .then(response => {
-                console.log('Response status:', response.status);
-                return response.json();
-            })
-            .then(data => {
-                console.log('Received data:', data);
-                classSelect.innerHTML = '<option value="">Select a class</option>';
-                
-                if (data.length === 0) {
-                    classSelect.innerHTML = '<option value="">No classes available for this date. You can enroll up to 7 days in advance. Try selecting a different date.</option>';
-                    timeSlotsContainer.style.display = 'none';
-                    noSlotsMessage.style.display = 'none';
-                    selectedTimeSlot.value = '';
-                } else {
-                    data.forEach(classItem => {
-                        console.log('Processing class item:', classItem);
-                        const option = document.createElement('option');
-                        option.value = classItem.id;
-                        
-                        // Format time for better display
-                        const startTime = classItem.start_time.replace(':', '.');
-                        const endTime = classItem.end_time.replace(':', '.');
-                        
-                        option.textContent = `${classItem.name} with ${classItem.tutor_name} - ${classItem.day_of_week} ${startTime}-${endTime} (10-week block, ${classItem.available_slots} slots available)`;
-                        console.log('Adding option:', option.textContent);
-                        classSelect.appendChild(option);
-                    });
-                    console.log(`Found ${data.length} classes for ${classType} on ${startDate}`);
-                }
-                classSelect.disabled = false;
-            })
-            .catch(error => {
-                console.error('Error loading classes:', error);
-                classSelect.innerHTML = '<option value="">Error loading classes. Please try again.</option>';
-                classSelect.disabled = false;
-            });
-    }
-
     function loadTimeSlots() {
         const selectedClassId = classSelect.value;
         
@@ -260,8 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
         noSlotsMessage.style.display = 'none';
         timeSlotsList.innerHTML = '<p>Loading time slots...</p>';
 
-        // For now, we'll show the selected class as the time slot
-        // In a more complex system, you might have multiple time slots per class
+        // Show the selected class as the time slot
         const selectedOption = classSelect.options[classSelect.selectedIndex];
         const classText = selectedOption.textContent;
         
@@ -273,8 +212,8 @@ document.addEventListener('DOMContentLoaded', function() {
         slotDiv.innerHTML = `
             <input type="radio" name="selected_time_slot" id="slot_${selectedClassId}" value="${selectedClassId}" checked>
             <label for="slot_${selectedClassId}">
-                <strong>${classText}</strong>
-                <br><small>This is your selected class time slot</small>
+                <strong>✅ ${classText}</strong>
+                <br><small>This is your selected class time slot - Click to confirm</small>
             </label>
         `;
         
@@ -284,6 +223,18 @@ document.addEventListener('DOMContentLoaded', function() {
             if (this.checked) {
                 selectedTimeSlot.value = this.value;
                 console.log('Selected time slot ID:', selectedTimeSlot.value);
+                
+                // Add visual feedback
+                slotDiv.style.borderColor = '#27ae60';
+                slotDiv.style.background = '#2ecc71';
+                slotDiv.style.color = 'white';
+                
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.className = 'time-slot-success';
+                successMsg.innerHTML = '<p>✅ Time slot confirmed! You can now proceed with your application.</p>';
+                successMsg.style.cssText = 'background: #27ae60; color: white; padding: 0.5rem; border-radius: 4px; margin-top: 0.5rem; text-align: center;';
+                timeSlotsContainer.appendChild(successMsg);
             }
         });
         
@@ -294,15 +245,8 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Time slot loaded for class:', selectedClassId);
     }
 
-    // Event listeners
-    classTypeSelect.addEventListener('change', loadAvailableClasses);
-    startDateInput.addEventListener('change', loadAvailableClasses);
-
-    // Initial load if values are pre-filled
-    if (classTypeSelect.value && startDateInput.value) {
-        console.log('Initial load: values are pre-filled, loading classes...');
-        loadAvailableClasses();
-    }
+    // Classes are now loaded directly from the database
+    // No need for dynamic loading via API
 });
 </script>
 {% endblock %} 
