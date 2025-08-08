@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Registration Successful - Fresit Art School{% endblock %}
+{% block title %}Registration Successful - royaldrawingschool Art School{% endblock %}
 {% block description %}Your student account has been created successfully{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="/fresit/public/styles/student.css">
+    <link rel="stylesheet" href="/royaldrawingschool/public/styles/student.css">
 {% endblock %}
 
 {% block content %}
@@ -13,7 +13,7 @@
         <div class="success-container">
             <div class="success-header">
                 <h1>🎉 Registration Successful!</h1>
-                <p>Welcome to Fresit Art School!</p>
+                <p>Welcome to royaldrawingschool Art School!</p>
             </div>
 
             <div class="success-message">
@@ -37,7 +37,7 @@
                     <p>Please check your email and click the verification link to activate your account.</p>
                     
                     <div class="email-actions">
-                        <a href="/fresit/view-email.php?file=registration-{{ student.id }}.eml" class="btn btn-secondary" target="_blank">
+                        <a href="/royaldrawingschool/view-email.php?file=registration-{{ student.id }}.eml" class="btn btn-secondary" target="_blank">
                             📄 View Email (.eml)
                         </a>
                     </div>
@@ -54,8 +54,8 @@
             </div>
 
             <div class="action-buttons">
-                <a href="/fresit/student-login.php" class="btn btn-primary">Login to Your Account</a>
-                <a href="/fresit/" class="btn btn-secondary">Return to Home</a>
+                <a href="/royaldrawingschool/student-login.php" class="btn btn-primary">Login to Your Account</a>
+                <a href="/royaldrawingschool/" class="btn btn-secondary">Return to Home</a>
             </div>
         </div>
     </div>

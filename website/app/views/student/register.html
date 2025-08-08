@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Student Registration - Fresit Art School{% endblock %}
+{% block title %}Student Registration - royaldrawingschool Art School{% endblock %}
 {% block description %}Create your student account to manage your art class applications{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="/fresit/public/styles/student.css">
+    <link rel="stylesheet" href="/royaldrawingschool/public/styles/student.css">
 {% endblock %}
 
 {% block content %}
@@ -12,7 +12,7 @@
     <div class="student-container">
         <div class="form-header">
             <h1>Create Your Student Account</h1>
-            <p>Join Fresit Art School and start your artistic journey today!</p>
+            <p>Join royaldrawingschool Art School and start your artistic journey today!</p>
         </div>
 
         {% if errors.general %}
@@ -21,7 +21,7 @@
             </div>
         {% endif %}
 
-        <form class="student-form" method="POST" action="/fresit/student-register.php">
+        <form class="student-form" method="POST" action="/royaldrawingschool/student-register.php">
             <div class="form-group">
                 <label for="name">Full Name *</label>
                 <input type="text" id="name" name="name" required 
@@ -61,7 +61,7 @@
 
             <div class="form-actions">
                 <button type="submit" class="btn-primary">Create Account</button>
-                <a href="/fresit/student-login.php" class="btn-secondary">Already have an account? Login</a>
+                <a href="/royaldrawingschool/student-login.php" class="btn-secondary">Already have an account? Login</a>
             </div>
         </form>
 

@@ -55,8 +55,8 @@ try {
             <h3>Error Details:</h3>
             <p><strong>Message:</strong> " . htmlspecialchars($e->getMessage()) . "</p>
         </div>
-        <p><a href='/fresit/student-register.php'>Try Registering Again</a></p>
-        <p><a href='/fresit/'>Return to Home</a></p>
+        <p><a href='/royaldrawingschool/student-register.php'>Try Registering Again</a></p>
+        <p><a href='/royaldrawingschool/'>Return to Home</a></p>
     </body>
     </html>";
 }

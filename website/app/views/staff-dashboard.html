@@ -3,7 +3,7 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="/fresit/public/styles/staff.css">
+    <link rel="stylesheet" href="/royaldrawingschool/public/styles/staff.css">
 {% endblock %}
 
 
@@ -13,8 +13,8 @@
         <h1>Staff Dashboard</h1>
         <div class="user-info">
             <span>Welcome, {{ user.name }}</span>
-            <a href="/fresit/roster.php" class="btn btn-primary">View Roster</a>
-            <a href="/fresit/staff-logout.php" class="logout-btn">Logout</a>
+            <a href="/royaldrawingschool/roster.php" class="btn btn-primary">View Roster</a>
+            <a href="/royaldrawingschool/staff-logout.php" class="logout-btn">Logout</a>
         </div>
     </header>
 
@@ -362,7 +362,7 @@ function acceptApplication(applicationId) {
         const formData = new FormData();
         formData.append('application_id', applicationId);
         
-        fetch('/fresit/staff-accept-application.php', {
+        fetch('/royaldrawingschool/staff-accept-application.php', {
             method: 'POST',
             body: formData
         })
@@ -387,7 +387,7 @@ function rejectApplication(applicationId) {
         const formData = new FormData();
         formData.append('application_id', applicationId);
         
-        fetch('/fresit/staff-reject-application.php', {
+        fetch('/royaldrawingschool/staff-reject-application.php', {
             method: 'POST',
             body: formData
         })
@@ -424,7 +424,7 @@ function createClass(event) {
     
     
     
-    fetch('/fresit/staff-create-class.php', {
+    fetch('/royaldrawingschool/staff-create-class.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

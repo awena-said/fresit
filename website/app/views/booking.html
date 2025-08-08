@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Apply for Classes - Fresit Art School{% endblock %}
-{% block description %}Apply for art classes at Fresit Art School{% endblock %}
+{% block title %}Apply for Classes - royaldrawingschool Art School{% endblock %}
+{% block description %}Apply for art classes at royaldrawingschool Art School{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="/fresit/public/styles/booking.css">
+    <link rel="stylesheet" href="/royaldrawingschool/public/styles/booking.css">
 {% endblock %}
 
 {% block content %}
@@ -21,7 +21,7 @@
             </div>
         {% endif %}
 
-        <form id="booking-form" class="student-form" method="POST" action="/fresit/student-apply.php">
+        <form id="booking-form" class="student-form" method="POST" action="/royaldrawingschool/student-apply.php">
             <div class="form-section">
                 <h2>Class Selection</h2>
                 
@@ -143,12 +143,12 @@
 
             <div class="form-actions">
                 <button type="submit" class="btn-primary">Submit Application</button>
-                <a href="/fresit/" class="btn-secondary">Cancel</a>
+                <a href="/royaldrawingschool/" class="btn-secondary">Cancel</a>
             </div>
         </form>
 
         <div class="form-footer">
-            <p>Already have an account? <a href="/fresit/student-login.php">Login here</a> to manage your applications.</p>
+            <p>Already have an account? <a href="/royaldrawingschool/student-login.php">Login here</a> to manage your applications.</p>
         </div>
     </div>
 </section>

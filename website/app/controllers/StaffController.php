@@ -9,7 +9,7 @@ class StaffController extends BaseController
 {
     private $staffUser;
     private $artClass;
-    private $baseUrl = '/fresit';
+    private $baseUrl = '/royaldrawingschool';
 
     public function __construct()
     {

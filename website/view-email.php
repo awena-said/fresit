@@ -1,25 +1,25 @@
 <?php
-// Simple email viewer for .eml files
+//.eml files
 session_start();
 
 $emailType = $_GET['type'] ?? '';
 $emailId = $_GET['id'] ?? '';
 $emailFile = $_GET['file'] ?? '';
 
-// Handle new URL format: view-email.php?type=application&id=APP-001
+// Handle new URL format
 if (!empty($emailType) && !empty($emailId)) {
     $emailFile = $emailType . '-' . $emailId . '.eml';
 }
 
 if (empty($emailFile)) {
-    header('Location: /fresit/');
+    header('Location: /royaldrawingschool/');
     exit;
 }
 
 // Security: only allow .eml files from emails directory
 $emailPath = __DIR__ . '/emails/' . basename($emailFile);
 if (!file_exists($emailPath) || pathinfo($emailFile, PATHINFO_EXTENSION) !== 'eml') {
-    header('Location: /fresit/');
+    header('Location: /royaldrawingschool/');
     exit;
 }
 
@@ -34,7 +34,7 @@ $emailTypeDisplay = $isApplication ? 'Application Confirmation' : 'Registration 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $emailTypeDisplay; ?> - Fresit Art School</title>
+    <title><?php echo $emailTypeDisplay; ?> - Royal Drawing School</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -69,7 +69,7 @@ $emailTypeDisplay = $isApplication ? 'Application Confirmation' : 'Registration 
             border-top: 1px solid #e0e0e0;
             text-align: center;
         }
-        .btn {
+        .button {
             display: inline-block;
             padding: 10px 20px;
             margin: 0 10px;
@@ -79,19 +79,19 @@ $emailTypeDisplay = $isApplication ? 'Application Confirmation' : 'Registration 
             border-radius: 5px;
             transition: background 0.3s;
         }
-        .btn:hover {
+        .button:hover {
             background: #0056b3;
         }
-        .btn-secondary {
+        .button-secondary {
             background: #6c757d;
         }
-        .btn-secondary:hover {
+        .button-secondary:hover {
             background: #545b62;
         }
-        .btn-success {
+        .button-success {
             background: #28a745;
         }
-        .btn-success:hover {
+        .button-success:hover {
             background: #218838;
         }
         .email-body {
@@ -139,12 +139,12 @@ $emailTypeDisplay = $isApplication ? 'Application Confirmation' : 'Registration 
         
         <div class="email-actions">
             <?php if ($isApplication): ?>
-                <a href="/fresit/booking.php" class="btn btn-success">📝 Book Another Class</a>
-                <a href="/fresit/student-login.php" class="btn">👤 Student Login</a>
+                <a href="/royaldrawingschool/booking.php" class="button button-success">Book Another Class</a>
+                <a href="/royaldrawingschool/student-login.php" class="button">Student Login</a>
             <?php else: ?>
-                <a href="/fresit/student-login.php" class="btn">👤 Login to Account</a>
+                <a href="/royaldrawingschool/student-login.php" class="button">Login to Account</a>
             <?php endif; ?>
-            <a href="/fresit/" class="btn btn-secondary">🏠 Return to Home</a>
+            <a href="/royaldrawingschool/" class="button button-secondary">Return to Home</a>
         </div>
     </div>
 </body>

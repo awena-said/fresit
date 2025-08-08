@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Student Login - Fresit Art School{% endblock %}
+{% block title %}Student Login - royaldrawingschool Art School{% endblock %}
 {% block description %}Login to your student account to manage your applications{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="/fresit/public/styles/student.css">
+    <link rel="stylesheet" href="/royaldrawingschool/public/styles/student.css">
 {% endblock %}
 
 {% block content %}
@@ -27,7 +27,7 @@
             </div>
         {% endif %}
 
-        <form class="student-form" method="POST" action="/fresit/student-login.php">
+        <form class="student-form" method="POST" action="/royaldrawingschool/student-login.php">
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input type="email" id="email" name="email" required 
@@ -47,13 +47,13 @@
 
             <div class="form-actions">
                 <button type="submit" class="btn-primary">Login</button>
-                <a href="/fresit/student-register.php" class="btn-secondary">Create New Account</a>
+                <a href="/royaldrawingschool/student-register.php" class="btn-secondary">Create New Account</a>
             </div>
         </form>
 
         <div class="form-footer">
-            <p>Don't have an account? <a href="/fresit/student-register.php">Register here</a></p>
-            <p><a href="/fresit/student-forgot-password.php">Forgot your password?</a></p>
+            <p>Don't have an account? <a href="/royaldrawingschool/student-register.php">Register here</a></p>
+            <p><a href="/royaldrawingschool/student-forgot-password.php">Forgot your password?</a></p>
         </div>
     </div>
 </section>

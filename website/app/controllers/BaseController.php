@@ -5,7 +5,7 @@ namespace App\Controllers;
 class BaseController
 {
     protected static $twig;
-    protected $loginUrl = '/fresit/staff-login.php';
+    protected $loginUrl = '/royaldrawingschool/staff-login.php';
 
     public function __construct()
     {

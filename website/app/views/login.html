@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="/fresit/public/styles/staff.css">
+    <link rel="stylesheet" href="/royaldrawingschool/public/styles/staff.css">
 {% endblock %}
 
 {% block content %}
@@ -24,7 +24,7 @@
                 </div>
             {% endif %}
             
-            <form id="login-form" class="login-form" method="POST" action="/fresit/staff-login.php" novalidate>
+            <form id="login-form" class="login-form" method="POST" action="/royaldrawingschool/staff-login.php" novalidate>
                 <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                 <fieldset>
                     <legend class="sr-only">Login Information</legend>
@@ -137,7 +137,7 @@
                         </div>
                     {% endif %}
                     
-                    <form id="create-account-form" class="create-account-form" method="POST" action="/fresit/staff-login.php">
+                    <form id="create-account-form" class="create-account-form" method="POST" action="/royaldrawingschool/staff-login.php">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                         <input type="hidden" name="create_account" value="1">
                         

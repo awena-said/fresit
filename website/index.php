@@ -27,7 +27,7 @@ use App\Controllers\StudentController;
 $route = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 // Remove the base path from the URI if it exists
-$basePath = '/fresit';
+$basePath = '/royaldrawingschool';
 if (strpos($route, $basePath) === 0) {
     $route = substr($route, strlen($basePath));
 }
@@ -298,13 +298,13 @@ switch ($route) {
 
     case '/login':
         // Redirect to staff login
-        header('Location: /fresit/staff/login');
+        header('Location: /royaldrawingschool/staff/login');
         exit;
         break;
         
     case '/staff-dashboard':
         // Redirect to staff dashboard
-        header('Location: /fresit/staff/dashboard');
+        header('Location: /royaldrawingschool/staff/dashboard');
         exit;
         break;
 

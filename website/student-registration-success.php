@@ -58,8 +58,8 @@ try {
                         <li>There was a database error</li>
                     </ul>
                 </div>
-                <p><a href='/fresit/student-register.php'>Try Registering Again</a></p>
-                <p><a href='/fresit/'>Return to Home</a></p>
+                <p><a href='/royaldrawingschool/student-register.php'>Try Registering Again</a></p>
+                <p><a href='/royaldrawingschool/'>Return to Home</a></p>
             </body>
             </html>";
         }
@@ -85,8 +85,8 @@ try {
                     <li>There was an error during registration</li>
                 </ul>
             </div>
-            <p><a href='/fresit/student-register.php'>Register a New Account</a></p>
-            <p><a href='/fresit/'>Return to Home</a></p>
+            <p><a href='/royaldrawingschool/student-register.php'>Register a New Account</a></p>
+            <p><a href='/royaldrawingschool/'>Return to Home</a></p>
         </body>
         </html>";
     }
@@ -115,8 +115,8 @@ try {
                 <pre>" . htmlspecialchars($e->getTraceAsString()) . "</pre>
             </div>
         </div>
-        <p><a href='/fresit/student-register.php'>Try Registering Again</a></p>
-        <p><a href='/fresit/'>Return to Home</a></p>
+        <p><a href='/royaldrawingschool/student-register.php'>Try Registering Again</a></p>
+        <p><a href='/royaldrawingschool/'>Return to Home</a></p>
     </body>
     </html>";
 }

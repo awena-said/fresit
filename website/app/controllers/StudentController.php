@@ -77,7 +77,7 @@ class StudentController extends BaseController
                 $_SESSION['new_student_id'] = $studentId;
                 
                 // Redirect to success page
-                header('Location: /fresit/simple-registration-success.php');
+                header('Location: /royaldrawingschool/simple-registration-success.php');
                 exit;
             } else {
                 $errors['general'] = 'Registration failed. Email may already be in use.';
@@ -117,7 +117,7 @@ class StudentController extends BaseController
             $student = $this->getStudent()->authenticate($_POST['email'], $_POST['password']);
             if ($student) {
                 $this->getStudent()->startSession($student);
-                header('Location: /fresit/student-dashboard.php');
+                header('Location: /royaldrawingschool/student-dashboard.php');
                 exit;
             } else {
                 $errors['general'] = 'Invalid email or password';
@@ -137,7 +137,7 @@ class StudentController extends BaseController
     public function dashboard()
     {
         if (!isset($_SESSION['student_id'])) {
-            header('Location: /fresit/student-login.php');
+            header('Location: /royaldrawingschool/student-login.php');
             exit;
         }
 
@@ -157,7 +157,7 @@ class StudentController extends BaseController
     public function showChangePassword()
     {
         if (!isset($_SESSION['student_id'])) {
-            header('Location: /fresit/student-login.php');
+            header('Location: /royaldrawingschool/student-login.php');
             exit;
         }
 
@@ -174,7 +174,7 @@ class StudentController extends BaseController
     public function changePassword()
     {
         if (!isset($_SESSION['student_id'])) {
-            header('Location: /fresit/student-login.php');
+            header('Location: /royaldrawingschool/student-login.php');
             exit;
         }
 
@@ -213,7 +213,7 @@ class StudentController extends BaseController
     public function logout()
     {
         $this->getStudent()->logout();
-        header('Location: /fresit/');
+        header('Location: /royaldrawingschool/');
         exit;
     }
 
@@ -290,7 +290,7 @@ class StudentController extends BaseController
                 $this->sendApplicationEmail($_POST['student_email'], $_POST['student_name'], $applicationId);
                 
                 // Redirect to success page
-                header('Location: /fresit/student-application-success.php?id=' . $applicationId);
+                header('Location: /royaldrawingschool/student-application-success.php?id=' . $applicationId);
                 exit;
             } else {
                 $errors['general'] = 'Failed to submit application. Please try again.';
@@ -352,8 +352,8 @@ class StudentController extends BaseController
      */
     private function sendRegistrationEmail($email, $name, $studentId)
     {
-        $subject = "Welcome to Fresit Art School - Account Confirmation";
-        $verificationLink = "http://localhost/fresit/verify-email.php?token=" . $studentId;
+        $subject = "Welcome to royaldrawingschool Art School - Account Confirmation";
+        $verificationLink = "http://localhost/royaldrawingschool/verify-email.php?token=" . $studentId;
         
         $emailContent = $this->generateRegistrationEmailContent($name, $verificationLink);
         
@@ -368,7 +368,7 @@ class StudentController extends BaseController
      */
     private function sendApplicationEmail($email, $name, $applicationId)
     {
-        $subject = "Application Received - Fresit Art School";
+        $subject = "Application Received - royaldrawingschool Art School";
         
         $emailContent = $this->generateApplicationEmailContent($name, $applicationId);
         
@@ -384,9 +384,9 @@ class StudentController extends BaseController
     private function generateRegistrationEmailContent($name, $verificationLink)
     {
         return "
-From: Fresit Art School <noreply@fresit.com>
+From: royaldrawingschool Art School <noreply@royaldrawingschool.com>
 To: {$name} <{$name}@example.com>
-Subject: Welcome to Fresit Art School - Account Confirmation
+Subject: Welcome to royaldrawingschool Art School - Account Confirmation
 Date: " . date('r') . "
 MIME-Version: 1.0
 Content-Type: text/html; charset=UTF-8
@@ -395,7 +395,7 @@ Content-Type: text/html; charset=UTF-8
 <html>
 <head>
     <meta charset='UTF-8'>
-    <title>Welcome to Fresit Art School</title>
+    <title>Welcome to royaldrawingschool Art School</title>
     <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
@@ -408,13 +408,13 @@ Content-Type: text/html; charset=UTF-8
 <body>
     <div class='container'>
         <div class='header'>
-            <h1>🎨 Welcome to Fresit Art School!</h1>
+            <h1>🎨 Welcome to royaldrawingschool Art School!</h1>
         </div>
         
         <div class='content'>
             <h2>Hello {$name},</h2>
             
-            <p>Thank you for registering with Fresit Art School! We're excited to have you join our creative community.</p>
+            <p>Thank you for registering with royaldrawingschool Art School! We're excited to have you join our creative community.</p>
             
             <p>Your account has been successfully created. To complete your registration and start exploring our art classes, please verify your email address by clicking the button below:</p>
             
@@ -436,11 +436,11 @@ Content-Type: text/html; charset=UTF-8
             <p>If you have any questions, please don't hesitate to contact us.</p>
             
             <p>Best regards,<br>
-            The Fresit Art School Team</p>
+            The royaldrawingschool Art School Team</p>
         </div>
         
         <div class='footer'>
-            <p>This email was sent to you because you registered for an account at Fresit Art School.</p>
+            <p>This email was sent to you because you registered for an account at royaldrawingschool Art School.</p>
             <p>If you didn't create this account, please ignore this email.</p>
         </div>
     </div>
@@ -455,9 +455,9 @@ Content-Type: text/html; charset=UTF-8
     private function generateApplicationEmailContent($name, $applicationId)
     {
         return "
-From: Fresit Art School <noreply@fresit.com>
+From: royaldrawingschool Art School <noreply@royaldrawingschool.com>
 To: {$name} <{$name}@example.com>
-Subject: Application Received - Fresit Art School
+Subject: Application Received - royaldrawingschool Art School
 Date: " . date('r') . "
 MIME-Version: 1.0
 Content-Type: text/html; charset=UTF-8
@@ -484,7 +484,7 @@ Content-Type: text/html; charset=UTF-8
         <div class='content'>
             <h2>Hello {$name},</h2>
             
-            <p>Thank you for your application to Fresit Art School!</p>
+            <p>Thank you for your application to royaldrawingschool Art School!</p>
             
             <p>We have received your application and it is currently being reviewed by our team.</p>
             
@@ -500,11 +500,11 @@ Content-Type: text/html; charset=UTF-8
             <p>If you have any questions about your application, please contact us.</p>
             
             <p>Best regards,<br>
-            The Fresit Art School Team</p>
+            The royaldrawingschool Art School Team</p>
         </div>
         
         <div class='footer'>
-            <p>This email confirms that we have received your application to Fresit Art School.</p>
+            <p>This email confirms that we have received your application to royaldrawingschool Art School.</p>
         </div>
     </div>
 </body>
