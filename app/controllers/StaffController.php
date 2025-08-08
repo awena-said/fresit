@@ -79,6 +79,58 @@ class StaffController extends BaseController
     }
 
     /**
+     * Show create account page
+     */
+    public function showCreateAccount()
+    {
+        if ($this->isLoggedIn()) {
+            $this->redirect("{$this->baseUrl}/staff-dashboard.php");
+            return;
+        }
+
+        if ($this->staffUser->hasUsers()) {
+            $this->redirect("{$this->baseUrl}/staff-login.php");
+            return;
+        }
+
+        $errors = $_SESSION['flash_errors'] ?? [];
+        $formData = $_SESSION['flash_form_data'] ?? [];
+        unset($_SESSION['flash_errors'], $_SESSION['flash_form_data']);
+
+        $this->render('create-account.html', [
+            'title' => 'Create Staff Account',
+            'errors' => $errors,
+            'form_data' => $formData,
+            'csrf_token' => $this->generateCsrfToken()
+        ]);
+    }
+
+    /**
+     * Handle account creation
+     */
+    public function createAccount()
+    {
+        if (!$this->checkAccessAndCsrf('staff-create-account.php')) {
+            return;
+        }
+
+        $email = trim($_POST['email'] ?? '');
+        $password = $_POST['password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+        $name = trim($_POST['name'] ?? '');
+
+        list($success, $errors, $formData) = $this->validateAndCreateUser($email, $password, $confirmPassword, $name);
+
+        if ($success) {
+            $this->redirect("{$this->baseUrl}/staff-dashboard.php");
+            return;
+        }
+
+        $this->setFlashData($errors, $formData);
+        $this->redirect("{$this->baseUrl}/staff-create-account.php");
+    }
+
+    /**
      * Handle account creation from login page
      */
     public function createAccountFromLogin()
@@ -91,30 +143,12 @@ class StaffController extends BaseController
         $password = $_POST['create_password'] ?? '';
         $confirmPassword = $_POST['create_confirm_password'] ?? '';
         $name = trim($_POST['create_name'] ?? '');
-        $formData = ['email' => $email, 'name' => $name];
-        $errors = [];
 
-        if (empty($email) || empty($password) || empty($name)) {
-            $errors['create_general'] = 'All fields are required';
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors['create_email'] = 'Invalid email format';
-        } elseif (strlen($password) < 8) {
-            $errors['create_password'] = 'Password must be at least 8 characters';
-        } elseif ($password !== $confirmPassword) {
-            $errors['create_confirm_password'] = 'Passwords do not match';
-        } elseif ($this->staffUser->emailExists($email)) {
-            $errors['create_email'] = 'An account with this email already exists';
-        } else {
-            $userData = ['name' => $name, 'email' => $email, 'password' => $password];
-            $user = $this->staffUser->create($userData);
-            if ($user) {
-                $this->staffUser->startSession($user);
-                $this->redirect("{$this->baseUrl}/staff-dashboard.php");
-                return;
-            } else {
-                $errors['create_general'] = 'Failed to create account';
-                error_log("Failed to create account for email: $email");
-            }
+        list($success, $errors, $formData) = $this->validateAndCreateUser($email, $password, $confirmPassword, $name, true);
+
+        if ($success) {
+            $this->redirect("{$this->baseUrl}/staff-dashboard.php");
+            return;
         }
 
         $this->setFlashData($errors, $formData);
@@ -185,12 +219,51 @@ class StaffController extends BaseController
             return;
         }
 
-        // Verify user exists in database
         $user = $this->getCurrentUser();
         if (!$user || !$this->staffUser->emailExists($user['email'])) {
             error_log("Invalid session: User {$user['email']} not found in database");
             $this->staffUser->logout();
             $this->redirect("{$this->baseUrl}/staff-login.php");
         }
+    }
+
+    /**
+     * Validate and create a user account
+     *
+     * @param string $email
+     * @param string $password
+     * @param string $confirmPassword
+     * @param string $name
+     * @param bool $checkEmailExists
+     * @return array [bool, array, array] Returns [success, errors, formData]
+     */
+    private function validateAndCreateUser($email, $password, $confirmPassword, $name, $checkEmailExists = false)
+    {
+        $errors = [];
+        $formData = ['email' => $email, 'name' => $name];
+
+        if (empty($email) || empty($password) || empty($name)) {
+            $errors[$checkEmailExists ? 'create_general' : 'general'] = 'All fields are required';
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[$checkEmailExists ? 'create_email' : 'email'] = 'Invalid email format';
+        } elseif (strlen($password) < 8) {
+            $errors[$checkEmailExists ? 'create_password' : 'password'] = 'Password must be at least 8 characters';
+        } elseif ($password !== $confirmPassword) {
+            $errors[$checkEmailExists ? 'create_confirm_password' : 'confirm_password'] = 'Passwords do not match';
+        } elseif ($checkEmailExists && $this->staffUser->emailExists($email)) {
+            $errors['create_email'] = 'An account with this email already exists';
+        } else {
+            $userData = ['name' => $name, 'email' => $email, 'password' => $password];
+            $user = $this->staffUser->create($userData);
+            if ($user) {
+                $this->staffUser->startSession($user);
+                return [true, [], []];
+            } else {
+                $errors[$checkEmailExists ? 'create_general' : 'general'] = 'Failed to create account';
+                error_log("Failed to create account for email: $email");
+            }
+        }
+
+        return [false, $errors, $formData];
     }
 }
